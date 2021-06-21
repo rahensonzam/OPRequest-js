@@ -954,50 +954,74 @@ async function runCurrentAction(action, logValue, myCsvFileObj, logDataBool) {
 
 function getActionOptions(action) {
     // return params: hasWeb, hasConversion, hasFile, apiKey, wpConvertUser, projectList, categoryList, workPackageList, timeEntryList, userList, billingStatusList
-    switch (action) {
-        case actions.updateWorkPackage:
-            return {hasWeb: true, hasConversion: false, hasFile: true, apiKey}
-        case actions.updateTimeEntry:
-            // return {hasWeb: true, hasConversion: false, hasFile: true, apiKey, billingStatusList}
-            return {hasWeb: true, hasConversion: false, hasFile: true, apiKey}
-        case actions.addMembership:
-            return {hasWeb: true, hasConversion: false, hasFile: true, apiKey}
-        case actions.addWorkPackage:
-            return {hasWeb: true, hasConversion: false, hasFile: true, apiKey}
-        case actions.addProject:
-            return {hasWeb: true, hasConversion: false, hasFile: true, apiKey}
-        case actions.addTimeEntry:
-            return {hasWeb: true, hasConversion: false, hasFile: true, apiKey}
-        case actions.convertToWorkPackageIDs:
-            return {hasWeb: false, hasConversion: true, hasFile: true, wpConvertUser, projectList, workPackageList}
-        case actions.convertNamesToIDs:
-            return {hasWeb: false, hasConversion: true, hasFile: true, projectList, categoryList}
-        case actions.convertMembershipNamesToIDs:
-            return {hasWeb: false, hasConversion: true, hasFile: true, projectList}
-        case actions.convertWeekToDays:
-            return {hasWeb: false, hasConversion: true, hasFile: true}
-        case actions.exportTimeEntries:
-            return {hasWeb: false, hasConversion: true, hasFile: false, projectList, categoryList, workPackageList, timeEntryList, userList}
-        case actions.extractTimeSheets:
-            return {hasWeb: false, hasConversion: true, hasFile: true, userList}
-        case actions.condenseTimeSheets:
-            return {hasWeb: false, hasConversion: true, hasFile: false}
-        case actions.summarizeUtTimeEntries:
-            return {hasWeb: false, hasConversion: true, hasFile: true, projectList, userList}
-        case actions.summarizeCatTimeEntries:
-            return {hasWeb: false, hasConversion: true, hasFile: true, projectList, categoryList, userList}
-        case actions.breakdownClientByCatTimeEntries:
-            return {hasWeb: false, hasConversion: true, hasFile: true, projectList, categoryList, userList}
-        case actions.getProjects:
-            return {hasWeb: true, hasConversion: true, hasFile: false, apiKey}
-        case actions.getWorkPackages:
+    if (action === actions.updateWorkPackage
+        || action === actions.updateTimeEntry
+        || action === actions.addMembership
+        || action === actions.addWorkPackage
+        || action === actions.addProject
+        || action === actions.addTimeEntry) {
+        // action === actions.updateTimeEntry
+        // return {hasWeb: true, hasConversion: false, hasFile: true, apiKey, billingStatusList}
+        return {hasWeb: true, hasConversion: false, hasFile: true, apiKey}
+    } else if (action === actions.convertToWorkPackageIDs
+        || action === actions.convertNamesToIDs
+        || action === actions.convertMembershipNamesToIDs
+        || action === actions.convertWeekToDays
+        || action === actions.exportTimeEntries
+        || action === actions.extractTimeSheets
+        || action === actions.condenseTimeSheets
+        || action === actions.summarizeUtTimeEntries
+        || action === actions.summarizeCatTimeEntries
+        || action === actions.breakdownClientByCatTimeEntries) {
+
+        const returnObj = {hasWeb: false, hasConversion: true, hasFile: true}
+        if (action === actions.exportTimeEntries) {
+            // || action === actions.condenseTimeSheets
+            returnObj.hasFile = false
+        }
+        if (action === actions.convertToWorkPackageIDs) {
+            returnObj.wpConvertUser = wpConvertUser
+        }
+        if (action === actions.convertToWorkPackageIDs
+            || action === actions.convertNamesToIDs
+            || action === actions.convertMembershipNamesToIDs
+            || action === actions.exportTimeEntries
+            || action === actions.summarizeUtTimeEntries
+            || action === actions.summarizeCatTimeEntries
+            || action === actions.breakdownClientByCatTimeEntries) {
+            returnObj.projectList = projectList
+        }
+        if (action === actions.convertNamesToIDs
+            || action === actions.exportTimeEntries
+            || action === actions.summarizeCatTimeEntries
+            || action === actions.breakdownClientByCatTimeEntries) {
+            returnObj.categoryList = categoryList
+        }
+        if (action === actions.convertToWorkPackageIDs
+            || action === actions.exportTimeEntries) {
+            returnObj.workPackageList = workPackageList
+        }
+        if (actions.exportTimeEntries) {
+            returnObj.timeEntryList = timeEntryList
+        }
+        if (action === actions.exportTimeEntries
+            || action === actions.extractTimeSheets
+            || action === actions.summarizeUtTimeEntries
+            || action === actions.summarizeCatTimeEntries
+            || action === actions.breakdownClientByCatTimeEntries) {
+            returnObj.userList = userList
+        }
+        return returnObj
+    } else if (action === actions.getProjects
+        || action === actions.getWorkPackages
+        || action === actions.getAllWorkPackages
+        || action === actions.getTimeEntries) {
+        if (action === actions.getWorkPackages) {
             return {hasWeb: true, hasConversion: true, hasFile: false, apiKey, wpConvertUser}
-        case actions.getAllWorkPackages:
-            return {hasWeb: true, hasConversion: true, hasFile: false, apiKey}
-        case actions.getTimeEntries:
-            return {hasWeb: true, hasConversion: true, hasFile: false, apiKey}
-        default:
-            return {}
+        }
+        return {hasWeb: true, hasConversion: true, hasFile: false, apiKey}
+    } else {
+        return {}
     }
 }
 
