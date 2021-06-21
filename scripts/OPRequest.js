@@ -1861,4 +1861,4 @@ async function WRequestAsync(fullURL, httpMethod, apiKey, bodyData) {
 	return responseData
 }
 
-export { actions, webErrorTypes, doActionAsync, webErrorsPresent, checkIfPropertyExists }
+export { actions, webErrorTypes, doActionAsync, webErrorsPresent }

@@ -3,7 +3,7 @@
 // import "./libs/jquery/jquery.module.js"
 // import $ from "./libs/jquery/jquery-3.5.1.js"
 import { passwordToApiKey } from "./apiKeyListFile.js"
-import { actions, webErrorTypes, doActionAsync, webErrorsPresent, checkIfPropertyExists } from "./OPRequest.js"
+import { actions, webErrorTypes, doActionAsync, webErrorsPresent } from "./OPRequest.js"
 
 // import * as Papa from "./libs/papaparse/papaparse.js"
 // import { $ } from "./libs/jquery/jquery-3.5.1.js"
@@ -929,24 +929,13 @@ async function runSecondHalf(initCsvFileString) {
 
 async function runCurrentAction(action, logValue, myCsvFileObj, logDataBool) {
     const actionOptions = getActionOptions(action)
-    const runOneActionParamsObj = {
-        action,
-        logValue,
-        myCsvFileObj,
-        hasWeb: checkIfPropertyExists(actionOptions,"hasWeb"),
-        hasConversion: checkIfPropertyExists(actionOptions,"hasConversion"),
-        hasFile: checkIfPropertyExists(actionOptions,"hasFile"),
-        logDataBool,
-        apiKey: checkIfPropertyExists(actionOptions,"apiKey"),
-        wpConvertUser: checkIfPropertyExists(actionOptions,"wpConvertUser"),
-        projectList: checkIfPropertyExists(actionOptions,"projectList"),
-        categoryList: checkIfPropertyExists(actionOptions,"categoryList"),
-        workPackageList: checkIfPropertyExists(actionOptions,"workPackageList"),
-        timeEntryList: checkIfPropertyExists(actionOptions,"timeEntryList"),
-        userList: checkIfPropertyExists(actionOptions,"userList"),
-        // billingStatusList: checkIfPropertyExists(actionOptions,"billingStatusList")
-        billingStatusList: billingStatusList
-    }
+    const runOneActionParamsObj = actionOptions
+    runOneActionParamsObj.action = action
+    runOneActionParamsObj.logValue = logValue
+    runOneActionParamsObj.myCsvFileObj = myCsvFileObj
+    runOneActionParamsObj.logDataBool = logDataBool
+    runOneActionParamsObj.billingStatusList = billingStatusList
+
     // runOneAction params: action, logValue, myCsvFileObj, hasWeb, hasConversion, hasFile, logDataBool, apiKey, wpConvertUser, projectList, categoryList, workPackageList, timeEntryList, userList, billingStatusList
     const currentStep = await runOneAction(runOneActionParamsObj)
     return currentStep
@@ -1031,21 +1020,12 @@ async function runOneAction(paramsObj) {
     console.log(paramsObj.logValue)
     const myCsvFile = await checkGetFile(paramsObj.hasFile, paramsObj.myCsvFileObj)
     // doActionAsync params: action,apiKey,wpConvertUser,rows,headerRow,weekBegin,dateEndPeriod,projectList,categoryList,workPackageList,timeEntryList,userList,billingStatusList
-    const doActionAsyncParamsObj = {
-        action: paramsObj.action,
-        apiKey: paramsObj.apiKey,
-        wpConvertUser: paramsObj.wpConvertUser,
-        rows: myCsvFile.rows,
-        headerRow: myCsvFile.headerRow,
-        weekBegin,
-        dateEndPeriod,
-        projectList: paramsObj.projectList,
-        categoryList: paramsObj.categoryList,
-        workPackageList: paramsObj.workPackageList,
-        timeEntryList: paramsObj.timeEntryList,
-        userList: paramsObj.userList,
-        billingStatusList: paramsObj.billingStatusList
-    }
+    const doActionAsyncParamsObj = paramsObj
+    doActionAsyncParamsObj.rows = myCsvFile.rows
+    doActionAsyncParamsObj.headerRow = myCsvFile.headerRow
+    doActionAsyncParamsObj.weekBegin = weekBegin
+    doActionAsyncParamsObj.dateEndPeriod = dateEndPeriod
+
     const currentStep = await doActionAsync(doActionAsyncParamsObj)
     if (paramsObj.hasWeb) {
         logWebResults(currentStep.web)
