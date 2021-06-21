@@ -1,0 +1,106 @@
+.banner {
+    background-color: orange;
+    border: 3px solid darkorange;
+    text-align: center;
+    margin: auto;
+    width: 400px;
+    padding: 10px;
+}
+
+p {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+#actionLabel, #actionSelect, #actionSelectLogLabel, #actionSelectLogCheckbox , #staticListsLabel, #staticListsCheckbox {
+    display: none;
+}
+
+#weeklyHref1, #weeklyHref2, #dailyHref1, #dailyHref2 {
+    display: none;
+}
+
+#fileLabelP, #fileSelectP, #fileListWLabelP, #fileListWSelectP , #fileListTLabelP, #fileListTSelectP {
+    display: none;
+}
+
+#dateEndPeriodLabel, #dateEndPeriodBox {
+    display: none;
+}
+
+#spreadsheet1, #loading {
+    display: none;
+}
+
+.pad {
+    padding: 5px;
+}
+
+#actions {
+    width: 445px;
+}
+
+#getAPIKey {
+    width: 190px;
+}
+
+#csvChooser {
+    width: 180px;
+}
+
+.bug {
+    color: red;
+    background-color: #fff0f0;
+}
+
+.goButton{
+    width: 80px;
+    height: 40px;
+}
+
+/* log css
+------------------------------------------------------------------------------- */
+
+.log {
+    max-height: 300px;
+    overflow-y: scroll;
+    border: 1px solid #b7b7b7;
+    border-radius: 3px;
+    /* font-size: 11px; */
+    font-family: monospace;
+    margin-bottom: .25em;
+}
+
+.log .log-inner {
+    border-collapse: collapse;
+}
+
+.log .log-inner .line {
+    display: table-row;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.log .log-inner .line .content {
+    width: 100%;
+}
+.log .log-inner .line>.cell {
+    display: table-cell;
+    padding: .1em .3em;
+}
+
+.log .log-inner .line.error {
+    color: red;
+    background-color: #fff0f0;
+    position: relative;
+}
+
+.log .log-inner .line.step {
+    color: blue;
+    position: relative;
+}
+
+.log .log-inner .line.finished {
+    /* color: #23d160; */
+    color: lime;
+    position: relative;
+}

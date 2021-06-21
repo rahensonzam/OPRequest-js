@@ -1,0 +1,2 @@
+"client","period","category","nature of work","spent on","number of units"
+"SELECT","SELECT","SELECT","TEXT","DATE YYYY-MM-DD","INTEGER","<< Delete this row"
