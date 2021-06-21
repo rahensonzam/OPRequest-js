@@ -479,13 +479,6 @@ async function convertResultsToCsv(resultArray) {
 	const temp2 = extractErrors(resultArray)
 	return {data: [{data: outputCsv}], errors: temp2}
 	// console.log(outputCsv)
-	// // FIXME: Use array.every
-	// // if (resultArray.every(function (element) {element.errors === ""})) {
-	// // above returns false regardless
-	// if (!(conversionErrorsPresent(resultArray))) {
-	// 	const outputFilename = myCsvFile.replace(".csv","output.csv")
-	// 	await writeToFileAsync(outputFilename, outputCsv)
-	// }
 }
 
 async function convertResultsToCsv2(resultArray) {
@@ -504,13 +497,6 @@ async function convertResultsToCsv2(resultArray) {
 	const temp2 = extractErrors(resultArray)
 	return {data: outputData, errors: temp2}
 	// console.log(outputCsv)
-	// // FIXME: Use array.every
-	// // if (resultArray.every(function (element) {element.errors === ""})) {
-	// // above returns false regardless
-	// if (!(conversionErrorsPresent(resultArray))) {
-	// 	const outputFilename = myCsvFile.replace(".csv","output.csv")
-	// 	await writeToFileAsync(outputFilename, outputCsv)
-	// }
 }
 
 function convertResults(resultArray) {
@@ -530,6 +516,13 @@ function convertResults(resultArray) {
 // 			console.log(element.errors)
 // 		}
 // 	})
+// // FIXME: Use array.every
+// // if (resultArray.every(function (element) {element.errors === ""})) {
+// // above returns false regardless
+// if (!(conversionErrorsPresent(resultArray))) {
+// 	const outputFilename = myCsvFile.replace(".csv","output.csv")
+// 	await writeToFileAsync(outputFilename, outputCsv)
+// }
 // }
 
 function addEmptyDays(resultArray) {
