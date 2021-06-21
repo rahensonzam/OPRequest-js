@@ -726,7 +726,7 @@ function convertCsvAction(paramsObj) {
 			if (outputArrayDataRow.length !== 0) {
 				if (action === actions.extractTimeSheets || action === actions.summarizeUtTimeEntries || action === actions.summarizeCatTimeEntries) {
 					if (action === actions.extractTimeSheets || action === actions.summarizeUtTimeEntries) {
-						outputArrayDataRow.sort(compareAphabetical)
+						outputArrayDataRow.sort(compareAlphabetical)
 						outputArrayDataRow.sort(compareMoveCurlyToBottom)
 					}
 					// if (action === actions.extractTimeSheets || action === actions.summarizeUtTimeEntries) {
@@ -765,7 +765,7 @@ function convertCsvAction(paramsObj) {
 			const outputArrayDataRow = []
 			outputArrayDataRow.push.apply(outputArrayDataRow, setOutputArrayData(actions.condenseTimeSheets, row, rowIndex, i, currentDate, outputExt2, workPackageIDs, filteredSortedList, uniqueValuesList, clientTypesList, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList))
 			if (outputArrayDataRow.length !== 0) {
-				outputArrayDataRow.sort(compareAphabetical)
+				outputArrayDataRow.sort(compareAlphabetical)
 				outputArrayDataRow.sort(compareMoveCurlyToBottom)
 				outputArray.push({name: outputExt2[i].name, data: outputArrayDataRow})
 			}
@@ -1426,7 +1426,7 @@ function getSummedList3(clientTypesListRow) {
 	}
 }
 
-function compareAphabetical(a, b) {
+function compareAlphabetical(a, b) {
 	let clientA = a.client
 	let clientB = b.client
 
