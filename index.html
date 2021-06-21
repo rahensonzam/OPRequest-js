@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>OpenProject Bulk Upload</title>
+        <meta charset="utf-8">
+        <link rel="icon" type="image/vnd.microsoft.icon" href="/bulk-upload/favicon.ico">
+        <link rel="stylesheet" href="/bulk-upload/styles/main.css">
+        <link rel="stylesheet" href="/bulk-upload/styles/libs/material-design/materialIconsv67.css">
+        <link rel="stylesheet" href="/bulk-upload/styles/libs/jquery-ui/jquery-ui.css">
+        <!-- <link rel="stylesheet" href="/bulk-upload/styles/libs/jexcel/jexcel.css"> -->
+        <!-- <link rel="stylesheet" href="/bulk-upload/styles/libs/jexcel/jsuites.css"> -->
+        <link rel="stylesheet" href="/bulk-upload/styles/libs/jexcel/jquery.jexcel.css">
+        <script src="/bulk-upload/scripts/libs/jquery/jquery-3.5.1.js"></script>
+        <script src="/bulk-upload/scripts/libs/jquery-ui/jquery-ui.js"></script>
+        <script src="/bulk-upload/scripts/libs/jquery-csv/jquery.csv.js"></script>
+        <!-- <script src="/bulk-upload/scripts/libs/jexcel/jexcel.js"></script> -->
+        <!-- <script src="/bulk-upload/scripts/libs/jexcel/jsuites.js"></script> -->
+        <script src="/bulk-upload/scripts/libs/jexcel/jquery.jexcel.js"></script>
+        <script src="/bulk-upload/scripts/libs/dayjs/day.min.js"></script>
+        <script src="/bulk-upload/scripts/libs/dayjs/customParseFormat.min.js"></script>
+        <script src="/bulk-upload/scripts/libs/papaparse/papaparse.js"></script>
+        <!-- <script src="/bulk-upload/scripts/apiKeyListFile.js"></script> -->
+        <!-- <script src="/bulk-upload/scripts/OPRequest.js"></script> -->
+        <script type="module" src="/bulk-upload/scripts/main.js"></script>
+    </head>
+    <body>
+        <div class="banner pad">
+            Under active development. Things may break.
+        </div>
+        <div class="pad">
+            <fieldset id="actions">
+                <p>
+                    <input type="radio" id="sequenceWeekly" name="actionType" value="sequenceWeekly" checked>
+                    <label for="sequenceWeekly">Action Sequence - Log Time, Weekly</label>
+                </p>
+                <p>
+                    <input type="radio" id="sequenceDaily" name="actionType" value="sequenceDaily">
+                    <label for="sequenceDaily">Action Sequence - Log Time, Daily</label>
+                </p>
+                <p>
+                    <input type="radio" id="sequenceExportExtract" name="actionType" value="sequenceExportExtract">
+                    <label for="sequenceExportExtract">Action Sequence - Export & extract from time entries</label>
+                </p>
+                <p>
+                    <input type="radio" id="sequenceExportSummarizeUt" name="actionType" value="sequenceExportSummarizeUt">
+                    <label for="sequenceExportSummarizeUt">Action Sequence - Export & summarize time entries (Utilization)</label>
+                </p>
+                <p>
+                    <input type="radio" id="sequenceExportSummarizeCat" name="actionType" value="sequenceExportSummarizeCat">
+                    <label for="sequenceExportSummarizeCat">Action Sequence - Export & summarize time entries (Category)</label>
+                </p>
+                <p>
+                    <input type="radio" id="sequenceExportBreakdown" name="actionType" value="sequenceExportBreakdown">
+                    <label for="sequenceExportBreakdown">Action Sequence - Export & breakdown summary of time entries</label>
+                </p>
+                <p>
+                    <input type="radio" id="single" name="actionType" value="single">
+                    <label for="single">Individual Action</label>
+                </p>
+           </fieldset>
+
+            <label id="actionLabel" for="actionSelect">Select action:</label>
+            <select id="actionSelect" name="actionSelect">
+                <option value=-1>Please select</option>
+                <option value="updateWorkPackage">updateWorkPackage</option">
+                <option value="updateTimeEntry">updateTimeEntry</option">
+                <option value="addMembership">addMembership</option">
+                <option value="addWorkPackage">addWorkPackage</option">
+                <option value="addProject">addProject</option">
+                <option value="addTimeEntry">addTimeEntry</option">
+                <option value="getProjects">getProjects</option">
+                <option value="getWorkPackages">getWorkPackages</option">
+                <option value="getAllWorkPackages">getAllWorkPackages</option">
+                <option value="getTimeEntries">getTimeEntries</option">
+                <option value="exportTimeEntries">exportTimeEntries</option">
+                <option value="extractTimeSheets">extractTimeSheets</option">
+                <option value="summarizeUtTimeEntries">summarizeUtTimeEntries</option">
+                <option value="summarizeCatTimeEntries">summarizeCatTimeEntries</option">
+                <option value="breakdownClientByCatTimeEntries">breakdownClientByCatTimeEntries</option">
+                <option value="convertToWorkPackageIDs">convertToWorkPackageIDs</option">
+                <option value="convertNamesToIDs">convertNamesToIDs</option">
+                <option value="convertMembershipNamesToIDs">convertMembershipNamesToIDs</option">
+                <option value="convertWeekToDays">convertWeekToDays</option">
+            </select>
+            <input type="checkbox" id="actionSelectLogCheckbox" name="actionSelectLogCheckbox">
+            <label id="actionSelectLogLabel" for="actionSelectLogCheckbox">Log data</label>
+            <input type="checkbox" id="staticListsCheckbox" name="staticListsCheckbox">
+            <label id="staticListsLabel" for="staticListsCheckbox">Static Lists</label>
+        </div>
+        <div class="pad">
+            <label for="user">Select User:</label>
+            <select id="user" name="user">
+                <option value=-1>Please select</option>
+                <option value=2>admin</option>
+                <option value=4>Alice</option>
+                <option value=5>Bob</option>
+                <option value=6>Carol</option>
+            </select>
+        </div>
+        <div class="pad">
+            <fieldset id="getAPIKey">
+                <p>Get API Key:</p>
+                <p>
+                    <label for="passwordBox">Password:</label>
+                    <input type="text" id="passwordBox" size="4">
+                    <button id="enterPassword">Enter</button>
+                </p>
+            </fieldset>
+        </div>
+        <div class="pad">
+            <label for="apiKeyBox">API Key:</label>
+            <input type="text" id="apiKeyBox" size="63">
+        </div>
+        <div class="pad">
+            <label id="weekBeginLabel" for="weekBeginBox">Week beginning:</label>
+            <input type="text" id="weekBeginBox" size="10">
+        </div>
+        <div class="pad">
+            <label id="dateEndPeriodLabel" for="dateEndPeriodBox">End of period date:</label>
+            <input type="text" id="dateEndPeriodBox" size="10">
+        </div>
+        <div class="pad">
+            <fieldset id="csvChooser">
+                <p>
+                    <input type="radio" id="csvImport" name="csvType" value="import">
+                    <label for="csvImport">Import CSV</label>
+                </p>
+                <p>
+                    <input type="radio" id="csvImport2" name="csvType" value="import2">
+                    <label for="csvImport2">Import CSV (Fallback)</label>
+                </p>
+                <p>
+                    <input type="radio" id="csvCreate" name="csvType" value="create" checked>
+                    <label for="csvCreate">Create CSV</label>
+                </p>
+            </fieldset>
+            <p id="fileLabelP">
+                <label for="fileSelect">Select CSV file for upload:</label>
+            </p>
+            <p id="fileSelectP">
+                <input type="file" id="fileSelect" accept=".csv,text/csv">
+            </p>
+            <p id="fileListWLabelP">
+                <label for="workPackageListFileSelect">Select workPackageList CSV file for use:</label>
+            </p>
+            <p id="fileListWSelectP">
+                <input type="file" id="workPackageListFileSelect" accept="application/json">
+            </p>
+            <p id="fileListTLabelP">
+                <label for="timeEntryListFileSelect">Select timeEntryList CSV file for use:</label>
+            </p>
+            <p id="fileListTSelectP">
+                <input type="file" id="timeEntryListFileSelect" accept="application/json">
+            </p>
+        </div>
+        <div class="pad">
+            <p><button id="go1Button" class="goButton">Go 1</button></p>
+        </div>
+        <div id="spreadsheet1">
+            <p>Double click or type to enter data.</p>
+        </div>
+        <div class="pad">
+            <img id="loading" src="/bulk-upload/styles/ajax-loader.gif" alt="loading gif" width="32" height="32">
+        </div>
+        <div class="pad">
+            <p><label for="log">Log</label></p>
+            <div id="log" class="log pad">
+                <div class="log-inner pad">
+                </div>
+            </div>
+            <p><button id="go2Button" class="goButton">Go 2</button></p>
+        </div>
+    </body>
+</html>

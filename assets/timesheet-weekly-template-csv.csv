@@ -1,0 +1,2 @@
+"client","period","category","nature of work","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"
+"SELECT","SELECT","SELECT","TEXT","INTEGER","INTEGER","INTEGER","INTEGER","INTEGER","INTEGER","INTEGER","<< Delete this row"
