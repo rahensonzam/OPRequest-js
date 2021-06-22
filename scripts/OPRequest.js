@@ -1220,14 +1220,19 @@ function filterList(resultList, weekBegin, upperBound) {
 function splitListByUser(resultList, userList) {
 	const tempArray = []
 	for (let index = 0; index <= userList.length - 1; index++) {
-		const tempArrayData = []
-		for (let index2 = 0; index2 <= resultList.length - 1; index2++) {
-			if (resultList[index2].user === userList[index].name) {
-				tempArrayData.push(resultList[index2])
-			}
-		}
+		const tempArrayData = innerLoopA(resultList, "user", userList, "name", index)
 		if (tempArrayData.length !== 0) {
 			tempArray.push({name: userList[index].name, data: tempArrayData})
+		}
+	}
+	return tempArray
+}
+
+function innerLoopA(listA, propA, listB, propB, indexB) {
+	const tempArray = []
+	for (let indexA = 0; indexA <= listA.length - 1; indexA++) {
+		if (listA[indexA][propA] === listB[indexB][propB]) {
+			tempArray.push(listA[indexA])
 		}
 	}
 	return tempArray
@@ -1238,12 +1243,7 @@ function splitListByGrade(resultList, userList) {
 	for (let index = 0; index <= userList.length - 1; index++) {
 		// if userList[index].grade is not found in tempArray[all].name
 		if (!(tempArray.some(function(e) {return e.name === userList[index].grade}))) {
-			const tempArrayData = []
-			for (let index2 = 0; index2 <= resultList.length - 1; index2++) {
-				if (resultList[index2].grade === userList[index].grade) {
-					tempArrayData.push(resultList[index2])
-				}
-			}
+			const tempArrayData = innerLoopA(resultList, "grade", userList, "grade", index)
 			if (tempArrayData.length !== 0) {
 				tempArray.push({name: userList[index].grade, data: tempArrayData})
 			}
