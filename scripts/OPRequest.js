@@ -1506,26 +1506,22 @@ function findArrayIndexFromID(items, condition) {
 }
 
 function removeNatureNull(element) {
-	if (element !== null) {
-		return element
-	} else {
-		return "none"
-	}
+	return removeNull(element, "none")
 }
 
 function removeUnitsNull(element) {
-	if (element !== null) {
-		return element
-	} else {
-		return "null"
-	}
+	return removeNull(element, "null")
 }
 
 function removeFeeNoteNull(element) {
+	return removeNull(element, "-")
+}
+
+function removeNull(element, value) {
 	if (element !== null) {
 		return element
 	} else {
-		return "-"
+		return value
 	}
 }
 
