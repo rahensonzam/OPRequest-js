@@ -1390,7 +1390,10 @@ function filterTableCategoryTypes(resultList) {
 
 function getReducedList(uniqueValuesListRow) {
 	return function (accumulator, currentValue) {
-		if (currentValue.client === uniqueValuesListRow.client && currentValue.period === uniqueValuesListRow.period && currentValue.category === uniqueValuesListRow.category && currentValue.natureOfWork === uniqueValuesListRow.natureOfWork) {
+		if (currentValue.client === uniqueValuesListRow.client
+			&& currentValue.period === uniqueValuesListRow.period
+			&& currentValue.category === uniqueValuesListRow.category
+			&& currentValue.natureOfWork === uniqueValuesListRow.natureOfWork) {
 			for (let index = 0; index <= daysOfWeek.length - 1; index++) {
 				if (!(currentValue[daysOfWeek[index]] === "")) {
 					accumulator[daysOfWeek[index]] = String(Number(accumulator[daysOfWeek[index]]) + Number(currentValue[daysOfWeek[index]]))
