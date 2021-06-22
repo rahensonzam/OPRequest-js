@@ -1284,17 +1284,25 @@ function filterUniqueValues(resultList) {
 	const tempArray = []
 	for (let i = 0; i <= resultList.length - 1; i++) {
 		const tempArrayData = []
-		tempArrayData.push({client: resultList[i].data[0].client, period: resultList[i].data[0].period, category: resultList[i].data[0].category, natureOfWork: resultList[i].data[0].natureOfWork})
-		for (let j = 0 + 1; j <= resultList[i].data.length - 1; j++) {
-			//array.every ?
-			let unique = true
-			for (let k = 0; k <= tempArrayData.length - 1; k++) {
-				if (tempArrayData[k].client === resultList[i].data[j].client && tempArrayData[k].period === resultList[i].data[j].period && tempArrayData[k].category === resultList[i].data[j].category && tempArrayData[k].natureOfWork === resultList[i].data[j].natureOfWork) {
-					unique = false
-				}
-			}
-			if (unique === true) {
-				tempArrayData.push({client: resultList[i].data[j].client, period: resultList[i].data[j].period, category: resultList[i].data[j].category, natureOfWork: resultList[i].data[j].natureOfWork})
+		const resultListData = resultList[i].data
+		tempArrayData.push({
+			client: resultListData[0].client,
+			period: resultListData[0].period,
+			category: resultListData[0].category,
+			natureOfWork: resultListData[0].natureOfWork
+		})
+		for (let j = 0 + 1; j <= resultListData.length - 1; j++) {
+			// if ### is not ### in tempArrayData[all].###
+			if (!(tempArrayData.some(function(e) {return (e.client === resultListData[j].client
+				&& e.period === resultListData[j].period
+				&& e.category === resultListData[j].category
+				&& e.natureOfWork === resultListData[j].natureOfWork)}))) {
+				tempArrayData.push({
+					client: resultListData[j].client,
+					period: resultListData[j].period,
+					category: resultListData[j].category,
+					natureOfWork: resultListData[j].natureOfWork
+				})
 			}
 		}
 		tempArray.push({name: resultList[i].name, data: tempArrayData})
