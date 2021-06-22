@@ -1479,8 +1479,7 @@ function findArrayNameFromID(items, condition) {
 
 function findArrayIDFromName(items, condition) {
 	for (let i = 0; i <= items.length - 1; i++) {
-		// == because numbers as strings
-		if (items[i].name == condition) {
+		if (items[i].name === condition) {
 			return items[i].id
 		}
 	}
