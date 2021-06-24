@@ -1095,7 +1095,7 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 		return [innerTableData]
 	} else if (action === actions.tabulateCatTimeEntries) {
 		resultListData = resultList[i].data
-		categoryTypesListData = filterTableTypes(resultList, "category")
+		categoryTypesListData = filterTableCategoryTypes(resultList)
 
 		innerTableData = {"grade/category": resultList[i].name}
 		for (let j = 0; j <= categoryTypesListData.length - 1; j++) {
