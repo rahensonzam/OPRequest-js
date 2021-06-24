@@ -1083,46 +1083,19 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 		clientTypesListData = filterTableClientTypes(resultList)
 
 		innerTableData = {"user/client": resultList[i].name}
-		for (let j = 0; j <= clientTypesListData.length - 1; j++) {
-			// if clientTypesListData[j].client is found in resultListData[all].client
-			if (resultListData.some(function(e) {return e.client === clientTypesListData[j].client})) {
-				const resultListIndex = resultListData.findIndex(function(e) {return e.client === clientTypesListData[j].client})
-				innerTableData[clientTypesListData[j].client] = resultListData[resultListIndex].units
-			} else {
-				innerTableData[clientTypesListData[j].client] = 0
-			}
-		}
-		return [innerTableData]
+		return tabulateData(resultListData, clientTypesListData, innerTableData, "client")
 	} else if (action === actions.tabulateCatTimeEntries) {
 		resultListData = resultList[i].data
 		categoryTypesListData = filterTableCategoryTypes(resultList)
 
 		innerTableData = {"grade/category": resultList[i].name}
-		for (let j = 0; j <= categoryTypesListData.length - 1; j++) {
-			// if categoryTypesListData[j].category is found in resultListData[all].category
-			if (resultListData.some(function(e) {return e.category === categoryTypesListData[j].category})) {
-				const resultListIndex = resultListData.findIndex(function(e) {return e.category === categoryTypesListData[j].category})
-				innerTableData[categoryTypesListData[j].category] = resultListData[resultListIndex].units
-			} else {
-				innerTableData[categoryTypesListData[j].category] = 0
-			}
-		}
-		return [innerTableData]
+		return tabulateData(resultListData, categoryTypesListData, innerTableData, "category")
 	} else if (action === actions.tabulateBreakdownTimeEntries) {
 		resultListData = resultList[i].data 
 		clientTypesListData = filterTableClientTypes(resultList) 
 
 		innerTableData = {"grade/client": resultList[i].name} 
-		for (let j = 0; j <= clientTypesListData.length - 1; j++) { 
-			// if clientTypesListData[j].client is found in resultListData[all].client 
-			if (resultListData.some(function(e) {return e.client === clientTypesListData[j].client})) { 
-				const resultListIndex = resultListData.findIndex(function(e) {return e.client === clientTypesListData[j].client}) 
-				innerTableData[clientTypesListData[j].client] = resultListData[resultListIndex].units 
-			} else { 
-				innerTableData[clientTypesListData[j].client] = 0 
-			} 
-		} 
-		return [innerTableData] 
+		return tabulateData(resultListData, clientTypesListData, innerTableData, "client")
 	} else if (action === actions.getProjects
 		|| action === actions.getWorkPackages
 		|| action === actions.getAllWorkPackages
@@ -1386,6 +1359,19 @@ function filterTableCategoryTypes(resultList) {
 	}
 
 	return temp
+}
+
+function tabulateData(resultListData, typesListData, innerTableData, prop) {
+	for (let j = 0; j <= typesListData.length - 1; j++) {
+		// if clientTypesListData[j][prop] is found in resultListData[all][prop]
+		if (resultListData.some(function(e) {return e[prop] === typesListData[j][prop]})) {
+			const resultListIndex = resultListData.findIndex(function(e) {return e[prop] === typesListData[j][prop]})
+			innerTableData[typesListData[j][prop]] = resultListData[resultListIndex].units
+		} else {
+			innerTableData[typesListData[j][prop]] = 0
+		}
+	}
+	return [innerTableData]
 }
 
 function getReducedList(uniqueValuesListRow) {
