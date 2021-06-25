@@ -973,7 +973,6 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 	let innerTableData
 	let resultListData
 	let filteredSortedListData
-	let uniqueValuesListData
 	let clientTypesListData
 	let categoryTypesListData
 	const outputArrayDataRow = []
@@ -1045,85 +1044,15 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 		}
 		return outputArrayDataRow
 	} else if (action === actions.condenseTimeSheets) {
-		resultListData = resultList[i].data
-		uniqueValuesListData = uniqueValuesList[i].data
-		
-		// @ts-ignore
-		// eslint-disable-next-line no-inner-declarations
-		function reduceFunction1(index) {
-			return getReducedList(uniqueValuesListData[index])
-		}
-		
-		// @ts-ignore
-		// eslint-disable-next-line no-inner-declarations
-		function reduceObjectFunction1(index) {
-			return {
-				client: uniqueValuesListData[index].client,
-				period: uniqueValuesListData[index].period,
-				category: uniqueValuesListData[index].category,
-				natureOfWork: uniqueValuesListData[index].natureOfWork,
-				monday: "",
-				tuesday: "",
-				wednesday: "",
-				thursday: "",
-				friday: "",
-				saturday: "",
-				sunday: ""
-			}
-		}
+		return summarizeData(action, resultList, uniqueValuesList, i, "")
 
-		return summarizeData(resultListData, uniqueValuesListData, reduceFunction1, reduceObjectFunction1)
-	} else if (action === actions.summarizeUtTimeEntries) {
-		filteredSortedListData = filteredSortedList[i].data
-		clientTypesListData = clientTypesList[i].data
-		
-		// @ts-ignore
-		// eslint-disable-next-line no-inner-declarations
-		function reduceFunction2(index) {
-			return getSummedList(clientTypesListData[index], "client")
-		}
-		
-		// @ts-ignore
-		// eslint-disable-next-line no-inner-declarations
-		function reduceObjectFunction2(index) {
-			return {client: clientTypesListData[index].client, units: ""}
-		}
+	} else if (action === actions.summarizeUtTimeEntries
+		|| action === actions.breakdownClientByCatTimeEntries) {
+		return summarizeData(action, filteredSortedList, clientTypesList, i, "client")
 
-		return summarizeData(filteredSortedListData, clientTypesListData, reduceFunction2, reduceObjectFunction2)
 	} else if (action === actions.summarizeCatTimeEntries) {
-		filteredSortedListData = filteredSortedList[i].data
-		categoryTypesListData = categoryTypesList[i].data
-		
-		// @ts-ignore
-		// eslint-disable-next-line no-inner-declarations
-		function reduceFunction3(index) {
-			return getSummedList2(categoryTypesListData[index], "category")
-		}
-		
-		// @ts-ignore
-		// eslint-disable-next-line no-inner-declarations
-		function reduceObjectFunction3(index) {
-			return {category: categoryTypesListData[index].category, units: ""}
-		}
+		return summarizeData(action, filteredSortedList, categoryTypesList, i, "category")
 
-		return summarizeData(filteredSortedListData, categoryTypesListData, reduceFunction3, reduceObjectFunction3)
-	} else if (action === actions.breakdownClientByCatTimeEntries) {
-		filteredSortedListData = filteredSortedList[i].data
-		clientTypesListData = clientTypesList[i].data
-		
-		// @ts-ignore
-		// eslint-disable-next-line no-inner-declarations
-		function reduceFunction4(index) {
-			return getSummedList2(clientTypesListData[index], "client")
-		}
-		
-		// @ts-ignore
-		// eslint-disable-next-line no-inner-declarations
-		function reduceObjectFunction4(index) {
-			return {client: clientTypesListData[index].client, units: ""}
-		}
-
-		return summarizeData(filteredSortedListData, clientTypesListData, reduceFunction4, reduceObjectFunction4)
 	} else if (action === actions.tabulateUtTimeEntries) {
 		resultListData = resultList[i].data
 		clientTypesListData = filterTableTypes(resultList, "client")
@@ -1395,7 +1324,65 @@ function filterTableTypes(resultList, prop) {
 	return temp
 }
 
-function summarizeData(listDataA, listDataB, reduceFunctionArg, reduceObjectFunctionArg) {
+function summarizeData(action, listA, listB, i, prop) {
+
+    const listDataA = listA[i].data
+    const listDataB = listB[i].data
+
+	// @ts-ignore
+	// eslint-disable-next-line no-inner-declarations
+	function reduceFunctionA(index) {
+		return getReducedList(listDataB[index])
+	}
+
+	// @ts-ignore
+    // eslint-disable-next-line no-inner-declarations
+    function reduceFunctionB(index) {
+        return getSummedList(listDataB[index], prop)
+    }
+
+    // @ts-ignore
+    // eslint-disable-next-line no-inner-declarations
+    function reduceFunctionC(index) {
+        return getSummedList2(listDataB[index], prop)
+    }
+
+    // @ts-ignore
+    // eslint-disable-next-line no-inner-declarations
+	function reduceObjectFunctionA(index) {
+		return {
+			client: listDataB[index].client,
+			period: listDataB[index].period,
+			category: listDataB[index].category,
+			natureOfWork: listDataB[index].natureOfWork,
+			monday: "",
+			tuesday: "",
+			wednesday: "",
+			thursday: "",
+			friday: "",
+			saturday: "",
+			sunday: ""
+		}
+	}
+
+    // @ts-ignore
+    // eslint-disable-next-line no-inner-declarations
+    function reduceObjectFunctionB(index) {
+        return {[prop]: listDataB[index][prop], units: ""}
+    }
+
+	if (action === actions.condenseTimeSheets) {
+		return summarizeDataInner(listDataA, listDataB, reduceFunctionA, reduceObjectFunctionA)
+	} else if (action === actions.summarizeUtTimeEntries) {
+		return summarizeDataInner(listDataA, listDataB, reduceFunctionB, reduceObjectFunctionB)
+	} else if (action === actions.summarizeCatTimeEntries) {
+		return summarizeDataInner(listDataA, listDataB, reduceFunctionC, reduceObjectFunctionB)
+	} else if (action === actions.breakdownClientByCatTimeEntries) {
+		return summarizeDataInner(listDataA, listDataB, reduceFunctionC, reduceObjectFunctionB)
+	}
+}
+
+function summarizeDataInner(listDataA, listDataB, reduceFunctionArg, reduceObjectFunctionArg) {
 	const outputArrayDataRow = []
 	for (let j = 0; j <= listDataB.length - 1; j++) {
 		const summedOrCondensedRow = listDataA.reduce(reduceFunctionArg(j), reduceObjectFunctionArg(j))
