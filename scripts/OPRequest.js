@@ -1080,19 +1080,23 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 		return outputArrayDataRow
 	} else if (action === actions.tabulateUtTimeEntries) {
 		resultListData = resultList[i].data
-		clientTypesListData = filterTableClientTypes(resultList)
+		clientTypesListData = filterTableTypes(resultList, "client")
+		clientTypesListData.sort(compareAlphabetical)
+		clientTypesListData.sort(compareMoveCurlyToBottom)
 
 		innerTableData = {"user/client": resultList[i].name}
 		return tabulateData(resultListData, clientTypesListData, innerTableData, "client")
 	} else if (action === actions.tabulateCatTimeEntries) {
 		resultListData = resultList[i].data
-		categoryTypesListData = filterTableCategoryTypes(resultList)
+		categoryTypesListData = filterTableTypes(resultList, "category")
 
 		innerTableData = {"grade/category": resultList[i].name}
 		return tabulateData(resultListData, categoryTypesListData, innerTableData, "category")
 	} else if (action === actions.tabulateBreakdownTimeEntries) {
 		resultListData = resultList[i].data 
-		clientTypesListData = filterTableClientTypes(resultList) 
+		clientTypesListData = filterTableTypes(resultList, "client")
+		clientTypesListData.sort(compareAlphabetical)
+		clientTypesListData.sort(compareMoveCurlyToBottom)
 
 		innerTableData = {"grade/client": resultList[i].name} 
 		return tabulateData(resultListData, clientTypesListData, innerTableData, "client")
@@ -1331,29 +1335,13 @@ function filterCategoryTypes(resultList, categoryList) {
 	return tempArray
 }
 
-function filterTableClientTypes(resultList) {
-	const temp = [{client: resultList[0].data[0].client}]
+function filterTableTypes(resultList, prop) {
+	const temp = [{[prop]: resultList[0].data[0][prop]}]
 	for (let i = 0; i <= resultList.length - 1; i++) {
 		for (let j = 0; j <= resultList[i].data.length - 1; j++) {
-			// if resultList[i].data[j].client is found in temp[all].client
-			if (!(temp.some(function(e) {return e.client === resultList[i].data[j].client}))) {
-				temp.push({client: resultList[i].data[j].client})
-			}
-		}
-	}
-	temp.sort(compareAlphabetical)
-	temp.sort(compareMoveCurlyToBottom)
-
-	return temp
-}
-
-function filterTableCategoryTypes(resultList) {
-	const temp = [{category: resultList[0].data[0].category}]
-	for (let i = 0; i <= resultList.length - 1; i++) {
-		for (let j = 0; j <= resultList[i].data.length - 1; j++) {
-			// if resultList[i].data[j].category is found in temp[all].category
-			if (!(temp.some(function(e) {return e.category === resultList[i].data[j].category}))) {
-				temp.push({category: resultList[i].data[j].category})
+			// if resultList[i].data[j][prop] is found in temp[all][prop]
+			if (!(temp.some(function(e) {return e[prop] === resultList[i].data[j][prop]}))) {
+				temp.push({[prop]: resultList[i].data[j][prop]})
 			}
 		}
 	}
