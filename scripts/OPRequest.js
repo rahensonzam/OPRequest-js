@@ -970,8 +970,6 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 	let userIndex
 	let retrivedProjectList
 	let currentDate2
-	let condensedRow
-	let summedRow
 	let innerTableData
 	let resultListData
 	let filteredSortedListData
@@ -1047,37 +1045,85 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 		}
 		return outputArrayDataRow
 	} else if (action === actions.condenseTimeSheets) {
-		uniqueValuesListData = uniqueValuesList[i].data
 		resultListData = resultList[i].data
-		for (let j = 0; j <= uniqueValuesListData.length - 1; j++) {
-			condensedRow = resultListData.reduce(getReducedList(uniqueValuesListData[j]), {client: uniqueValuesListData[j].client, period: uniqueValuesListData[j].period, category: uniqueValuesListData[j].category, natureOfWork: uniqueValuesListData[j].natureOfWork, monday: "", tuesday: "", wednesday: "", thursday: "", friday: "", saturday: "", sunday: ""})
-			outputArrayDataRow.push(condensedRow)
+		uniqueValuesListData = uniqueValuesList[i].data
+		
+		// @ts-ignore
+		// eslint-disable-next-line no-inner-declarations
+		function reduceFunction1(index) {
+			return getReducedList(uniqueValuesListData[index])
 		}
-		return outputArrayDataRow
+		
+		// @ts-ignore
+		// eslint-disable-next-line no-inner-declarations
+		function reduceObjectFunction1(index) {
+			return {
+				client: uniqueValuesListData[index].client,
+				period: uniqueValuesListData[index].period,
+				category: uniqueValuesListData[index].category,
+				natureOfWork: uniqueValuesListData[index].natureOfWork,
+				monday: "",
+				tuesday: "",
+				wednesday: "",
+				thursday: "",
+				friday: "",
+				saturday: "",
+				sunday: ""
+			}
+		}
+
+		return summarizeData(resultListData, uniqueValuesListData, reduceFunction1, reduceObjectFunction1)
 	} else if (action === actions.summarizeUtTimeEntries) {
 		filteredSortedListData = filteredSortedList[i].data
 		clientTypesListData = clientTypesList[i].data
-		for (let j = 0; j <= clientTypesListData.length - 1; j++) {
-			summedRow = filteredSortedListData.reduce(getSummedList(clientTypesListData[j]), {client: clientTypesListData[j].client, units: ""})
-			outputArrayDataRow.push(summedRow)
+		
+		// @ts-ignore
+		// eslint-disable-next-line no-inner-declarations
+		function reduceFunction2(index) {
+			return getSummedList(clientTypesListData[index], "client")
 		}
-		return outputArrayDataRow
+		
+		// @ts-ignore
+		// eslint-disable-next-line no-inner-declarations
+		function reduceObjectFunction2(index) {
+			return {client: clientTypesListData[index].client, units: ""}
+		}
+
+		return summarizeData(filteredSortedListData, clientTypesListData, reduceFunction2, reduceObjectFunction2)
 	} else if (action === actions.summarizeCatTimeEntries) {
 		filteredSortedListData = filteredSortedList[i].data
 		categoryTypesListData = categoryTypesList[i].data
-		for (let j = 0; j <= categoryTypesListData.length - 1; j++) {
-			summedRow = filteredSortedListData.reduce(getSummedList2(categoryTypesListData[j], "category"), {category: categoryTypesListData[j].category, units: ""})
-			outputArrayDataRow.push(summedRow)
+		
+		// @ts-ignore
+		// eslint-disable-next-line no-inner-declarations
+		function reduceFunction3(index) {
+			return getSummedList2(categoryTypesListData[index], "category")
 		}
-		return outputArrayDataRow
+		
+		// @ts-ignore
+		// eslint-disable-next-line no-inner-declarations
+		function reduceObjectFunction3(index) {
+			return {category: categoryTypesListData[index].category, units: ""}
+		}
+
+		return summarizeData(filteredSortedListData, categoryTypesListData, reduceFunction3, reduceObjectFunction3)
 	} else if (action === actions.breakdownClientByCatTimeEntries) {
 		filteredSortedListData = filteredSortedList[i].data
 		clientTypesListData = clientTypesList[i].data
-		for (let j = 0; j <= clientTypesListData.length - 1; j++) {
-			summedRow = filteredSortedListData.reduce(getSummedList2(clientTypesListData[j], "client"), {client: clientTypesListData[j].client, units: ""})
-			outputArrayDataRow.push(summedRow)
+		
+		// @ts-ignore
+		// eslint-disable-next-line no-inner-declarations
+		function reduceFunction4(index) {
+			return getSummedList2(clientTypesListData[index], "client")
 		}
-		return outputArrayDataRow
+		
+		// @ts-ignore
+		// eslint-disable-next-line no-inner-declarations
+		function reduceObjectFunction4(index) {
+			return {client: clientTypesListData[index].client, units: ""}
+		}
+
+		return summarizeData(filteredSortedListData, clientTypesListData, reduceFunction4, reduceObjectFunction4)
 	} else if (action === actions.tabulateUtTimeEntries) {
 		resultListData = resultList[i].data
 		clientTypesListData = filterTableTypes(resultList, "client")
@@ -1349,6 +1395,15 @@ function filterTableTypes(resultList, prop) {
 	return temp
 }
 
+function summarizeData(listDataA, listDataB, reduceFunctionArg, reduceObjectFunctionArg) {
+	const outputArrayDataRow = []
+	for (let j = 0; j <= listDataB.length - 1; j++) {
+		const summedOrCondensedRow = listDataA.reduce(reduceFunctionArg(j), reduceObjectFunctionArg(j))
+		outputArrayDataRow.push(summedOrCondensedRow)
+	}
+	return outputArrayDataRow
+}
+
 function tabulateData(resultListData, typesListData, innerTableData, prop) {
 	for (let j = 0; j <= typesListData.length - 1; j++) {
 		// if clientTypesListData[j][prop] is found in resultListData[all][prop]
@@ -1378,13 +1433,14 @@ function getReducedList(uniqueValuesListRow) {
 	}
 }
 
-function getSummedList(clientTypesListRow) {
+function getSummedList(typesListRow, prop) {
+	// clientTypesListRow, client
 	return function (accumulator, currentValue) {
-		if (clientTypesListRow.client === "client") {
-			const condition = (currentValue.client[0] !== "}")
+		if (typesListRow[prop] === "client") {
+			const condition = (currentValue[prop][0] !== "}")
 			return getSummedListInner(accumulator, currentValue, condition)
 		}
-		const condition = (currentValue.client === clientTypesListRow.client)
+		const condition = (currentValue[prop] === typesListRow[prop])
 		return getSummedListInner(accumulator, currentValue, condition)
 	}
 }
