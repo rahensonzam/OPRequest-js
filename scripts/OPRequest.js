@@ -1066,7 +1066,7 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 		filteredSortedListData = filteredSortedList[i].data
 		categoryTypesListData = categoryTypesList[i].data
 		for (let j = 0; j <= categoryTypesListData.length - 1; j++) {
-			summedRow = filteredSortedListData.reduce(getSummedList2(categoryTypesListData[j]), {category: categoryTypesListData[j].category, units: ""})
+			summedRow = filteredSortedListData.reduce(getSummedList2(categoryTypesListData[j], "category"), {category: categoryTypesListData[j].category, units: ""})
 			outputArrayDataRow.push(summedRow)
 		}
 		return outputArrayDataRow
@@ -1074,7 +1074,7 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 		filteredSortedListData = filteredSortedList[i].data
 		clientTypesListData = clientTypesList[i].data
 		for (let j = 0; j <= clientTypesListData.length - 1; j++) {
-			summedRow = filteredSortedListData.reduce(getSummedList3(clientTypesListData[j]), {client: clientTypesListData[j].client, units: ""})
+			summedRow = filteredSortedListData.reduce(getSummedList2(clientTypesListData[j], "client"), {client: clientTypesListData[j].client, units: ""})
 			outputArrayDataRow.push(summedRow)
 		}
 		return outputArrayDataRow
@@ -1393,22 +1393,18 @@ function getSummedList(clientTypesListRow) {
 	}
 }
 
-function getSummedList2(categoryTypesListRow) {
+function getSummedList2(typesListRow, prop) {
 	return function (accumulator, currentValue) {
-		if (currentValue.category === categoryTypesListRow.category) {
-			accumulator["units"] = String(Number(accumulator["units"]) + Number(currentValue["units"]))
-		}
-		return accumulator
+		const condition = (currentValue[prop] === typesListRow[prop])
+		return getSummedListInner(accumulator, currentValue, condition)
 	}
 }
 
-function getSummedList3(clientTypesListRow) {
-	return function (accumulator, currentValue) {
-		if (currentValue.client === clientTypesListRow.client) {
-			accumulator["units"] = String(Number(accumulator["units"]) + Number(currentValue["units"]))
-		}
-		return accumulator
+function getSummedListInner(accumulator, currentValue, condition) {
+	if (condition) {
+		accumulator["units"] = String(Number(accumulator["units"]) + Number(currentValue["units"]))
 	}
+	return accumulator
 }
 
 function compareAlphabetical(a, b) {
