@@ -1341,7 +1341,7 @@ function filterTableClientTypes(resultList) {
 			}
 		}
 	}
-	temp.sort(compareAphabetical)
+	temp.sort(compareAlphabetical)
 	temp.sort(compareMoveCurlyToBottom)
 
 	return temp
