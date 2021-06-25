@@ -1381,15 +1381,11 @@ function getReducedList(uniqueValuesListRow) {
 function getSummedList(clientTypesListRow) {
 	return function (accumulator, currentValue) {
 		if (clientTypesListRow.client === "client") {
-			if (currentValue.client[0] !== "}") {
-				accumulator["units"] = String(Number(accumulator["units"]) + Number(currentValue["units"]))
-			}
-			return accumulator
+			const condition = (currentValue.client[0] !== "}")
+			return getSummedListInner(accumulator, currentValue, condition)
 		}
-		if (currentValue.client === clientTypesListRow.client) {
-			accumulator["units"] = String(Number(accumulator["units"]) + Number(currentValue["units"]))
-		}
-		return accumulator
+		const condition = (currentValue.client === clientTypesListRow.client)
+		return getSummedListInner(accumulator, currentValue, condition)
 	}
 }
 
