@@ -991,7 +991,6 @@ function conversionErrorSelect(action, row, rowIndex, projectList, categoryList,
 }
 
 function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, workPackageIDs, filteredSortedList, uniqueValuesList, clientTypesList, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList) {
-	const outputArrayDataRow = []
 
 	if (action === actions.convertToWorkPackageIDs) {
 		return [{
@@ -1041,6 +1040,7 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 		return []
 	} else if (action === actions.extractTimeSheets) {
 		const filteredSortedListData = filteredSortedList[i].data
+		const outputArrayDataRow = []
 		for (let j = 0; j <= filteredSortedListData.length - 1; j++) {
 			let innerDataRow
 			let currentDate2 = currentDate
