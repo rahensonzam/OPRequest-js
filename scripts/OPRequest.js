@@ -169,13 +169,20 @@ async function doActionAsync(paramsObj) {
 	// const categoryList = await getListFileAsync(action, categoryListFilename)
 
 	const isValid = validateCSV(action, rows, headerRow)
-	if (action === actions.updateWorkPackage || action === actions.updateTimeEntry || action === actions.deleteTimeEntry || action === actions.addMembership || action === actions.addWorkPackage || action === actions.addProject || action === actions.addTimeEntry) {
+	if (action === actions.updateWorkPackage
+		|| action === actions.updateTimeEntry
+		|| action === actions.deleteTimeEntry
+		|| action === actions.addMembership
+		|| action === actions.addWorkPackage
+		|| action === actions.addProject
+		|| action === actions.addTimeEntry) {
 		if (typeof isValid[0].errorType !== "undefined") {
 			return {web: isValid}
 		}
 	}
-	if (action === actions.convertWeekToDays || action === actions.convertNamesToIDs) {
-		if (isValid.errors[0] !== "") {
+	if (action === actions.convertWeekToDays
+		|| action === actions.convertNamesToIDs) {
+		if (isValid.errors[0].message !== "") {
 			return {conversion: isValid}
 		}
 	}
@@ -185,7 +192,9 @@ async function doActionAsync(paramsObj) {
 	const taskList = []
 
 	let numOfPages
-	if (action === actions.getWorkPackages || action === actions.getAllWorkPackages || action === actions.getTimeEntries) {
+	if (action === actions.getWorkPackages
+		|| action === actions.getAllWorkPackages
+		|| action === actions.getTimeEntries) {
 		const result = await retrievePageCountAsync(action, apiKey, wpConvertUser)
 		// logWebResults(result)
 		// FIXME: Use array.every
@@ -249,12 +258,17 @@ async function doActionAsync(paramsObj) {
 		}
 	}
 
-	if (action === actions.convertToWorkPackageIDs || action === actions.convertNamesToIDs || action === actions.convertMembershipNamesToIDs || action === actions.convertWeekToDays || action === actions.exportTimeEntries) {
+	if (action === actions.convertToWorkPackageIDs
+		|| action === actions.convertNamesToIDs
+		|| action === actions.convertMembershipNamesToIDs
+		|| action === actions.convertWeekToDays
+		|| action === actions.exportTimeEntries) {
 		const outputObj = await convertResultsToCsv(convertedCSVResults)
 		return {conversion: outputObj}
 	}
 
-	if (action === actions.summarizeUtTimeEntries || action === actions.summarizeCatTimeEntries) {
+	if (action === actions.summarizeUtTimeEntries
+		|| action === actions.summarizeCatTimeEntries) {
 		const outputObj = await convertResultsToCsv(convertedCSVResults)
 		return {conversion: outputObj}
 	}
@@ -264,8 +278,11 @@ async function doActionAsync(paramsObj) {
 		return {conversion: outputObj}
 	}
 
-	// if (action === actions.extractTimeSheets || action === actions.condenseTimeSheets || action === actions.summarizeUtTimeEntries) {
-	if (action === actions.extractTimeSheets || action === actions.condenseTimeSheets) {
+	// if (action === actions.extractTimeSheets
+	// 	|| action === actions.condenseTimeSheets
+	// 	|| action === actions.summarizeUtTimeEntries) {
+	if (action === actions.extractTimeSheets
+		|| action === actions.condenseTimeSheets) {
 		console.log("convertedCSVResults", convertedCSVResults)
 		const coversionObj = await convertExtractResultsToCsv(action, convertedCSVResults)
 		return {conversion: coversionObj}
@@ -275,7 +292,10 @@ async function doActionAsync(paramsObj) {
 
 	// logWebResults(resultList)
 
-	if (action === actions.getProjects || action === actions.getWorkPackages || action === actions.getAllWorkPackages || action === actions.getTimeEntries) {
+	if (action === actions.getProjects
+		|| action === actions.getWorkPackages
+		|| action === actions.getAllWorkPackages
+		|| action === actions.getTimeEntries) {
 		for (let rowIndex = 0; rowIndex <= resultList.length - 1; rowIndex++) {
 			convertedCSVResults.push(convertCsvAction({action, rowIndex, resultList}))
 		}
@@ -296,13 +316,18 @@ async function doActionAsync(paramsObj) {
 }
 
 function setCount(action, rows, numOfPages, timeEntryList) {
-	if (action === actions.getWorkPackages || action === actions.getAllWorkPackages || action === actions.getTimeEntries) {
+	if (action === actions.getWorkPackages
+		|| action === actions.getAllWorkPackages
+		|| action === actions.getTimeEntries) {
 		return {start: 1, end: numOfPages}
 	} else if (action === actions.getProjects) {
 		return {start: 0, end: 0}
 	} else if (action === actions.exportTimeEntries) {
 		return {start: 0, end: timeEntryList.length - 1}
-	} else if (action === actions.extractTimeSheets || action === actions.summarizeUtTimeEntries || action === actions.summarizeCatTimeEntries || action === actions.breakdownClientByCatTimeEntries) {
+	} else if (action === actions.extractTimeSheets
+		|| action === actions.summarizeUtTimeEntries
+		|| action === actions.summarizeCatTimeEntries
+		|| action === actions.breakdownClientByCatTimeEntries) {
 		return {start: 0, end: 0}
 	} else {
 		return {start: 0, end: rows.length - 1}
@@ -433,12 +458,13 @@ function innerValidateCSVConversion(expected, headerRow) {
 //  		return JSON.parse(await fs.readFile(listFilename, "utf8"))
 // 	}
 
-// 	if (action === actions.convertNamesToIDs || action === actions.convertMembershipNamesToIDs) {
-//  		return JSON.parse(await fs.readFile(listFilename, "utf8"))
+// 	if (action === actions.convertNamesToIDs
+// 		|| action === actions.convertMembershipNamesToIDs) {
+// 		return JSON.parse(await fs.readFile(listFilename, "utf8"))
 // 	}
 
 // 	if (action === actions.convertNamesToIDs) {
-// 	 	return JSON.parse(await fs.readFile(listFilename, "utf8"))
+// 		return JSON.parse(await fs.readFile(listFilename, "utf8"))
 // 	}
 // }
 
@@ -644,7 +670,9 @@ function convertCsvAction(paramsObj) {
 			const project = workPackageRow["project"]
 			const subject = workPackageRow["subject"]
 			const assignee = workPackageRow["assignee"]
-			if ((project == client) && (subject == period) && (assignee == wpConvertUser)) {
+			if ((project == client)
+				&& (subject == period)
+				&& (assignee == wpConvertUser)) {
 				workPackageIDs.push(workPackageRow.id)
 			}
 		}
@@ -703,7 +731,10 @@ function convertCsvAction(paramsObj) {
 	}
 
 	let retrievedListLength
-	if (action === actions.getProjects || action === actions.getWorkPackages || action === actions.getAllWorkPackages || action === actions.getTimeEntries) {
+	if (action === actions.getProjects
+		|| action === actions.getWorkPackages
+		|| action === actions.getAllWorkPackages
+		|| action === actions.getTimeEntries) {
 		retrievedListLength = resultList[rowIndex].data["_embedded"]["elements"].length - 1
 	}
 
@@ -719,17 +750,23 @@ function convertCsvAction(paramsObj) {
 
 			outputArrayDataRow.push.apply(outputArrayDataRow, setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, workPackageIDs, filteredSortedList, uniqueValuesList, clientTypesList, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList))
 			// console.log(action)
-			// console.log(action !== actions.extractTimeSheets && action !== actions.condenseTimeSheets && action !== actions.summarizeUtTimeEntries)
+			// console.log(action !== actions.extractTimeSheets
+			// 	&& action !== actions.condenseTimeSheets
+			// 	&& action !== actions.summarizeUtTimeEntries)
 			// console.log("retrievedList", resultList[rowIndex].data["_embedded"]["elements"])
 			// console.log("outputArrayDataRow", outputArrayDataRow)
 
 			if (outputArrayDataRow.length !== 0) {
-				if (action === actions.extractTimeSheets || action === actions.summarizeUtTimeEntries || action === actions.summarizeCatTimeEntries) {
-					if (action === actions.extractTimeSheets || action === actions.summarizeUtTimeEntries) {
+				if (action === actions.extractTimeSheets
+					|| action === actions.summarizeUtTimeEntries
+					|| action === actions.summarizeCatTimeEntries) {
+					if (action === actions.extractTimeSheets
+						|| action === actions.summarizeUtTimeEntries) {
 						outputArrayDataRow.sort(compareAlphabetical)
 						outputArrayDataRow.sort(compareMoveCurlyToBottom)
 					}
-					// if (action === actions.extractTimeSheets || action === actions.summarizeUtTimeEntries) {
+					// if (action === actions.extractTimeSheets
+					// 	|| action === actions.summarizeUtTimeEntries) {
 					if (action === actions.extractTimeSheets) {
 						outputExt.push({name: filteredSortedList[i].name, data: outputArrayDataRow})
 					}
@@ -1174,7 +1211,8 @@ function splitListByCategoryThenGrade(resultList, categoryList, userList) {
 				if (!(tempArrayData.some(function(e) {return e.name === userList[index2].grade}))) {
 					const tempArrayinnerData = []
 					for (let index3 = 0; index3 <= resultList.length - 1; index3++) {
-						if (resultList[index3].grade === userList[index2].grade && resultList[index3].category === categoryList[index].name) {
+						if (resultList[index3].grade === userList[index2].grade
+							&& resultList[index3].category === categoryList[index].name) {
 							tempArrayinnerData.push(resultList[index3])
 						}
 					}
@@ -1437,10 +1475,12 @@ function compareMoveCurlyToBottom(a, b) {
 	let clientA = a.client
 	let clientB = b.client
 
-	if (clientA[0] === "}" && clientB[0] !== "}") {
+	if (clientA[0] === "}"
+		&& clientB[0] !== "}") {
 		return 1
 	}
-	if (clientA[0] !== "}" && clientB[0] === "}") {
+	if (clientA[0] !== "}"
+		&& clientB[0] === "}") {
 		return -1
 	}
 	return 0
@@ -1778,7 +1818,8 @@ async function currentRequestAsync(fullURL, httpMethod, apiKey, body, prefixName
 
 	const reqResponse = await WRequestAsync(fullURL, httpMethod, apiKey, body)
 
-	if (typeof reqResponse.data === "undefined" && typeof reqResponse.errorType !== "undefined") {
+	if (typeof reqResponse.data === "undefined"
+		&& typeof reqResponse.errorType !== "undefined") {
 		return {prefix: `${prefixName} ${prefixValue}: ${httpMethod}`, prelog: ["request started"], status: reqResponse.status, errorType: reqResponse.errorType, error: reqResponse.error}
 	}
 

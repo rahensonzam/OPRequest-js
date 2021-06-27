@@ -122,7 +122,10 @@ function showHideUI() {
         showHideUtil("weekBeginBox", "inline")
     }
 
-    if (actionType === actionTypes.sequenceExportSummarizeUt || actionType === actionTypes.sequenceExportSummarizeCat || actionType === actionTypes.sequenceExportBreakdown || actionType === actionTypes.single) {
+    if (actionType === actionTypes.sequenceExportSummarizeUt
+        || actionType === actionTypes.sequenceExportSummarizeCat
+        || actionType === actionTypes.sequenceExportBreakdown
+        || actionType === actionTypes.single) {
         //showDateEndPeriod
         showHideUtil("dateEndPeriodLabel", "inline")
         showHideUtil("dateEndPeriodBox", "inline")
@@ -132,7 +135,10 @@ function showHideUI() {
         showHideUtil("dateEndPeriodBox", "none")
     }
 
-    if (actionType === actionTypes.sequenceExportExtract || actionType === actionTypes.sequenceExportSummarizeUt || actionType === actionTypes.sequenceExportSummarizeCat || actionType === actionTypes.sequenceExportBreakdown) {
+    if (actionType === actionTypes.sequenceExportExtract
+        || actionType === actionTypes.sequenceExportSummarizeUt
+        || actionType === actionTypes.sequenceExportSummarizeCat
+        || actionType === actionTypes.sequenceExportBreakdown) {
         //hideCsvChooser
         showHideUtil("csvChooser", "none")
 
@@ -154,7 +160,11 @@ function showHideUI() {
         // }
     }
 
-    if (actionType === actionTypes.sequenceExportExtract || actionType === actionTypes.sequenceExportSummarizeUt || actionType === actionTypes.sequenceExportSummarizeCat || actionType === actionTypes.sequenceExportBreakdown || actionType === actionTypes.single) {
+    if (actionType === actionTypes.sequenceExportExtract
+        || actionType === actionTypes.sequenceExportSummarizeUt
+        || actionType === actionTypes.sequenceExportSummarizeCat
+        || actionType === actionTypes.sequenceExportBreakdown
+        || actionType === actionTypes.single) {
         //showStaticListsCheckbox
         showHideUtil("staticListsCheckbox", "inline")
         showHideUtil("staticListsLabel", "inline")
@@ -168,7 +178,10 @@ function showHideUI() {
         showStaticFile()
     } else {
         if (staticListsCheckbox.checked) {
-            if (actionType === actionTypes.sequenceExportExtract || actionType === actionTypes.sequenceExportSummarizeUt || actionType === actionTypes.sequenceExportSummarizeCat || actionType === actionTypes.sequenceExportBreakdown) {
+            if (actionType === actionTypes.sequenceExportExtract
+                || actionType === actionTypes.sequenceExportSummarizeUt
+                || actionType === actionTypes.sequenceExportSummarizeCat
+                || actionType === actionTypes.sequenceExportBreakdown) {
                 showStaticFile()
             }
         } else {
@@ -292,7 +305,8 @@ async function runActions() {
 
     showLoading()
 
-    if (!(wpConvertUser == adminUser1 || wpConvertUser == adminUser2)) {
+    if (!(wpConvertUser == adminUser1
+        || wpConvertUser == adminUser2)) {
         localStorage.setItem("userStore", wpConvertUser)
         localStorage.setItem("apiKeyStore", apiKey)
     }
@@ -315,7 +329,8 @@ async function runActions() {
         writeToLog("step: 2/8 action: csvInput", "step", logType.step)
         console.log("step: 2/6 action: csvInput")
 
-        if (csvType === csvTypes.create || csvType === csvTypes.import) {
+        if (csvType === csvTypes.create
+            || csvType === csvTypes.import) {
             // const spreadsheetCsvFilename = getCsvFilename()
 
             showSpreadsheet()
@@ -342,7 +357,8 @@ async function runActions() {
         writeToLog("step: 2/6 action: csvInput", "step", logType.step)
         console.log("step: 2/6 action: csvInput")
 
-        if (csvType === csvTypes.create || csvType === csvTypes.import) {
+        if (csvType === csvTypes.create
+            || csvType === csvTypes.import) {
             // const spreadsheetCsvFilename = getCsvFilename()
 
             showSpreadsheet()
@@ -640,7 +656,10 @@ async function runSpreadsheetDone() {
     
     // hideSpreadsheet()
 
-    if (actionType === actionTypes.sequenceExportExtract || actionType === actionTypes.sequenceExportSummarizeUt || actionType === actionTypes.sequenceExportSummarizeCat || actionType === actionTypes.sequenceExportBreakdown) {
+    if (actionType === actionTypes.sequenceExportExtract
+        || actionType === actionTypes.sequenceExportSummarizeUt
+        || actionType === actionTypes.sequenceExportSummarizeCat
+        || actionType === actionTypes.sequenceExportBreakdown) {
         showLoading()
         await runSecondHalf("")
         
@@ -788,7 +807,10 @@ async function runSecondHalf(initCsvFileString) {
         console.log("Sequence completed successfully")
         writeSeparatorToLog()
     }
-    if (actionType === actionTypes.sequenceExportExtract || actionType === actionTypes.sequenceExportSummarizeUt || actionType === actionTypes.sequenceExportSummarizeCat || actionType === actionTypes.sequenceExportBreakdown) {
+    if (actionType === actionTypes.sequenceExportExtract
+        || actionType === actionTypes.sequenceExportSummarizeUt
+        || actionType === actionTypes.sequenceExportSummarizeCat
+        || actionType === actionTypes.sequenceExportBreakdown) {
         if (staticLists === false) {
             const step2 = await runCurrentAction(actions.getAllWorkPackages, "step: 2/4 action: getWorkPackages (please wait, this step takes a bit of time)", "", false)
             if (step2.halt) {
@@ -1190,17 +1212,28 @@ function logConversionErrors(resultArray) {
 }
 
 function logData(action, currentStep) {
-    if (action === actions.getProjects || action === actions.getWorkPackages || action === actions.getAllWorkPackages || action === actions.getTimeEntries) {
+    if (action === actions.getProjects
+        || action === actions.getWorkPackages
+        || action === actions.getAllWorkPackages
+        || action === actions.getTimeEntries) {
         writeToLog(`${JSON.stringify(currentStep.conversion.data[0].data)}`, "output", logType.normal)
         console.log(currentStep.conversion.data[0].data)
         return
     }
-    if (action === actions.convertToWorkPackageIDs || action === actions.convertNamesToIDs || action === actions.convertMembershipNamesToIDs || action === actions.convertWeekToDays || action === actions.exportTimeEntries) {
+    if (action === actions.convertToWorkPackageIDs
+        || action === actions.convertNamesToIDs
+        || action === actions.convertMembershipNamesToIDs
+        || action === actions.convertWeekToDays
+        || action === actions.exportTimeEntries) {
         writeToLog(`${currentStep.conversion.data[0].data}`, "output", logType.normal)
         console.log(currentStep.conversion.data[0].data)
         return
     }
-    if (action === actions.extractTimeSheets || action === actions.condenseTimeSheets || action === actions.summarizeUtTimeEntries || action === actions.summarizeCatTimeEntries || action === actions.breakdownClientByCatTimeEntries) {
+    if (action === actions.extractTimeSheets
+        || action === actions.condenseTimeSheets
+        || action === actions.summarizeUtTimeEntries
+        || action === actions.summarizeCatTimeEntries
+        || action === actions.breakdownClientByCatTimeEntries) {
         // writeToLog(`${currentStep.conversion.data}`, "output", logType.normal)
         console.log(currentStep.conversion.data)
         for (let i = 0; i <= currentStep.conversion.data.length - 1; i++) {
@@ -1222,7 +1255,8 @@ function writeSeparatorToLog() {
 
 function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, csvType, selectedFile) {
     if (preReqType === preReqTypes.sequence) {
-        if (actionType === actionTypes.sequenceWeekly || actionType === actionTypes.sequenceDaily) {
+        if (actionType === actionTypes.sequenceWeekly
+            || actionType === actionTypes.sequenceDaily) {
             if (user === "-1") {
                 writeToLog("error: No user selected", "error", logType.error)
                 return false
@@ -1232,20 +1266,30 @@ function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, csvType
             writeToLog("error: Invalid API Key", "error", logType.error)
             return false            
         }
-        if (actionType === actionTypes.sequenceWeekly || actionType === actionTypes.sequenceExportExtract || actionType === actionTypes.sequenceExportSummarizeUt || actionType === actionTypes.sequenceExportSummarizeCat || actionType === actionTypes.sequenceExportBreakdown) {
+        if (actionType === actionTypes.sequenceWeekly
+            || actionType === actionTypes.sequenceExportExtract
+            || actionType === actionTypes.sequenceExportSummarizeUt
+            || actionType === actionTypes.sequenceExportSummarizeCat
+            || actionType === actionTypes.sequenceExportBreakdown) {
             if (!(dayjs(weekBegin, validDateFormats).isValid())) {
                 writeToLog("error: Invalid date for week beginning", "error", logType.error)
                 return false            
             }
-            if (actionType === actionTypes.sequenceExportSummarizeUt || actionType === actionTypes.sequenceExportSummarizeCat || actionType === actionTypes.sequenceExportBreakdown) {
+            if (actionType === actionTypes.sequenceExportSummarizeUt
+                || actionType === actionTypes.sequenceExportSummarizeCat
+                || actionType === actionTypes.sequenceExportBreakdown) {
                 if (!(dayjs(dateEndPeriod, validDateFormats).isValid())) {
                     writeToLog("error: Invalid date for end of period", "error", logType.error)
                     return false            
                 }
             }
         }
-        if (actionType !== actionTypes.sequenceExportExtract && actionType !== actionTypes.sequenceExportSummarizeUt && actionType !== actionTypes.sequenceExportSummarizeCat && actionType !== actionTypes.sequenceExportBreakdown) {
-            if (csvType === csvTypes.import || csvType === csvTypes.import2) {
+        if (actionType !== actionTypes.sequenceExportExtract
+            && actionType !== actionTypes.sequenceExportSummarizeUt
+            && actionType !== actionTypes.sequenceExportSummarizeCat
+            && actionType !== actionTypes.sequenceExportBreakdown) {
+            if (csvType === csvTypes.import
+                || csvType === csvTypes.import2) {
                 if (typeof selectedFile === "undefined") {
                     writeToLog("error: Import CSV selected but no file selected for upload", "error", logType.error)
                     return false
