@@ -878,10 +878,6 @@ function setConversionCount(action, retrievedListLength, filteredSortedListLengt
 function conversionErrorSelect(action, row, rowIndex, projectList, categoryList, workPackageIDs, filteredSortedList) {
 	const outputArray = []
 	let error = ""
-	let projectName
-	let projectIndex
-	let categoryName
-	let categoryIndex
 
 	if (action === actions.convertToWorkPackageIDs) {
 		if (!(workPackageIDs.length === 1)) {
@@ -899,10 +895,10 @@ function conversionErrorSelect(action, row, rowIndex, projectList, categoryList,
 		}
 		return false
 	} else if (action === actions.convertNamesToIDs) {
-		projectName = row.client
-		projectIndex = findArrayIndexFromName(projectList, projectName)
-		categoryName = row.category
-		categoryIndex = findArrayIndexFromName(categoryList, categoryName)
+		const projectName = row.client
+		const projectIndex = findArrayIndexFromName(projectList, projectName)
+		const categoryName = row.category
+		const categoryIndex = findArrayIndexFromName(categoryList, categoryName)
 
 		if (projectIndex === -1 || categoryIndex === -1) {
 			if (projectIndex === -1) {
@@ -923,8 +919,8 @@ function conversionErrorSelect(action, row, rowIndex, projectList, categoryList,
 		}
 		return false
 	} else if (action === actions.convertMembershipNamesToIDs) {
-		projectName = row.client
-		projectIndex = findArrayIndexFromName(projectList, projectName)
+		const projectName = row.client
+		const projectIndex = findArrayIndexFromName(projectList, projectName)
 		if (projectIndex === -1) {
 			error = `error: index ${rowIndex + 2} "${projectName}" not found`
 			outputArray.push({data: {
@@ -958,19 +954,6 @@ function conversionErrorSelect(action, row, rowIndex, projectList, categoryList,
 }
 
 function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, workPackageIDs, filteredSortedList, uniqueValuesList, clientTypesList, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList) {
-	let projectName
-	let projectIndex
-	let projectID
-	let categoryName
-	let categoryIndex
-	let categoryID
-	let workPackageID
-	let workPackageIndex
-	let userID
-	let userIndex
-	let retrivedProjectList
-	let currentDate2
-	let filteredSortedListData
 	const outputArrayDataRow = []
 
 	if (action === actions.convertToWorkPackageIDs) {
@@ -982,12 +965,12 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 			units: row.units
 		}]
 	} else if (action === actions.convertNamesToIDs) {
-		projectName = row.client
-		projectIndex = findArrayIndexFromName(projectList, projectName)
-		projectID = projectList[projectIndex].id
-		categoryName = row.category
-		categoryIndex = findArrayIndexFromName(categoryList, categoryName)
-		categoryID = categoryList[categoryIndex].id
+		const projectName = row.client
+		const projectIndex = findArrayIndexFromName(projectList, projectName)
+		const projectID = projectList[projectIndex].id
+		const categoryName = row.category
+		const categoryIndex = findArrayIndexFromName(categoryList, categoryName)
+		const categoryID = categoryList[categoryIndex].id
 		return [{
 			client: projectID,
 			period: row.period,
@@ -997,9 +980,9 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 			units: row.units
 		}]
 	} else if (action === actions.convertMembershipNamesToIDs) {
-		projectName = row.client
-		projectIndex = findArrayIndexFromName(projectList, projectName)
-		projectID = projectList[projectIndex].id
+		const projectName = row.client
+		const projectIndex = findArrayIndexFromName(projectList, projectName)
+		const projectID = projectList[projectIndex].id
 		return [{
 			project: projectID,
 			user: row.user,
@@ -1020,10 +1003,10 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 		}
 		return []
 	} else if (action === actions.extractTimeSheets) {
-		filteredSortedListData = filteredSortedList[i].data
+		const filteredSortedListData = filteredSortedList[i].data
 		for (let j = 0; j <= filteredSortedListData.length - 1; j++) {
 			let innerDataRow
-			currentDate2 = currentDate
+			let currentDate2 = currentDate
 			for (let index = 0; index <= daysOfWeek.length - 1; index++) {
 				if (filteredSortedListData[j].spentOn === currentDate2) {
 					innerDataRow = {
@@ -1062,7 +1045,7 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 		|| action === actions.getWorkPackages
 		|| action === actions.getAllWorkPackages
 		|| action === actions.getTimeEntries) {
-		retrivedProjectList = resultList[rowIndex].data["_embedded"]["elements"]
+		const retrivedProjectList = resultList[rowIndex].data["_embedded"]["elements"]
 		if (action === actions.getProjects) {
 			return [{
 				id: retrivedProjectList[i]["id"],
@@ -1092,14 +1075,14 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 			}]
 		}
 	} else if (action === actions.exportTimeEntries) {
-		workPackageID = timeEntryList[rowIndex]["workPackage"]
-		workPackageIndex = findArrayIndexFromID(workPackageList, workPackageID)
-		projectID = workPackageList[workPackageIndex]["project"]
-		projectIndex = findArrayIndexFromID(projectList, projectID)
-		categoryID = timeEntryList[rowIndex]["activity"]
-		categoryIndex = findArrayIndexFromID(categoryList, categoryID)
-		userID = timeEntryList[rowIndex]["user"]
-		userIndex = findArrayIndexFromID(userList, userID)
+		const workPackageID = timeEntryList[rowIndex]["workPackage"]
+		const workPackageIndex = findArrayIndexFromID(workPackageList, workPackageID)
+		const projectID = workPackageList[workPackageIndex]["project"]
+		const projectIndex = findArrayIndexFromID(projectList, projectID)
+		const categoryID = timeEntryList[rowIndex]["activity"]
+		const categoryIndex = findArrayIndexFromID(categoryList, categoryID)
+		const userID = timeEntryList[rowIndex]["user"]
+		const userIndex = findArrayIndexFromID(userList, userID)
 		return [{
 			id: timeEntryList[rowIndex]["id"],
 			workPackage: workPackageID,
@@ -1580,11 +1563,8 @@ function setFullUrl(action, row) {
 
 function setBody(action, row, lockVersion, rowIndex, wpConvertUser, billingStatusList) {
 
-	let convertedUnits
-	let tempWP = {}
-	let tempTimeEntry = {}
-
 	if (action === actions.updateWorkPackage) {
+		const tempWP = {}
 		tempWP["lockVersion"] = lockVersion
 		if (checkIfPropertyExists(row, "subject")) {
 			tempWP["subject"] = row.subject
@@ -1616,11 +1596,12 @@ function setBody(action, row, lockVersion, rowIndex, wpConvertUser, billingStatu
 		}
 		return tempWP
 	} else if (action === actions.updateTimeEntry) {
+		const tempTimeEntry = {}
 		if (checkIfPropertyExists(row, "spentOn")) {
 			tempTimeEntry["spentOn"] = row.spentOn
 		}
 		if (checkIfPropertyExists(row, "units")) {
-			convertedUnits = convertUnits(row.units)
+			const convertedUnits = convertUnits(row.units)
 			tempTimeEntry["hours"] = convertedUnits
 		}
 		if (checkIfPropertyExists(row, "comment")) {
@@ -1682,7 +1663,7 @@ function setBody(action, row, lockVersion, rowIndex, wpConvertUser, billingStatu
 			"name": row.name
 		}
 	} else if (action === actions.addTimeEntry) {
-		convertedUnits = convertUnits(row.units)
+		const convertedUnits = convertUnits(row.units)
 		return {
 			"spentOn": row.spentOn,
 			"hours": convertedUnits,
