@@ -8,17 +8,17 @@
             "type": "pwa-chrome",
             "request": "launch",
             "name": "Chrome",
-            "url": "http://127.0.0.1:5500/index.html",
+            "url": "http://127.0.0.1:5500/bulk-upload/index.html",
             "webRoot": "${workspaceFolder}"
         },
         {
             "type": "node",
             "request": "launch",
-            "name": "Node js",
+            "name": "Node JS",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\scripts\\OPRequest-v26.1.js"
+            "program": "${workspaceFolder}\bulk-upload\\scripts\\OPRequest-v24.js"
         }
     ]
 }
