@@ -917,7 +917,7 @@ function conversionErrorSelect(action, row, rowIndex, projectList, categoryList,
 	let error = ""
 
 	if (action === actions.convertToWorkPackageIDs) {
-		if (!(workPackageIDs.length === 1)) {
+		if (workPackageIDs.length !== 1) {
 			const projectName = findArrayNameFromID(projectList, row.client)
 			const period = row.period
 			error = `error: index ${rowIndex + 2}, number of matching workPackageIDs for this user: ${workPackageIDs.length}`
