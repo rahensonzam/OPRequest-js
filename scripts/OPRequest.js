@@ -970,11 +970,7 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 	let userIndex
 	let retrivedProjectList
 	let currentDate2
-	let innerTableData
-	let resultListData
 	let filteredSortedListData
-	let clientTypesListData
-	let categoryTypesListData
 	const outputArrayDataRow = []
 
 	if (action === actions.convertToWorkPackageIDs) {
@@ -1054,27 +1050,14 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 		return summarizeData(action, filteredSortedList, categoryTypesList, i, "category")
 
 	} else if (action === actions.tabulateUtTimeEntries) {
-		resultListData = resultList[i].data
-		clientTypesListData = filterTableTypes(resultList, "client")
-		clientTypesListData.sort(compareAlphabetical)
-		clientTypesListData.sort(compareMoveCurlyToBottom)
+		return tabulateData(action, resultList, i, "client", "user/client")
 
-		innerTableData = {"user/client": resultList[i].name}
-		return tabulateData(resultListData, clientTypesListData, innerTableData, "client")
 	} else if (action === actions.tabulateCatTimeEntries) {
-		resultListData = resultList[i].data
-		categoryTypesListData = filterTableTypes(resultList, "category")
+		return tabulateData(action, resultList, i, "category", "grade/category")
 
-		innerTableData = {"grade/category": resultList[i].name}
-		return tabulateData(resultListData, categoryTypesListData, innerTableData, "category")
 	} else if (action === actions.tabulateBreakdownTimeEntries) {
-		resultListData = resultList[i].data 
-		clientTypesListData = filterTableTypes(resultList, "client")
-		clientTypesListData.sort(compareAlphabetical)
-		clientTypesListData.sort(compareMoveCurlyToBottom)
+		return tabulateData(action, resultList, i, "client", "grade/client")
 
-		innerTableData = {"grade/client": resultList[i].name} 
-		return tabulateData(resultListData, clientTypesListData, innerTableData, "client")
 	} else if (action === actions.getProjects
 		|| action === actions.getWorkPackages
 		|| action === actions.getAllWorkPackages
@@ -1391,7 +1374,22 @@ function summarizeDataInner(listDataA, listDataB, reduceFunctionArg, reduceObjec
 	return outputArrayDataRow
 }
 
-function tabulateData(resultListData, typesListData, innerTableData, prop) {
+function tabulateData(action, resultList, i, prop, topLeft) {
+
+	const resultListData = resultList[i].data
+	const typesListData = filterTableTypes(resultList, prop)
+
+	if (action === actions.tabulateUtTimeEntries
+		|| action === actions.tabulateBreakdownTimeEntries) {
+		typesListData.sort(compareAlphabetical)
+		typesListData.sort(compareMoveCurlyToBottom)
+	}
+
+	const innerTableData = {[topLeft]: resultList[i].name}
+	return tabulateDataInner(resultListData, typesListData, innerTableData, prop)
+}
+
+function tabulateDataInner(resultListData, typesListData, innerTableData, prop) {
 	for (let j = 0; j <= typesListData.length - 1; j++) {
 		// if clientTypesListData[j][prop] is found in resultListData[all][prop]
 		if (resultListData.some(function(e) {return e[prop] === typesListData[j][prop]})) {
