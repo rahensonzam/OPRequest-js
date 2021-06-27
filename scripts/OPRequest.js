@@ -1069,15 +1069,8 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 				identifier: retrivedProjectList[i]["identifier"],
 				name: retrivedProjectList[i]["name"]
 			}]
-		} else if (action === actions.getWorkPackages) {
-			return [{
-				id: retrivedProjectList[i]["id"],
-				subject: retrivedProjectList[i]["subject"],
-				project: extractProject(retrivedProjectList[i]),
-				assignee: extractAssignee(retrivedProjectList[i]),
-				status: retrivedProjectList[i]["_links"]["status"]["title"]
-			}]
-		} else if (action === actions.getAllWorkPackages) {
+		} else if (action === actions.getWorkPackages
+			|| action === actions.getAllWorkPackages) {
 			return [{
 				id: retrivedProjectList[i]["id"],
 				subject: retrivedProjectList[i]["subject"],
