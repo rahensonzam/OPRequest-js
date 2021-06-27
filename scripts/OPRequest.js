@@ -937,7 +937,8 @@ function conversionErrorSelect(action, row, rowIndex, projectList, categoryList,
 		const categoryName = row.category
 		const categoryIndex = findArrayIndexFromName(categoryList, categoryName)
 
-		if (projectIndex === -1 || categoryIndex === -1) {
+		if (projectIndex === -1
+			|| categoryIndex === -1) {
 			if (projectIndex === -1) {
 				error = `error: index ${rowIndex + 2} "${projectName}" not found`
 			}
