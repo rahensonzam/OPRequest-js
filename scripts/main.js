@@ -1130,7 +1130,7 @@ function getSelectedRadioButtonValue(radioGroupName) {
 function conversionErrorsPresent(resultArray) {
     //FIXME: Use array.every
     for (let i = 0; i <= resultArray.errors.length - 1; i++) {
-        if (resultArray.errors[i] !== "") {
+        if (resultArray.errors[i].message !== "") {
             return true
         }
     }
@@ -1197,10 +1197,14 @@ function logWebResults(resultList) {
 
 function logConversionErrors(resultArray) {
     for (let i = 0; i <= resultArray.errors.length - 1; i++) {
-        if (resultArray.errors[i] !== "") {
-            console.error(resultArray.errors[i])
-            writeToLog(`${resultArray.errors[i]}`, "error", logType.error)
+        if (resultArray.errors[i].message !== "") {
+            console.error(resultArray.errors[i].message)
+            writeToLog(`${resultArray.errors[i].message}`, "error", logType.error)
         }
+    }
+    if (typeof resultArray.errors[0].csv !== "undefined") {
+        console.error(resultArray.errors[0].csv)
+        writeToLog(`${resultArray.errors[0].csv}`, "error", logType.error)
     }
     // ReferenceError: logTextBox is not defined
     // resultArray.errors.forEach(function (element) { 

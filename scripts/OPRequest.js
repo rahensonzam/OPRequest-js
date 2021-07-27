@@ -258,8 +258,12 @@ async function doActionAsync(paramsObj) {
 		}
 	}
 
-	if (action === actions.convertToWorkPackageIDs
-		|| action === actions.convertNamesToIDs
+	if (action === actions.convertToWorkPackageIDs) {
+		const outputObj = await convertResultsToCsv3(convertedCSVResults)
+		return {conversion: outputObj}
+	}
+
+	if (action === actions.convertNamesToIDs
 		|| action === actions.convertMembershipNamesToIDs
 		|| action === actions.convertWeekToDays
 		|| action === actions.exportTimeEntries) {
@@ -433,7 +437,9 @@ function innerValidateCSVWeb(expected, headerRow, httpMethod) {
 				status: "400 Bad Request",
 				prelog: [],
 				prefix: `Invalid CSV input: ${httpMethod}`,
-				error: `"${expected[index]}" missing from CSV header\nExpected "${expected}" but got "${headerRow}"`
+				errors: [{
+					message: `"${expected[index]}" missing from CSV header\nExpected "${expected}" but got "${headerRow}"`
+				}]
 			}]
 		}
 	}
@@ -445,11 +451,13 @@ function innerValidateCSVConversion(expected, headerRow) {
 	for (let index = 0; index <= expected.length - 1; index++) {
 		if (!(headerRow.includes(expected[index]))) {
 			return {
-				errors: [`Invalid CSV input\n"${expected[index]}" missing from CSV header\nExpected "${expected}" but got "${headerRow}"`]
+				errors: [{
+					message: `Invalid CSV input\n"${expected[index]}" missing from CSV header\nExpected "${expected}" but got "${headerRow}"`
+				}]
 			}
 		}
 	}
-	return {errors: [""]}
+	return {errors: [{message: ""}]}
 }
 
 // async function getListFileAsync(action, listFilename) {
@@ -522,6 +530,28 @@ async function convertResultsToCsv2(resultArray) {
 	}
 	const temp2 = extractErrors(resultArray)
 	return {data: outputData, errors: temp2}
+	// console.log(outputCsv)
+}
+
+async function convertResultsToCsv3(resultArray) {
+	// logConversionErrors(resultArray)
+	const temp = expandResults(resultArray)
+	const temp3 = []
+	for (let i = 0; i <= temp.length - 1; i++) {
+		temp3.push(temp[i].data)
+	}
+	const outputCsv = Papa.unparse(temp3, {quotes: true})
+	const temp2 = extractErrors(resultArray)
+	const temp4 = []
+	for (let i = 0; i <= temp2.length - 1; i++) {
+		temp4.push(temp2[i].data)
+	}
+	const temp5 = filterUniqueValues2(temp4)
+	const errorsCsv = Papa.unparse(temp5, {quotes: true})
+	for (let i = 0; i <= temp2.length - 1; i++) {
+		temp2[i].csv = errorsCsv
+	}
+	return {data: [{data: outputCsv}], errors: temp2}
 	// console.log(outputCsv)
 }
 
@@ -658,7 +688,7 @@ function convertCsvAction(paramsObj) {
 	const userList = checkIfPropertyExists(paramsObj, "userList")
 
 	const outputArray = []
-	let error = ""
+	const error = {message: ""}
 	let currentDate = weekBegin
 
 	const workPackageIDs = []
@@ -724,7 +754,7 @@ function convertCsvAction(paramsObj) {
 	}
 
 	// check data for errors
-	const conversionErrorResult = conversionErrorSelect(action, row, rowIndex, projectList, categoryList, workPackageIDs, filteredSortedList)
+	const conversionErrorResult = conversionErrorSelect(action, row, rowIndex, wpConvertUser, projectList, categoryList, workPackageIDs, filteredSortedList)
 	if (conversionErrorResult !== false) {
 		return conversionErrorResult
 		// {data: outputArray, errors: error}
@@ -912,23 +942,27 @@ function setConversionCount(action, retrievedListLength, filteredSortedListLengt
 	}
 }
 
-function conversionErrorSelect(action, row, rowIndex, projectList, categoryList, workPackageIDs, filteredSortedList) {
+function conversionErrorSelect(action, row, rowIndex, wpConvertUser, projectList, categoryList, workPackageIDs, filteredSortedList) {
 	const outputArray = []
-	let error = ""
+	let error = {}
 
 	if (action === actions.convertToWorkPackageIDs) {
 		if (workPackageIDs.length !== 1) {
 			const projectName = findArrayNameFromID(projectList, row.client)
 			const period = row.period
-			error = `error: index ${rowIndex + 2}, number of matching workPackageIDs for this user: ${workPackageIDs.length}`
+			error.message = `error: index ${rowIndex + 2}, number of matching workPackageIDs for this user: ${workPackageIDs.length}`
 			if (workPackageIDs.length > 1) {
 				for (let i = 0; i <= workPackageIDs.length - 1; i++) {
-					error += `\r\n${workPackageIDs[i]} "${projectName}","${period}"`
+					error.message += `\r\n${workPackageIDs[i]} "${projectName}","${period}"`
 				}
 			} else {
-				error += `\r\nfor "${projectName}","${period}"`
+				error.message += `\r\nfor "${projectName}","${period}"`
+				error.data = {}
+				error.data.project = projectName
+				error.data.subject = period
+				error.data.user = wpConvertUser
 			}
-			return {data: [{data: outputArray}], errors: error}
+			return {data: [{data: {}}], errors: error}
 		}
 		return false
 	} else if (action === actions.convertNamesToIDs) {
@@ -940,10 +974,10 @@ function conversionErrorSelect(action, row, rowIndex, projectList, categoryList,
 		if (projectIndex === -1
 			|| categoryIndex === -1) {
 			if (projectIndex === -1) {
-				error = `error: index ${rowIndex + 2} "${projectName}" not found`
+				error.message = `error: index ${rowIndex + 2} "${projectName}" not found`
 			}
 			if (categoryIndex === -1) {
-				error = `error: index ${rowIndex + 2} "${categoryName}" not found`
+				error.message = `error: index ${rowIndex + 2} "${categoryName}" not found`
 			}
 			outputArray.push({data: {
 				client: projectName,
@@ -960,7 +994,7 @@ function conversionErrorSelect(action, row, rowIndex, projectList, categoryList,
 		const projectName = row.client
 		const projectIndex = findArrayIndexFromName(projectList, projectName)
 		if (projectIndex === -1) {
-			error = `error: index ${rowIndex + 2} "${projectName}" not found`
+			error.message = `error: index ${rowIndex + 2} "${projectName}" not found`
 			outputArray.push({data: {
 				project: projectName,
 				user: row.user,
@@ -974,7 +1008,7 @@ function conversionErrorSelect(action, row, rowIndex, projectList, categoryList,
 		|| action === actions.summarizeCatTimeEntries
 		|| action === actions.breakdownClientByCatTimeEntries) {
 		if (filteredSortedList.length === 0) {
-			error = "error: No rows found for the selected weeks"
+			error.message = "error: No rows found for the selected weeks"
 			return {errors: error}
 		}
 		return false
@@ -1256,6 +1290,28 @@ function filterUniqueValues(resultList) {
 			}
 		}
 		tempArray.push({name: resultList[i].name, data: tempArrayData})
+	}
+	return tempArray
+}
+
+function filterUniqueValues2(resultArray) {
+	const tempArray = []
+	tempArray.push({
+		project: resultArray[0].project,
+		subject: resultArray[0].subject,
+		user: resultArray[0].user
+	})
+	for (let i = 0 + 1; i <= resultArray.length - 1; i++) {
+		// if ### is not equal to ### in tempArrayData[all].###
+		if (!(tempArray.some(function(e) {return (e.project === resultArray[i].project
+			&& e.subject === resultArray[i].subject
+			&& e.user === resultArray[i].user)}))) {
+			tempArray.push({
+				project: resultArray[i].project,
+				subject: resultArray[i].subject,
+				user: resultArray[i].user
+			})
+		}
 	}
 	return tempArray
 }
