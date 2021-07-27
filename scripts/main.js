@@ -37,6 +37,7 @@ let actionType
 let csvType
 let fileSelect
 let staticLists
+let unbilledOnly
 let workPackageListFileSelect
 let timeEntryListFileSelect
 let projectList
@@ -174,6 +175,15 @@ function showHideUI() {
         showHideUtil("staticListsLabel", "none")
     }
 
+    if (actionType === actionTypes.sequenceExportBreakdown
+        || actionType === actionTypes.single) {
+        showHideUtil("unbilledOnlyCheckbox", "inline")
+        showHideUtil("unbilledOnlyLabel", "inline")
+    } else {
+        showHideUtil("unbilledOnlyCheckbox", "none")
+        showHideUtil("unbilledOnlyLabel", "none")
+    }
+
     if (actionType === actionTypes.single) {
         showStaticFile()
     } else {
@@ -277,6 +287,7 @@ async function runActions() {
     dateEndPeriod = document.getElementById("dateEndPeriodBox").value
     fileSelect = document.getElementById("fileSelect")
     staticLists = document.getElementById("staticListsCheckbox").checked
+    unbilledOnly = document.getElementById("unbilledOnlyCheckbox").checked
     workPackageListFileSelect = document.getElementById("workPackageListFileSelect")
     timeEntryListFileSelect = document.getElementById("timeEntryListFileSelect")
 
@@ -992,6 +1003,9 @@ function getActionOptions(action) {
         }
         if (action === actions.convertToWorkPackageIDs) {
             returnObj.wpConvertUser = wpConvertUser
+        }
+        if (action === actions.breakdownClientByCatTimeEntries) {
+            returnObj.unbilledOnly = unbilledOnly
         }
         if (action === actions.convertToWorkPackageIDs
             || action === actions.convertNamesToIDs

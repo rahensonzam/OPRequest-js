@@ -157,6 +157,7 @@ async function doActionAsync(paramsObj) {
 	const headerRow = checkIfPropertyExists(paramsObj, "headerRow")
 	const weekBegin = checkIfPropertyExists(paramsObj, "weekBegin")
 	const dateEndPeriod = checkIfPropertyExists(paramsObj, "dateEndPeriod")
+	const unbilledOnly = checkIfPropertyExists(paramsObj, "unbilledOnly")
 	const projectList = checkIfPropertyExists(paramsObj, "projectList")
 	const categoryList = checkIfPropertyExists(paramsObj, "categoryList")
 	const workPackageList = checkIfPropertyExists(paramsObj, "workPackageList")
@@ -244,7 +245,7 @@ async function doActionAsync(paramsObj) {
 		} else if (action === actions.summarizeCatTimeEntries) {
 			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, projectList, categoryList, userList}))
 		} else if (action === actions.breakdownClientByCatTimeEntries) {
-			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, projectList, categoryList, userList}))
+			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, unbilledOnly, projectList, categoryList, userList}))
 		} else if (action === actions.getProjects) {
 			taskList.push(getCurrentListPartAAsync(action, rowIndex, "", "GET", apiKey, "pageNum", rowIndex))
 		} else if (action === actions.getWorkPackages) {
@@ -680,6 +681,7 @@ function convertCsvAction(paramsObj) {
 	const wpConvertUser = checkIfPropertyExists(paramsObj, "wpConvertUser")
 	const weekBegin = checkIfPropertyExists(paramsObj, "weekBegin")
 	const dateEndPeriod = checkIfPropertyExists(paramsObj, "dateEndPeriod")
+	const unbilledOnly = checkIfPropertyExists(paramsObj, "unbilledOnly")
 	const resultList = checkIfPropertyExists(paramsObj, "resultList")
 	const projectList = checkIfPropertyExists(paramsObj, "projectList")
 	const categoryList = checkIfPropertyExists(paramsObj, "categoryList")
@@ -728,8 +730,14 @@ function convertCsvAction(paramsObj) {
 	}
 
 	if (action === actions.breakdownClientByCatTimeEntries) {
-		const tempList = filterListToDateRange(resultList, currentDate, dateEndPeriod)
-		filteredSortedList.push.apply(filteredSortedList, splitListByCategoryThenGrade(tempList, categoryList, userList))
+		let tempList2 = []
+		if (unbilledOnly === true) {
+			const tempList = filterListToUnbilledOnly(resultList)
+			tempList2.push.apply(tempList2, filterListToDateRange(tempList, currentDate, dateEndPeriod))
+		} else {
+			tempList2.push.apply(tempList2, filterListToDateRange(resultList, currentDate, dateEndPeriod))
+		}
+		filteredSortedList.push.apply(filteredSortedList, splitListByCategoryThenGrade(tempList2, categoryList, userList))
 		// console.log("filteredSortedList", filteredSortedList)
 	}
 
@@ -1184,6 +1192,17 @@ function filterListToDateRange(resultList, weekBegin, dateEndPeriod) {
 
 function filterListToNumberOfWeeks(resultList, weekBegin, numberOfWeeks) {
 	return filterList(resultList, weekBegin, (daysOfWeek.length - 1) * numberOfWeeks)
+}
+
+function filterListToUnbilledOnly(resultList) {
+	const tempArray = []
+	for (let index = 0; index <= resultList.length - 1; index++) {
+		// FIXME: "Unbilled" should maybe be a variable
+		if (resultList[index].billingStatus === "Unbilled") {
+			tempArray.push(resultList[index])
+		}
+	}
+	return tempArray
 }
 
 function filterList(resultList, weekBegin, upperBound) {

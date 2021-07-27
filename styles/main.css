@@ -12,7 +12,11 @@ p {
     margin-bottom: 0px;
 }
 
-#actionLabel, #actionSelect, #actionSelectLogLabel, #actionSelectLogCheckbox , #staticListsLabel, #staticListsCheckbox {
+#actionLabel, #actionSelect, #actionSelectLogLabel, #actionSelectLogCheckbox {
+    display: none;
+}
+
+#staticListsLabel, #staticListsCheckbox , #unbilledOnlyLabel, #unbilledOnlyCheckbox {
     display: none;
 }
 
