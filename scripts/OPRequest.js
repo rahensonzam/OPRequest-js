@@ -1591,7 +1591,7 @@ function setFullUrl(action, row) {
 		|| action === actions.getProjects) {
 		return `${baseURL}/projects`
 	} else if (action === actions.addWorkPackage
-		|| action === actions.getAllWorkPackages
+		|| action === actions.getWorkPackages
 		|| action === actions.getAllWorkPackages) {
 		return `${baseURL}/work_packages`
 	} else if (action === actions.addTimeEntry
