@@ -1145,7 +1145,7 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 function filterListToDateRange(resultList, weekBegin, dateEndPeriod) {
 	const endDateObj = dayjs(dateEndPeriod)
 	const weekBeginObj = dayjs(weekBegin)
-	return filterList(resultList, weekBegin, endDateObj.diff(weekBeginObj, 'day'))
+	return filterList(resultList, weekBegin, endDateObj.diff(weekBeginObj, "day"))
 }
 
 function filterListToNumberOfWeeks(resultList, weekBegin, numberOfWeeks) {
@@ -1161,7 +1161,7 @@ function filterList(resultList, weekBegin, upperBound) {
 				tempArray.push(resultList[index2])
 			}
 		}
-		currentDate = dayjs(currentDate).add(1, "day").format('YYYY-MM-DD')
+		currentDate = dayjs(currentDate).add(1, "day").format("YYYY-MM-DD")
 	}
 	return tempArray
 }
@@ -1242,7 +1242,7 @@ function filterUniqueValues(resultList) {
 			natureOfWork: resultListData[0].natureOfWork
 		})
 		for (let j = 0 + 1; j <= resultListData.length - 1; j++) {
-			// if ### is not ### in tempArrayData[all].###
+			// if ### is not equal to ### in tempArrayData[all].###
 			if (!(tempArrayData.some(function(e) {return (e.client === resultListData[j].client
 				&& e.period === resultListData[j].period
 				&& e.category === resultListData[j].category
