@@ -26,7 +26,7 @@ document.getElementById("go2Button").addEventListener("click", runSpreadsheetDon
 
 dayjs.extend(window.dayjs_plugin_customParseFormat)
 const logTextBox = document.getElementById("log").children[0]
-const validDateFormats = ["DD-MM-YYYY","DD/MM/YYYY","DD-MM-YY","DD/MM/YY"]
+const validDateFormats = ["DD-MM-YYYY","DD/MM/YYYY"]
 let wpConvertUser
 const adminUser1 = 4
 const adminUser2 = 5
