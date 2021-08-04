@@ -259,42 +259,23 @@ async function doActionAsync(paramsObj) {
 		}
 	}
 
-	if (action === actions.convertToWorkPackageIDs) {
-		const outputObj = await convertResultsToCsv3(convertedCSVResults)
-		return {conversion: outputObj}
-	}
-
-	if (action === actions.convertNamesToIDs
+	if (action === actions.convertWeekToDays
+		|| action === actions.convertNamesToIDs
 		|| action === actions.convertMembershipNamesToIDs
-		|| action === actions.convertWeekToDays
-		|| action === actions.exportTimeEntries) {
-		const outputObj = await convertResultsToCsv(convertedCSVResults)
+		|| action === actions.convertToWorkPackageIDs
+		|| action === actions.exportTimeEntries
+		|| action === actions.summarizeUtTimeEntries
+		|| action === actions.summarizeCatTimeEntries) {
+		const outputObj = convertResultsToCsv(action, convertedCSVResults)
 		return {conversion: outputObj}
 	}
 
-	if (action === actions.summarizeUtTimeEntries) {
-		const outputObj = await convertResultsToCsv(convertedCSVResults)
-		return {conversion: outputObj}
-	}
-
-	if (action === actions.summarizeCatTimeEntries) {
-		const outputObj = await convertResultsToCsv5(convertedCSVResults)
-		return {conversion: outputObj}
-	}
-
-	if (action === actions.breakdownClientByCatTimeEntries) {
-		const outputObj = await convertResultsToCsv2(convertedCSVResults)
-		return {conversion: outputObj}
-	}
-
-	// if (action === actions.extractTimeSheets
-	// 	|| action === actions.condenseTimeSheets
-	// 	|| action === actions.summarizeUtTimeEntries) {
 	if (action === actions.extractTimeSheets
-		|| action === actions.condenseTimeSheets) {
-		console.log("convertedCSVResults", convertedCSVResults)
-		const coversionObj = await convertExtractResultsToCsv(action, convertedCSVResults)
-		return {conversion: coversionObj}
+		|| action === actions.condenseTimeSheets
+		|| action === actions.breakdownClientByCatTimeEntries) {
+		// console.log("convertedCSVResults", convertedCSVResults)
+		const outputObj = convertResultsToCsv2(action, convertedCSVResults)
+		return {conversion: outputObj}
 	}
 
 	const resultList = await Promise.all(taskList)
@@ -493,93 +474,54 @@ function innerValidateCSVConversion(expected, headerRow) {
 // 	}
 // }
 
-async function convertExtractResultsToCsv(action, resultArray) {
+function convertResultsToCsv(action, resultArray) {
+	const temp = expandResults(resultArray)
+	let temp6 = []
+	if(action === actions.summarizeCatTimeEntries) {
+		const temp3 = extractProp(temp, "data")
+		temp6 = transposeResult(temp3)
+	} else {
+		temp6 = extractProp(temp, "data")
+	}
+	const outputCsv = Papa.unparse(temp6, {quotes: true})
+	const temp2 = extractErrors(resultArray)
+	if (action === actions.convertToWorkPackageIDs) {
+		const temp4 = extractProp(temp2, "data")
+		const temp5 = filterUniqueValues2(temp4)
+		const errorsCsv = Papa.unparse(temp5, {quotes: true})
+		for (let i = 0; i <= temp2.length - 1; i++) {
+			temp2[i].csv = errorsCsv
+		}	
+	}
+	return {data: [{data: outputCsv}], errors: temp2}
+}
+
+function convertResultsToCsv2(action, resultArray) {
 	let temp = expandResults(resultArray)
 	if (action === actions.extractTimeSheets) {
+		// FIXME: addEmptyDays modifies the orignal array
 		temp = addEmptyDays(temp)
 	}
-	const temp3 = []
-	for (let i = 0; i <= temp.length - 1; i++) {
-		const outputCsv = Papa.unparse(temp[i].data, {quotes: true})
-		temp3.push({name: temp[i].name, data: outputCsv})
-	}
-	const temp2 = extractErrors(resultArray)
-	return {data: temp3, errors: temp2}
-}
-
-async function convertResultsToCsv(resultArray) {
-	// logConversionErrors(resultArray)
-	const temp = expandResults(resultArray)
-	const temp3 = []
-	for (let i = 0; i <= temp.length - 1; i++) {
-		temp3.push(temp[i].data)
-	}
-	const outputCsv = Papa.unparse(temp3, {quotes: true})
-	const temp2 = extractErrors(resultArray)
-	return {data: [{data: outputCsv}], errors: temp2}
-	// console.log(outputCsv)
-}
-
-async function convertResultsToCsv2(resultArray) {
-	// logConversionErrors(resultArray)
-	const temp = expandResults(resultArray)
 	const outputData = []
 	for (let i = 0; i <= temp.length - 1; i++) {
-		const temp4 = temp[i].data
-		const temp3 = []
-		for (let j = 0; j <= temp4.length - 1; j++) {
-			temp3.push(temp4[j].data)
+		let temp6 = []
+		if(action === actions.breakdownClientByCatTimeEntries) {
+			const temp4 = temp[i].data
+			const temp3 = extractProp(temp4, "data")
+			temp6 = transposeResult(temp3)
+		} else {
+			temp6 = temp[i].data
 		}
-		const temp6 = transposeResult(temp3)
 		const outputCsv = Papa.unparse(temp6, {quotes: true})
 		outputData.push({name: temp[i].name, data: outputCsv})
 	}
 	const temp2 = extractErrors(resultArray)
 	return {data: outputData, errors: temp2}
-	// console.log(outputCsv)
-}
-
-async function convertResultsToCsv5(resultArray) {
-	const temp = expandResults(resultArray)
-	const temp3 = []
-	for (let i = 0; i <= temp.length - 1; i++) {
-		temp3.push(temp[i].data)
-	}
-	const temp6 = transposeResult(temp3)
-	const outputCsv = Papa.unparse(temp6, {quotes: true})
-	const temp2 = extractErrors(resultArray)
-	return {data: [{data: outputCsv}], errors: temp2}
-}
-
-async function convertResultsToCsv3(resultArray) {
-	// logConversionErrors(resultArray)
-	const temp = expandResults(resultArray)
-	const temp3 = []
-	for (let i = 0; i <= temp.length - 1; i++) {
-		temp3.push(temp[i].data)
-	}
-	const outputCsv = Papa.unparse(temp3, {quotes: true})
-	const temp2 = extractErrors(resultArray)
-	const temp4 = []
-	for (let i = 0; i <= temp2.length - 1; i++) {
-		temp4.push(temp2[i].data)
-	}
-	const temp5 = filterUniqueValues2(temp4)
-	const errorsCsv = Papa.unparse(temp5, {quotes: true})
-	for (let i = 0; i <= temp2.length - 1; i++) {
-		temp2[i].csv = errorsCsv
-	}
-	return {data: [{data: outputCsv}], errors: temp2}
-	// console.log(outputCsv)
 }
 
 function convertResults(resultArray) {
-	// logConversionErrors(resultArray)
 	const temp = expandResults(resultArray)
-	const temp3 = []
-	for (let i = 0; i <= temp.length - 1; i++) {
-		temp3.push(temp[i].data)
-	}
+	const temp3 = extractProp(temp, "data")
 	const temp2 = extractErrors(resultArray)
 	return {data: [{data: temp3}], errors: temp2}
 }
@@ -600,43 +542,39 @@ function convertResults(resultArray) {
 // }
 
 function addEmptyDays(resultArray) {
-	const tempArray = resultArray
+	// FIXME: addEmptyDays modifies the orignal array
 	for (let i = 0; i <= resultArray.length - 1; i++) {
 		for (let j = 0; j <= resultArray[i].data.length - 1; j++) {
 			for (let k = 0; k <= daysOfWeek.length - 1; k++) {
 				if (typeof resultArray[i].data[j][daysOfWeek[k]] === "undefined") {
-					tempArray[i].data[j][daysOfWeek[k]] = ""
+					resultArray[i].data[j][daysOfWeek[k]] = ""
 				}
 			}
 		}
 	}
-	return tempArray
+	return resultArray
 }
 
 function expandResults(resultArray) {
+	const temp = extractProp(resultArray, "data")
+	return extractPropInner(temp)
+}
+
+function extractProp(resultArray, prop) {
 	const temp = []
 	for (let i = 0; i <= resultArray.length - 1; i++) {
-		for (let j = 0; j <= resultArray[i].data.length - 1; j++) {
-			// const temp2 = futherExpandResults(resultArray[i].data[j])
-			// console.log("resultArray[i].data[j].data[0]", resultArray[i].data[j].data[0])
-			temp.push(resultArray[i].data[j])
-		}
+		temp.push(resultArray[i][prop])
 	}
 	return temp
 }
 
-// function futherExpandResults(resultArray) {
-// 	const temp = []
-// 	// 	for (let j = 0; j <= resultArray.data[].length - 1; j++) {
-// 	// 		temp.push({data: resultArray[i].data[j]})
-// 	// 	}
-// 	// for (let i = 0; i <= resultArray.length - 1; i++) {
-// 	// 	for (let j = 0; j <= resultArray[i].data.length - 1; j++) {
-// 	// 		temp.push({data: resultArray[i].data[j]})
-// 	// 	}
-// 	// }
-// 	return temp
-// }
+function extractPropInner(resultArray) {
+	const temp = []
+	for (let j = 0; j <= resultArray.length - 1; j++) {
+		temp.push.apply(temp, resultArray[j])
+	}
+	return temp
+}
 
 function transposeResult(inputArray) {
 
@@ -693,11 +631,7 @@ function transposeResult(inputArray) {
 }
 
 function extractErrors(resultArray) {
-	const temp = []
-	for (let j = 0; j <= resultArray.length - 1; j++) {
-		temp.push(resultArray[j].errors)
-	}
-	return temp
+	return extractProp(resultArray, "errors")
 }
 
 function webErrorsPresent(resultList) {
