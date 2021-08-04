@@ -272,9 +272,13 @@ async function doActionAsync(paramsObj) {
 		return {conversion: outputObj}
 	}
 
-	if (action === actions.summarizeUtTimeEntries
-		|| action === actions.summarizeCatTimeEntries) {
+	if (action === actions.summarizeUtTimeEntries) {
 		const outputObj = await convertResultsToCsv(convertedCSVResults)
+		return {conversion: outputObj}
+	}
+
+	if (action === actions.summarizeCatTimeEntries) {
+		const outputObj = await convertResultsToCsv5(convertedCSVResults)
 		return {conversion: outputObj}
 	}
 
@@ -526,12 +530,25 @@ async function convertResultsToCsv2(resultArray) {
 		for (let j = 0; j <= temp4.length - 1; j++) {
 			temp3.push(temp4[j].data)
 		}
-		const outputCsv = Papa.unparse(temp3, {quotes: true})
+		const temp6 = transposeResult(temp3)
+		const outputCsv = Papa.unparse(temp6, {quotes: true})
 		outputData.push({name: temp[i].name, data: outputCsv})
 	}
 	const temp2 = extractErrors(resultArray)
 	return {data: outputData, errors: temp2}
 	// console.log(outputCsv)
+}
+
+async function convertResultsToCsv5(resultArray) {
+	const temp = expandResults(resultArray)
+	const temp3 = []
+	for (let i = 0; i <= temp.length - 1; i++) {
+		temp3.push(temp[i].data)
+	}
+	const temp6 = transposeResult(temp3)
+	const outputCsv = Papa.unparse(temp6, {quotes: true})
+	const temp2 = extractErrors(resultArray)
+	return {data: [{data: outputCsv}], errors: temp2}
 }
 
 async function convertResultsToCsv3(resultArray) {
@@ -620,6 +637,60 @@ function expandResults(resultArray) {
 // 	// }
 // 	return temp
 // }
+
+function transposeResult(inputArray) {
+
+	// inputArray = [
+	//   {
+	//     grade/category: "Supervisor", Audit: "79", Tax: "70"
+	//   },
+	//   {
+	//     grade/category: "Assistant", Audit: "1", Tax: "2"
+	//   },
+	//   {
+	//     grade/category: "Trainee", Audit: "154", Tax: "131"
+	//   },
+	// ]
+
+	// "grade/category","Audit","Tax"
+	// "Supervisor","79","70"
+	// "Assistant","1","2"
+	// "Trainee","154","131"
+
+	// resultArray = [
+	//   {
+	//     category/grade: "Audit", Supervisor: "79", Assistant: "1", Trainee: "154"
+	//   },
+	//   {
+	//     category/grade: "Tax", Supervisor: "70", Assistant: "2", Trainee: "131"
+	//   },
+	// ]
+
+	// "category/grade","Supervisor","Assistant","Trainee"
+	// "Audit","79","1","154"
+	// "Tax","70","2","131"
+
+	const inputArrayProps = Object.keys(inputArray[0])
+	const topLeft = inputArrayProps[0]
+	const resultArrayProps = [topLeft]
+	for (let i = 0; i <= inputArray.length - 1; i++) {
+		resultArrayProps.push(inputArray[i][topLeft])
+	}
+
+	const resultArray = []
+
+	//skip topLeft
+	for (let i = 0 + 1; i <= inputArrayProps.length - 1; i++) {
+		let tempObj = {[topLeft]: inputArrayProps[i]}
+		//skip topLeft
+		for (let j = 0 + 1; j <= resultArrayProps.length - 1; j++) {
+			tempObj[resultArrayProps[j]] = inputArray[j - 1][inputArrayProps[i]]
+		}
+		resultArray.push(tempObj)
+	}
+
+	return resultArray
+}
 
 function extractErrors(resultArray) {
 	const temp = []
@@ -1116,10 +1187,10 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 		return tabulateData(action, resultList, i, "client", "user/client")
 
 	} else if (action === actions.tabulateCatTimeEntries) {
-		return tabulateData(action, resultList, i, "category", "grade/category")
+		return tabulateData(action, resultList, i, "category", "category/grade")
 
 	} else if (action === actions.tabulateBreakdownTimeEntries) {
-		return tabulateData(action, resultList, i, "client", "grade/client")
+		return tabulateData(action, resultList, i, "client", "client/grade")
 
 	} else if (action === actions.getProjects
 		|| action === actions.getWorkPackages
