@@ -263,7 +263,7 @@ function apiKeyMakeYellow() {
 }
 
 function apiKeyRemoveYellow() {
-    document.getElementById("apiKeyBox").style.backgroundColor = "unset"
+    document.getElementById("apiKeyBox").style.backgroundColor = "revert"
 }
 
 function fillApiKey() {
@@ -565,21 +565,21 @@ function makeSpreadsheet(spreadsheetData, myCols, myColHeaders, myColWidths, pro
             if (!(projectList.includes(val))) {
                 $('#spreadsheet1')["jexcel"]('setStyle', 'A'+(Number(cellName[1])+1), 'background-color', 'yellow')
             } else {
-                $('#spreadsheet1')["jexcel"]('setStyle', 'A'+(Number(cellName[1])+1), 'background-color', 'unset')
+                $('#spreadsheet1')["jexcel"]('setStyle', 'A'+(Number(cellName[1])+1), 'background-color', 'revert')
             }
         }
         if (cellName[0] === "1") {
             if (!(periodList.includes(val))) {
                 $('#spreadsheet1')["jexcel"]('setStyle', 'B'+(Number(cellName[1])+1), 'background-color', 'yellow')
             } else {
-                $('#spreadsheet1')["jexcel"]('setStyle', 'B'+(Number(cellName[1])+1), 'background-color', 'unset')
+                $('#spreadsheet1')["jexcel"]('setStyle', 'B'+(Number(cellName[1])+1), 'background-color', 'revert')
             }
         }
         if (cellName[0] === "2") {
             if (!(categoryList.includes(val))) {
                 $('#spreadsheet1')["jexcel"]('setStyle', 'C'+(Number(cellName[1])+1), 'background-color', 'yellow')
             } else {
-                $('#spreadsheet1')["jexcel"]('setStyle', 'C'+(Number(cellName[1])+1), 'background-color', 'unset')
+                $('#spreadsheet1')["jexcel"]('setStyle', 'C'+(Number(cellName[1])+1), 'background-color', 'revert')
             }
         }
     }
