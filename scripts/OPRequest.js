@@ -487,11 +487,13 @@ function convertResultsToCsv(action, resultArray) {
 	const temp2 = extractErrors(resultArray)
 	if (action === actions.convertToWorkPackageIDs) {
 		const temp4 = extractProp(temp2, "data")
-		const temp5 = filterUniqueValues2(temp4)
-		const errorsCsv = Papa.unparse(temp5, {quotes: true})
-		for (let i = 0; i <= temp2.length - 1; i++) {
-			temp2[i].csv = errorsCsv
-		}	
+		if (temp4.length !== 0) {
+			const temp5 = filterUniqueValues2(temp4)
+			const errorsCsv = Papa.unparse(temp5, {quotes: true})
+			for (let i = 0; i <= temp2.length - 1; i++) {
+				temp2[i].csv = errorsCsv
+			}
+		}
 	}
 	return {data: [{data: outputCsv}], errors: temp2}
 }
@@ -563,7 +565,9 @@ function expandResults(resultArray) {
 function extractProp(resultArray, prop) {
 	const temp = []
 	for (let i = 0; i <= resultArray.length - 1; i++) {
-		temp.push(resultArray[i][prop])
+		if (typeof resultArray[i][prop] !== "undefined") {
+			temp.push(resultArray[i][prop])
+		}
 	}
 	return temp
 }
