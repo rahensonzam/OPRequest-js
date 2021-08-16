@@ -243,7 +243,7 @@ async function doActionAsync(paramsObj) {
 		} else if (action === actions.summarizeUtTimeEntries) {
 			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, projectList, userList}))
 		} else if (action === actions.summarizeCatTimeEntries) {
-			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, projectList, categoryList, userList}))
+			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, unbilledOnly, projectList, categoryList, userList}))
 		} else if (action === actions.breakdownClientByCatTimeEntries) {
 			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, unbilledOnly, projectList, categoryList, userList}))
 		} else if (action === actions.getProjects) {
@@ -733,8 +733,14 @@ function convertCsvAction(paramsObj) {
 	}
 
 	if (action === actions.summarizeCatTimeEntries) {
-		const tempList = filterListToDateRange(resultList, currentDate, dateEndPeriod)
-		filteredSortedList.push.apply(filteredSortedList, splitListByGrade(tempList, userList))
+		let tempList2 = []
+		if (unbilledOnly === true) {
+			const tempList = filterListToUnbilledOnly(resultList)
+			tempList2.push.apply(tempList2, filterListToDateRange(tempList, currentDate, dateEndPeriod))
+		} else {
+			tempList2.push.apply(tempList2, filterListToDateRange(resultList, currentDate, dateEndPeriod))
+		}
+		filteredSortedList.push.apply(filteredSortedList, splitListByGrade(tempList2, userList))
 		// console.log("filteredSortedList", filteredSortedList)
 	}
 

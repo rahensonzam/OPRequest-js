@@ -175,7 +175,8 @@ function showHideUI() {
         showHideUtil("staticListsLabel", "none")
     }
 
-    if (actionType === actionTypes.sequenceExportBreakdown
+    if (actionType === actionTypes.sequenceExportSummarizeCat
+        || actionType === actionTypes.sequenceExportBreakdown
         || actionType === actionTypes.single) {
         showHideUtil("unbilledOnlyCheckbox", "inline")
         showHideUtil("unbilledOnlyLabel", "inline")
@@ -1002,7 +1003,8 @@ function getActionOptions(action) {
         if (action === actions.convertToWorkPackageIDs) {
             returnObj.wpConvertUser = wpConvertUser
         }
-        if (action === actions.breakdownClientByCatTimeEntries) {
+        if (action === actions.summarizeCatTimeEntries
+            || action === actions.breakdownClientByCatTimeEntries) {
             returnObj.unbilledOnly = unbilledOnly
         }
         if (action === actions.convertToWorkPackageIDs
