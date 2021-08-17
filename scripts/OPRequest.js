@@ -1374,12 +1374,12 @@ function filterClientTypes2(resultList) {
 			const resultListInnerData = resultListData[j].data
 			const tempArrayInnerData = []
 			for (let k = 0; k <= resultListInnerData.length - 1; k++) {
-				// if resultListInnerData[k].client is not found in tempArray[all].client
+				// if resultListInnerData[k].client is not found in tempArrayInnerData[all].client
 				if (!(tempArrayInnerData.some(function(e) {return e.client === resultListInnerData[k].client}))) {
 					tempArrayInnerData.push({client: resultListInnerData[k].client})
 				}
 			}
-			tempArrayData.push({name: resultList[j].name, data: tempArrayInnerData.slice()})
+			tempArrayData.push({name: resultListData[j].name, data: tempArrayInnerData.slice()})
 		}
 		tempArray.push({name: resultList[i].name, data: tempArrayData.slice()})
 	}
