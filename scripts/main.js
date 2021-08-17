@@ -3,7 +3,7 @@
 // import "./libs/jquery/jquery.module.js"
 // import $ from "./libs/jquery/jquery-3.5.1.js"
 import { passwordToApiKey } from "./apiKeyListFile.js"
-import { actions, webErrorTypes, doActionAsync, webErrorsPresent, checkIfPropertyExists } from "./OPRequest.js"
+import { actions, webErrorTypes, doActionAsync, webErrorsPresent } from "./OPRequest.js"
 
 // import * as Papa from "./libs/papaparse/papaparse.js"
 // import { $ } from "./libs/jquery/jquery-3.5.1.js"
@@ -26,7 +26,7 @@ document.getElementById("go2Button").addEventListener("click", runSpreadsheetDon
 
 dayjs.extend(window.dayjs_plugin_customParseFormat)
 const logTextBox = document.getElementById("log").children[0]
-const validDateFormats = ["DD-MM-YYYY","DD/MM/YYYY","DD-MM-YY","DD/MM/YY"]
+const validDateFormats = ["DD-MM-YYYY","DD/MM/YYYY"]
 let wpConvertUser
 const adminUser1 = 4
 const adminUser2 = 5
@@ -37,6 +37,7 @@ let actionType
 let csvType
 let fileSelect
 let staticLists
+let unbilledOnly
 let workPackageListFileSelect
 let timeEntryListFileSelect
 let projectList
@@ -122,7 +123,10 @@ function showHideUI() {
         showHideUtil("weekBeginBox", "inline")
     }
 
-    if (actionType === actionTypes.sequenceExportSummarizeUt || actionType === actionTypes.sequenceExportSummarizeCat || actionType === actionTypes.sequenceExportBreakdown || actionType === actionTypes.single) {
+    if (actionType === actionTypes.sequenceExportSummarizeUt
+        || actionType === actionTypes.sequenceExportSummarizeCat
+        || actionType === actionTypes.sequenceExportBreakdown
+        || actionType === actionTypes.single) {
         //showDateEndPeriod
         showHideUtil("dateEndPeriodLabel", "inline")
         showHideUtil("dateEndPeriodBox", "inline")
@@ -132,7 +136,10 @@ function showHideUI() {
         showHideUtil("dateEndPeriodBox", "none")
     }
 
-    if (actionType === actionTypes.sequenceExportExtract || actionType === actionTypes.sequenceExportSummarizeUt || actionType === actionTypes.sequenceExportSummarizeCat || actionType === actionTypes.sequenceExportBreakdown) {
+    if (actionType === actionTypes.sequenceExportExtract
+        || actionType === actionTypes.sequenceExportSummarizeUt
+        || actionType === actionTypes.sequenceExportSummarizeCat
+        || actionType === actionTypes.sequenceExportBreakdown) {
         //hideCsvChooser
         showHideUtil("csvChooser", "none")
 
@@ -154,7 +161,11 @@ function showHideUI() {
         // }
     }
 
-    if (actionType === actionTypes.sequenceExportExtract || actionType === actionTypes.sequenceExportSummarizeUt || actionType === actionTypes.sequenceExportSummarizeCat || actionType === actionTypes.sequenceExportBreakdown || actionType === actionTypes.single) {
+    if (actionType === actionTypes.sequenceExportExtract
+        || actionType === actionTypes.sequenceExportSummarizeUt
+        || actionType === actionTypes.sequenceExportSummarizeCat
+        || actionType === actionTypes.sequenceExportBreakdown
+        || actionType === actionTypes.single) {
         //showStaticListsCheckbox
         showHideUtil("staticListsCheckbox", "inline")
         showHideUtil("staticListsLabel", "inline")
@@ -164,11 +175,24 @@ function showHideUI() {
         showHideUtil("staticListsLabel", "none")
     }
 
+    if (actionType === actionTypes.sequenceExportSummarizeCat
+        || actionType === actionTypes.sequenceExportBreakdown
+        || actionType === actionTypes.single) {
+        showHideUtil("unbilledOnlyCheckbox", "inline")
+        showHideUtil("unbilledOnlyLabel", "inline")
+    } else {
+        showHideUtil("unbilledOnlyCheckbox", "none")
+        showHideUtil("unbilledOnlyLabel", "none")
+    }
+
     if (actionType === actionTypes.single) {
         showStaticFile()
     } else {
         if (staticListsCheckbox.checked) {
-            if (actionType === actionTypes.sequenceExportExtract || actionType === actionTypes.sequenceExportSummarizeUt || actionType === actionTypes.sequenceExportSummarizeCat || actionType === actionTypes.sequenceExportBreakdown) {
+            if (actionType === actionTypes.sequenceExportExtract
+                || actionType === actionTypes.sequenceExportSummarizeUt
+                || actionType === actionTypes.sequenceExportSummarizeCat
+                || actionType === actionTypes.sequenceExportBreakdown) {
                 showStaticFile()
             }
         } else {
@@ -240,7 +264,7 @@ function apiKeyMakeYellow() {
 }
 
 function apiKeyRemoveYellow() {
-    document.getElementById("apiKeyBox").style.backgroundColor = "unset"
+    document.getElementById("apiKeyBox").style.backgroundColor = "revert"
 }
 
 function fillApiKey() {
@@ -264,6 +288,7 @@ async function runActions() {
     dateEndPeriod = document.getElementById("dateEndPeriodBox").value
     fileSelect = document.getElementById("fileSelect")
     staticLists = document.getElementById("staticListsCheckbox").checked
+    unbilledOnly = document.getElementById("unbilledOnlyCheckbox").checked
     workPackageListFileSelect = document.getElementById("workPackageListFileSelect")
     timeEntryListFileSelect = document.getElementById("timeEntryListFileSelect")
 
@@ -292,7 +317,8 @@ async function runActions() {
 
     showLoading()
 
-    if (!(wpConvertUser == adminUser1 || wpConvertUser == adminUser2)) {
+    if (!(wpConvertUser == adminUser1
+        || wpConvertUser == adminUser2)) {
         localStorage.setItem("userStore", wpConvertUser)
         localStorage.setItem("apiKeyStore", apiKey)
     }
@@ -315,7 +341,8 @@ async function runActions() {
         writeToLog("step: 2/8 action: csvInput", "step", logType.step)
         console.log("step: 2/6 action: csvInput")
 
-        if (csvType === csvTypes.create || csvType === csvTypes.import) {
+        if (csvType === csvTypes.create
+            || csvType === csvTypes.import) {
             // const spreadsheetCsvFilename = getCsvFilename()
 
             showSpreadsheet()
@@ -342,7 +369,8 @@ async function runActions() {
         writeToLog("step: 2/6 action: csvInput", "step", logType.step)
         console.log("step: 2/6 action: csvInput")
 
-        if (csvType === csvTypes.create || csvType === csvTypes.import) {
+        if (csvType === csvTypes.create
+            || csvType === csvTypes.import) {
             // const spreadsheetCsvFilename = getCsvFilename()
 
             showSpreadsheet()
@@ -394,26 +422,24 @@ async function runFirstHalf() {
     // writeToLog("step: 1/8 action: getProjects", "step", logType.step)
     // projectList = JSON.parse(`[{"id": "1", "identifier": "client-a", "name": "Client A"},
     // {"id": "2", "identifier": "client-b", "name": "Client B"}]`)
-    // categoryList = JSON.parse(`[{"id": "14", "name": "Audit"},
-    // {"id": "15", "name": "Income Tax"},
-    // {"id": "16", "name": "VAT"},
-    // {"id": "17", "name": "Reverse Charge"},
-    // {"id": "18", "name": "Accountancy"},
-    // {"id": "19", "name": "Secretarial"},
-    // {"id": "20", "name": "Property Administration"},
-    // {"id": "31", "name": "PTT"},
-    // {"id": "27", "name": "Tax"},
-    // {"id": "21", "name": "PAYE"},
-    // {"id": "22", "name": "NAPSA"},
-    // {"id": "28", "name": "NHIMA"},
-    // {"id": "29", "name": "WCF"},
-    // {"id": "23", "name": "TOT"},
-    // {"id": "24", "name": "WHT"},
-    // {"id": "30", "name": "TLEVY"},
-    // {"id": "25", "name": "Special Assignment"},
-    // {"id": "26", "name": "Non-billable"}]`)
-    categoryList = JSON.parse(`[{"id": "1", "name": "Management"},
-    {"id": "3", "name": "Development"}]`)
+    categoryList = JSON.parse(`[{"id": "14", "name": "Audit"},
+    {"id": "15", "name": "Income Tax"},
+    {"id": "16", "name": "VAT"},
+    {"id": "17", "name": "Reverse Charge"},
+    {"id": "18", "name": "Accountancy"},
+    {"id": "19", "name": "Secretarial"},
+    {"id": "20", "name": "Property Administration"},
+    {"id": "31", "name": "PTT"},
+    {"id": "27", "name": "Tax"},
+    {"id": "21", "name": "PAYE"},
+    {"id": "22", "name": "NAPSA"},
+    {"id": "28", "name": "NHIMA"},
+    {"id": "29", "name": "WCF"},
+    {"id": "23", "name": "TOT"},
+    {"id": "24", "name": "WHT"},
+    {"id": "30", "name": "TLEVY"},
+    {"id": "25", "name": "Special Assignment"},
+    {"id": "26", "name": "Non-billable"}]`)
     userList = JSON.parse(`[{"id": "4", "name": "Alice", "grade": "Supervisor", "order": "1"},
     {"id": "5", "name": "Bob", "grade": "Trainee", "order": "3"},
     {"id": "2", "name": "admin", "grade": "", "order": "0"},
@@ -540,21 +566,21 @@ function makeSpreadsheet(spreadsheetData, myCols, myColHeaders, myColWidths, pro
             if (!(projectList.includes(val))) {
                 $('#spreadsheet1')["jexcel"]('setStyle', 'A'+(Number(cellName[1])+1), 'background-color', 'yellow')
             } else {
-                $('#spreadsheet1')["jexcel"]('setStyle', 'A'+(Number(cellName[1])+1), 'background-color', 'unset')
+                $('#spreadsheet1')["jexcel"]('setStyle', 'A'+(Number(cellName[1])+1), 'background-color', 'revert')
             }
         }
         if (cellName[0] === "1") {
             if (!(periodList.includes(val))) {
                 $('#spreadsheet1')["jexcel"]('setStyle', 'B'+(Number(cellName[1])+1), 'background-color', 'yellow')
             } else {
-                $('#spreadsheet1')["jexcel"]('setStyle', 'B'+(Number(cellName[1])+1), 'background-color', 'unset')
+                $('#spreadsheet1')["jexcel"]('setStyle', 'B'+(Number(cellName[1])+1), 'background-color', 'revert')
             }
         }
         if (cellName[0] === "2") {
             if (!(categoryList.includes(val))) {
                 $('#spreadsheet1')["jexcel"]('setStyle', 'C'+(Number(cellName[1])+1), 'background-color', 'yellow')
             } else {
-                $('#spreadsheet1')["jexcel"]('setStyle', 'C'+(Number(cellName[1])+1), 'background-color', 'unset')
+                $('#spreadsheet1')["jexcel"]('setStyle', 'C'+(Number(cellName[1])+1), 'background-color', 'revert')
             }
         }
     }
@@ -640,7 +666,10 @@ async function runSpreadsheetDone() {
     
     // hideSpreadsheet()
 
-    if (actionType === actionTypes.sequenceExportExtract || actionType === actionTypes.sequenceExportSummarizeUt || actionType === actionTypes.sequenceExportSummarizeCat || actionType === actionTypes.sequenceExportBreakdown) {
+    if (actionType === actionTypes.sequenceExportExtract
+        || actionType === actionTypes.sequenceExportSummarizeUt
+        || actionType === actionTypes.sequenceExportSummarizeCat
+        || actionType === actionTypes.sequenceExportBreakdown) {
         showLoading()
         await runSecondHalf("")
         
@@ -788,7 +817,10 @@ async function runSecondHalf(initCsvFileString) {
         console.log("Sequence completed successfully")
         writeSeparatorToLog()
     }
-    if (actionType === actionTypes.sequenceExportExtract || actionType === actionTypes.sequenceExportSummarizeUt || actionType === actionTypes.sequenceExportSummarizeCat || actionType === actionTypes.sequenceExportBreakdown) {
+    if (actionType === actionTypes.sequenceExportExtract
+        || actionType === actionTypes.sequenceExportSummarizeUt
+        || actionType === actionTypes.sequenceExportSummarizeCat
+        || actionType === actionTypes.sequenceExportBreakdown) {
         if (staticLists === false) {
             const step2 = await runCurrentAction(actions.getAllWorkPackages, "step: 2/4 action: getWorkPackages (please wait, this step takes a bit of time)", "", false)
             if (step2.halt) {
@@ -929,24 +961,13 @@ async function runSecondHalf(initCsvFileString) {
 
 async function runCurrentAction(action, logValue, myCsvFileObj, logDataBool) {
     const actionOptions = getActionOptions(action)
-    const runOneActionParamsObj = {
-        action,
-        logValue,
-        myCsvFileObj,
-        hasWeb: checkIfPropertyExists(actionOptions,"hasWeb"),
-        hasConversion: checkIfPropertyExists(actionOptions,"hasConversion"),
-        hasFile: checkIfPropertyExists(actionOptions,"hasFile"),
-        logDataBool,
-        apiKey: checkIfPropertyExists(actionOptions,"apiKey"),
-        wpConvertUser: checkIfPropertyExists(actionOptions,"wpConvertUser"),
-        projectList: checkIfPropertyExists(actionOptions,"projectList"),
-        categoryList: checkIfPropertyExists(actionOptions,"categoryList"),
-        workPackageList: checkIfPropertyExists(actionOptions,"workPackageList"),
-        timeEntryList: checkIfPropertyExists(actionOptions,"timeEntryList"),
-        userList: checkIfPropertyExists(actionOptions,"userList"),
-        // billingStatusList: checkIfPropertyExists(actionOptions,"billingStatusList")
-        billingStatusList: billingStatusList
-    }
+    const runOneActionParamsObj = actionOptions
+    runOneActionParamsObj.action = action
+    runOneActionParamsObj.logValue = logValue
+    runOneActionParamsObj.myCsvFileObj = myCsvFileObj
+    runOneActionParamsObj.logDataBool = logDataBool
+    runOneActionParamsObj.billingStatusList = billingStatusList
+
     // runOneAction params: action, logValue, myCsvFileObj, hasWeb, hasConversion, hasFile, logDataBool, apiKey, wpConvertUser, projectList, categoryList, workPackageList, timeEntryList, userList, billingStatusList
     const currentStep = await runOneAction(runOneActionParamsObj)
     return currentStep
@@ -954,50 +975,78 @@ async function runCurrentAction(action, logValue, myCsvFileObj, logDataBool) {
 
 function getActionOptions(action) {
     // return params: hasWeb, hasConversion, hasFile, apiKey, wpConvertUser, projectList, categoryList, workPackageList, timeEntryList, userList, billingStatusList
-    switch (action) {
-        case actions.updateWorkPackage:
-            return {hasWeb: true, hasConversion: false, hasFile: true, apiKey}
-        case actions.updateTimeEntry:
-            // return {hasWeb: true, hasConversion: false, hasFile: true, apiKey, billingStatusList}
-            return {hasWeb: true, hasConversion: false, hasFile: true, apiKey}
-        case actions.addMembership:
-            return {hasWeb: true, hasConversion: false, hasFile: true, apiKey}
-        case actions.addWorkPackage:
-            return {hasWeb: true, hasConversion: false, hasFile: true, apiKey}
-        case actions.addProject:
-            return {hasWeb: true, hasConversion: false, hasFile: true, apiKey}
-        case actions.addTimeEntry:
-            return {hasWeb: true, hasConversion: false, hasFile: true, apiKey}
-        case actions.convertToWorkPackageIDs:
-            return {hasWeb: false, hasConversion: true, hasFile: true, wpConvertUser, projectList, workPackageList}
-        case actions.convertNamesToIDs:
-            return {hasWeb: false, hasConversion: true, hasFile: true, projectList, categoryList}
-        case actions.convertMembershipNamesToIDs:
-            return {hasWeb: false, hasConversion: true, hasFile: true, projectList}
-        case actions.convertWeekToDays:
-            return {hasWeb: false, hasConversion: true, hasFile: true}
-        case actions.exportTimeEntries:
-            return {hasWeb: false, hasConversion: true, hasFile: false, projectList, categoryList, workPackageList, timeEntryList, userList}
-        case actions.extractTimeSheets:
-            return {hasWeb: false, hasConversion: true, hasFile: true, userList}
-        case actions.condenseTimeSheets:
-            return {hasWeb: false, hasConversion: true, hasFile: false}
-        case actions.summarizeUtTimeEntries:
-            return {hasWeb: false, hasConversion: true, hasFile: true, projectList, userList}
-        case actions.summarizeCatTimeEntries:
-            return {hasWeb: false, hasConversion: true, hasFile: true, projectList, categoryList, userList}
-        case actions.breakdownClientByCatTimeEntries:
-            return {hasWeb: false, hasConversion: true, hasFile: true, projectList, categoryList, userList}
-        case actions.getProjects:
-            return {hasWeb: true, hasConversion: true, hasFile: false, apiKey}
-        case actions.getWorkPackages:
+    if (action === actions.updateWorkPackage
+        || action === actions.updateTimeEntry
+        || action === actions.addMembership
+        || action === actions.addWorkPackage
+        || action === actions.addProject
+        || action === actions.addTimeEntry) {
+        // action === actions.updateTimeEntry
+        // return {hasWeb: true, hasConversion: false, hasFile: true, apiKey, billingStatusList}
+        return {hasWeb: true, hasConversion: false, hasFile: true, apiKey}
+    } else if (action === actions.convertToWorkPackageIDs
+        || action === actions.convertNamesToIDs
+        || action === actions.convertMembershipNamesToIDs
+        || action === actions.convertWeekToDays
+        || action === actions.exportTimeEntries
+        || action === actions.extractTimeSheets
+        || action === actions.condenseTimeSheets
+        || action === actions.summarizeUtTimeEntries
+        || action === actions.summarizeCatTimeEntries
+        || action === actions.breakdownClientByCatTimeEntries) {
+
+        const returnObj = {hasWeb: false, hasConversion: true, hasFile: true}
+        if (action === actions.exportTimeEntries) {
+            // || action === actions.condenseTimeSheets
+            returnObj.hasFile = false
+        }
+        if (action === actions.convertToWorkPackageIDs) {
+            returnObj.wpConvertUser = wpConvertUser
+        }
+        if (action === actions.summarizeCatTimeEntries
+            || action === actions.breakdownClientByCatTimeEntries) {
+            returnObj.unbilledOnly = unbilledOnly
+        }
+        if (action === actions.convertToWorkPackageIDs
+            || action === actions.convertNamesToIDs
+            || action === actions.convertMembershipNamesToIDs
+            || action === actions.exportTimeEntries
+            || action === actions.summarizeUtTimeEntries
+            || action === actions.summarizeCatTimeEntries
+            || action === actions.breakdownClientByCatTimeEntries) {
+            returnObj.projectList = projectList
+        }
+        if (action === actions.convertNamesToIDs
+            || action === actions.exportTimeEntries
+            || action === actions.summarizeCatTimeEntries
+            || action === actions.breakdownClientByCatTimeEntries) {
+            returnObj.categoryList = categoryList
+        }
+        if (action === actions.convertToWorkPackageIDs
+            || action === actions.exportTimeEntries) {
+            returnObj.workPackageList = workPackageList
+        }
+        if (actions.exportTimeEntries) {
+            returnObj.timeEntryList = timeEntryList
+        }
+        if (action === actions.exportTimeEntries
+            || action === actions.extractTimeSheets
+            || action === actions.summarizeUtTimeEntries
+            || action === actions.summarizeCatTimeEntries
+            || action === actions.breakdownClientByCatTimeEntries) {
+            returnObj.userList = userList
+        }
+        return returnObj
+    } else if (action === actions.getProjects
+        || action === actions.getWorkPackages
+        || action === actions.getAllWorkPackages
+        || action === actions.getTimeEntries) {
+        if (action === actions.getWorkPackages) {
             return {hasWeb: true, hasConversion: true, hasFile: false, apiKey, wpConvertUser}
-        case actions.getAllWorkPackages:
-            return {hasWeb: true, hasConversion: true, hasFile: false, apiKey}
-        case actions.getTimeEntries:
-            return {hasWeb: true, hasConversion: true, hasFile: false, apiKey}
-        default:
-            return {}
+        }
+        return {hasWeb: true, hasConversion: true, hasFile: false, apiKey}
+    } else {
+        return {}
     }
 }
 
@@ -1007,21 +1056,12 @@ async function runOneAction(paramsObj) {
     console.log(paramsObj.logValue)
     const myCsvFile = await checkGetFile(paramsObj.hasFile, paramsObj.myCsvFileObj)
     // doActionAsync params: action,apiKey,wpConvertUser,rows,headerRow,weekBegin,dateEndPeriod,projectList,categoryList,workPackageList,timeEntryList,userList,billingStatusList
-    const doActionAsyncParamsObj = {
-        action: paramsObj.action,
-        apiKey: paramsObj.apiKey,
-        wpConvertUser: paramsObj.wpConvertUser,
-        rows: myCsvFile.rows,
-        headerRow: myCsvFile.headerRow,
-        weekBegin,
-        dateEndPeriod,
-        projectList: paramsObj.projectList,
-        categoryList: paramsObj.categoryList,
-        workPackageList: paramsObj.workPackageList,
-        timeEntryList: paramsObj.timeEntryList,
-        userList: paramsObj.userList,
-        billingStatusList: paramsObj.billingStatusList
-    }
+    const doActionAsyncParamsObj = paramsObj
+    doActionAsyncParamsObj.rows = myCsvFile.rows
+    doActionAsyncParamsObj.headerRow = myCsvFile.headerRow
+    doActionAsyncParamsObj.weekBegin = weekBegin
+    doActionAsyncParamsObj.dateEndPeriod = dateEndPeriod
+
     const currentStep = await doActionAsync(doActionAsyncParamsObj)
     if (paramsObj.hasWeb) {
         logWebResults(currentStep.web)
@@ -1104,7 +1144,7 @@ function getSelectedRadioButtonValue(radioGroupName) {
 function conversionErrorsPresent(resultArray) {
     //FIXME: Use array.every
     for (let i = 0; i <= resultArray.errors.length - 1; i++) {
-        if (resultArray.errors[i] !== "") {
+        if (resultArray.errors[i].message !== "") {
             return true
         }
     }
@@ -1171,10 +1211,14 @@ function logWebResults(resultList) {
 
 function logConversionErrors(resultArray) {
     for (let i = 0; i <= resultArray.errors.length - 1; i++) {
-        if (resultArray.errors[i] !== "") {
-            console.error(resultArray.errors[i])
-            writeToLog(`${resultArray.errors[i]}`, "error", logType.error)
+        if (resultArray.errors[i].message !== "") {
+            console.error(resultArray.errors[i].message)
+            writeToLog(`${resultArray.errors[i].message}`, "error", logType.error)
         }
+    }
+    if (typeof resultArray.errors[0].csv !== "undefined") {
+        console.error(resultArray.errors[0].csv)
+        writeToLog(`${resultArray.errors[0].csv}`, "error", logType.error)
     }
     // ReferenceError: logTextBox is not defined
     // resultArray.errors.forEach(function (element) { 
@@ -1186,17 +1230,28 @@ function logConversionErrors(resultArray) {
 }
 
 function logData(action, currentStep) {
-    if (action === actions.getProjects || action === actions.getWorkPackages || action === actions.getAllWorkPackages || action === actions.getTimeEntries) {
+    if (action === actions.getProjects
+        || action === actions.getWorkPackages
+        || action === actions.getAllWorkPackages
+        || action === actions.getTimeEntries) {
         writeToLog(`${JSON.stringify(currentStep.conversion.data[0].data)}`, "output", logType.normal)
         console.log(currentStep.conversion.data[0].data)
         return
     }
-    if (action === actions.convertToWorkPackageIDs || action === actions.convertNamesToIDs || action === actions.convertMembershipNamesToIDs || action === actions.convertWeekToDays || action === actions.exportTimeEntries) {
+    if (action === actions.convertToWorkPackageIDs
+        || action === actions.convertNamesToIDs
+        || action === actions.convertMembershipNamesToIDs
+        || action === actions.convertWeekToDays
+        || action === actions.exportTimeEntries) {
         writeToLog(`${currentStep.conversion.data[0].data}`, "output", logType.normal)
         console.log(currentStep.conversion.data[0].data)
         return
     }
-    if (action === actions.extractTimeSheets || action === actions.condenseTimeSheets || action === actions.summarizeUtTimeEntries || action === actions.summarizeCatTimeEntries || action === actions.breakdownClientByCatTimeEntries) {
+    if (action === actions.extractTimeSheets
+        || action === actions.condenseTimeSheets
+        || action === actions.summarizeUtTimeEntries
+        || action === actions.summarizeCatTimeEntries
+        || action === actions.breakdownClientByCatTimeEntries) {
         // writeToLog(`${currentStep.conversion.data}`, "output", logType.normal)
         console.log(currentStep.conversion.data)
         for (let i = 0; i <= currentStep.conversion.data.length - 1; i++) {
@@ -1218,7 +1273,8 @@ function writeSeparatorToLog() {
 
 function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, csvType, selectedFile) {
     if (preReqType === preReqTypes.sequence) {
-        if (actionType === actionTypes.sequenceWeekly || actionType === actionTypes.sequenceDaily) {
+        if (actionType === actionTypes.sequenceWeekly
+            || actionType === actionTypes.sequenceDaily) {
             if (user === "-1") {
                 writeToLog("error: No user selected", "error", logType.error)
                 return false
@@ -1228,20 +1284,30 @@ function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, csvType
             writeToLog("error: Invalid API Key", "error", logType.error)
             return false            
         }
-        if (actionType === actionTypes.sequenceWeekly || actionType === actionTypes.sequenceExportExtract || actionType === actionTypes.sequenceExportSummarizeUt || actionType === actionTypes.sequenceExportSummarizeCat || actionType === actionTypes.sequenceExportBreakdown) {
+        if (actionType === actionTypes.sequenceWeekly
+            || actionType === actionTypes.sequenceExportExtract
+            || actionType === actionTypes.sequenceExportSummarizeUt
+            || actionType === actionTypes.sequenceExportSummarizeCat
+            || actionType === actionTypes.sequenceExportBreakdown) {
             if (!(dayjs(weekBegin, validDateFormats).isValid())) {
                 writeToLog("error: Invalid date for week beginning", "error", logType.error)
                 return false            
             }
-            if (actionType === actionTypes.sequenceExportSummarizeUt || actionType === actionTypes.sequenceExportSummarizeCat || actionType === actionTypes.sequenceExportBreakdown) {
+            if (actionType === actionTypes.sequenceExportSummarizeUt
+                || actionType === actionTypes.sequenceExportSummarizeCat
+                || actionType === actionTypes.sequenceExportBreakdown) {
                 if (!(dayjs(dateEndPeriod, validDateFormats).isValid())) {
                     writeToLog("error: Invalid date for end of period", "error", logType.error)
                     return false            
                 }
             }
         }
-        if (actionType !== actionTypes.sequenceExportExtract && actionType !== actionTypes.sequenceExportSummarizeUt && actionType !== actionTypes.sequenceExportSummarizeCat && actionType !== actionTypes.sequenceExportBreakdown) {
-            if (csvType === csvTypes.import || csvType === csvTypes.import2) {
+        if (actionType !== actionTypes.sequenceExportExtract
+            && actionType !== actionTypes.sequenceExportSummarizeUt
+            && actionType !== actionTypes.sequenceExportSummarizeCat
+            && actionType !== actionTypes.sequenceExportBreakdown) {
+            if (csvType === csvTypes.import
+                || csvType === csvTypes.import2) {
                 if (typeof selectedFile === "undefined") {
                     writeToLog("error: Import CSV selected but no file selected for upload", "error", logType.error)
                     return false
