@@ -14,7 +14,8 @@ document.getElementById("sequenceDaily").addEventListener("click", showHideUI)
 document.getElementById("sequenceExportExtract").addEventListener("click", showHideUI)
 document.getElementById("sequenceExportSummarizeUt").addEventListener("click", showHideUI)
 document.getElementById("sequenceExportSummarizeCat").addEventListener("click", showHideUI)
-document.getElementById("sequenceExportBreakdown").addEventListener("click", showHideUI)
+document.getElementById("sequenceExportBreakdownCat").addEventListener("click", showHideUI)
+document.getElementById("sequenceExportBreakdownClient").addEventListener("click", showHideUI)
 document.getElementById("staticListsCheckbox").addEventListener("change", showHideUI)
 document.getElementById("csvCreate").addEventListener("click", showHideUI)
 document.getElementById("csvImport").addEventListener("click", showHideUI)
@@ -66,7 +67,8 @@ const actionTypes = {
     sequenceExportExtract: "sequenceExportExtract",
     sequenceExportSummarizeUt: "sequenceExportSummarizeUt",
     sequenceExportSummarizeCat: "sequenceExportSummarizeCat",
-    sequenceExportBreakdown: "sequenceExportBreakdown",
+    sequenceExportBreakdownCat: "sequenceExportBreakdownCat",
+    sequenceExportBreakdownClient: "sequenceExportBreakdownClient",
     single: "single"
 }
 
@@ -125,7 +127,8 @@ function showHideUI() {
 
     if (actionType === actionTypes.sequenceExportSummarizeUt
         || actionType === actionTypes.sequenceExportSummarizeCat
-        || actionType === actionTypes.sequenceExportBreakdown
+        || actionType === actionTypes.sequenceExportBreakdownCat
+        || actionType === actionTypes.sequenceExportBreakdownClient
         || actionType === actionTypes.single) {
         //showDateEndPeriod
         showHideUtil("dateEndPeriodLabel", "inline")
@@ -139,7 +142,8 @@ function showHideUI() {
     if (actionType === actionTypes.sequenceExportExtract
         || actionType === actionTypes.sequenceExportSummarizeUt
         || actionType === actionTypes.sequenceExportSummarizeCat
-        || actionType === actionTypes.sequenceExportBreakdown) {
+        || actionType === actionTypes.sequenceExportBreakdownCat
+        || actionType === actionTypes.sequenceExportBreakdownClient) {
         //hideCsvChooser
         showHideUtil("csvChooser", "none")
 
@@ -164,7 +168,8 @@ function showHideUI() {
     if (actionType === actionTypes.sequenceExportExtract
         || actionType === actionTypes.sequenceExportSummarizeUt
         || actionType === actionTypes.sequenceExportSummarizeCat
-        || actionType === actionTypes.sequenceExportBreakdown
+        || actionType === actionTypes.sequenceExportBreakdownCat
+        || actionType === actionTypes.sequenceExportBreakdownClient
         || actionType === actionTypes.single) {
         //showStaticListsCheckbox
         showHideUtil("staticListsCheckbox", "inline")
@@ -176,7 +181,8 @@ function showHideUI() {
     }
 
     if (actionType === actionTypes.sequenceExportSummarizeCat
-        || actionType === actionTypes.sequenceExportBreakdown
+        || actionType === actionTypes.sequenceExportBreakdownCat
+        || actionType === actionTypes.sequenceExportBreakdownClient
         || actionType === actionTypes.single) {
         showHideUtil("unbilledOnlyCheckbox", "inline")
         showHideUtil("unbilledOnlyLabel", "inline")
@@ -192,7 +198,8 @@ function showHideUI() {
             if (actionType === actionTypes.sequenceExportExtract
                 || actionType === actionTypes.sequenceExportSummarizeUt
                 || actionType === actionTypes.sequenceExportSummarizeCat
-                || actionType === actionTypes.sequenceExportBreakdown) {
+                || actionType === actionTypes.sequenceExportBreakdownCat
+                || actionType === actionTypes.sequenceExportBreakdownClient) {
                 showStaticFile()
             }
         } else {
@@ -669,7 +676,8 @@ async function runSpreadsheetDone() {
     if (actionType === actionTypes.sequenceExportExtract
         || actionType === actionTypes.sequenceExportSummarizeUt
         || actionType === actionTypes.sequenceExportSummarizeCat
-        || actionType === actionTypes.sequenceExportBreakdown) {
+        || actionType === actionTypes.sequenceExportBreakdownCat
+        || actionType === actionTypes.sequenceExportBreakdownClient) {
         showLoading()
         await runSecondHalf("")
         
@@ -820,7 +828,8 @@ async function runSecondHalf(initCsvFileString) {
     if (actionType === actionTypes.sequenceExportExtract
         || actionType === actionTypes.sequenceExportSummarizeUt
         || actionType === actionTypes.sequenceExportSummarizeCat
-        || actionType === actionTypes.sequenceExportBreakdown) {
+        || actionType === actionTypes.sequenceExportBreakdownCat
+        || actionType === actionTypes.sequenceExportBreakdownClient) {
         if (staticLists === false) {
             const step2 = await runCurrentAction(actions.getAllWorkPackages, "step: 2/4 action: getWorkPackages (please wait, this step takes a bit of time)", "", false)
             if (step2.halt) {
@@ -933,7 +942,7 @@ async function runSecondHalf(initCsvFileString) {
             console.log("Sequence completed successfully")
             writeSeparatorToLog()
         }
-        if (actionType === actionTypes.sequenceExportBreakdown) {
+        if (actionType === actionTypes.sequenceExportBreakdownCat) {
         
             const step4 = await runCurrentAction(actions.exportTimeEntries, "step: 4/4 action: exportTimeEntries", "", true)
             if (step4.halt) {
@@ -947,7 +956,30 @@ async function runSecondHalf(initCsvFileString) {
             writeToLog("step: 5/4 action: breakdownClientByCatTimeEntries completed successfully", "step", logType.finished)
             console.log("step: 5/4 action: breakdownClientByCatTimeEntries completed successfully")
 
-            const step5 = await runCurrentAction(actions.breakdownClientByCatTimeEntries, "step: 6/4 action: tabulateBreakdownTimeEntries", step4.conversion.data[0].data, true)
+            const step5 = await runCurrentAction(actions.breakdownClientByCatTimeEntries, "step: 6/4 action: tabulateBreakdownClientByCatTimeEntries", step4.conversion.data[0].data, true)
+            if (step5.halt) {
+                return
+            }
+
+            writeToLog("Sequence completed successfully", "step", logType.finished)
+            console.log("Sequence completed successfully")
+            writeSeparatorToLog()
+        }
+        if (actionType === actionTypes.sequenceExportBreakdownClient) {
+        
+            const step4 = await runCurrentAction(actions.exportTimeEntries, "step: 4/4 action: exportTimeEntries", "", true)
+            if (step4.halt) {
+                return
+            }
+
+            writeToLog("step: 5/4 action: breakdownCatByClientTimeEntries", "step", logType.step)
+            console.log("step: 5/4 action: breakdownCatByClientTimeEntries")
+            writeToLog("CSV loaded", "log", logType.normal)
+            console.log("CSV loaded")
+            writeToLog("step: 5/4 action: breakdownCatByClientTimeEntries completed successfully", "step", logType.finished)
+            console.log("step: 5/4 action: breakdownCatByClientTimeEntries completed successfully")
+
+            const step5 = await runCurrentAction(actions.breakdownCatByClientTimeEntries, "step: 6/4 action: tabulateBreakdownCatByClientTimeEntries", step4.conversion.data[0].data, true)
             if (step5.halt) {
                 return
             }
@@ -993,8 +1025,8 @@ function getActionOptions(action) {
         || action === actions.condenseTimeSheets
         || action === actions.summarizeUtTimeEntries
         || action === actions.summarizeCatTimeEntries
-        || action === actions.breakdownClientByCatTimeEntries) {
-
+        || action === actions.breakdownClientByCatTimeEntries
+        || action === actions.breakdownCatByClientTimeEntries) {
         const returnObj = {hasWeb: false, hasConversion: true, hasFile: true}
         if (action === actions.exportTimeEntries) {
             // || action === actions.condenseTimeSheets
@@ -1004,7 +1036,8 @@ function getActionOptions(action) {
             returnObj.wpConvertUser = wpConvertUser
         }
         if (action === actions.summarizeCatTimeEntries
-            || action === actions.breakdownClientByCatTimeEntries) {
+            || action === actions.breakdownClientByCatTimeEntries
+            || action === actions.breakdownCatByClientTimeEntries) {
             returnObj.unbilledOnly = unbilledOnly
         }
         if (action === actions.convertToWorkPackageIDs
@@ -1013,13 +1046,15 @@ function getActionOptions(action) {
             || action === actions.exportTimeEntries
             || action === actions.summarizeUtTimeEntries
             || action === actions.summarizeCatTimeEntries
-            || action === actions.breakdownClientByCatTimeEntries) {
+            || action === actions.breakdownClientByCatTimeEntries
+            || action === actions.breakdownCatByClientTimeEntries) {
             returnObj.projectList = projectList
         }
         if (action === actions.convertNamesToIDs
             || action === actions.exportTimeEntries
             || action === actions.summarizeCatTimeEntries
-            || action === actions.breakdownClientByCatTimeEntries) {
+            || action === actions.breakdownClientByCatTimeEntries
+            || action === actions.breakdownCatByClientTimeEntries) {
             returnObj.categoryList = categoryList
         }
         if (action === actions.convertToWorkPackageIDs
@@ -1033,7 +1068,8 @@ function getActionOptions(action) {
             || action === actions.extractTimeSheets
             || action === actions.summarizeUtTimeEntries
             || action === actions.summarizeCatTimeEntries
-            || action === actions.breakdownClientByCatTimeEntries) {
+            || action === actions.breakdownClientByCatTimeEntries
+            || action === actions.breakdownCatByClientTimeEntries) {
             returnObj.userList = userList
         }
         return returnObj
@@ -1251,7 +1287,8 @@ function logData(action, currentStep) {
         || action === actions.condenseTimeSheets
         || action === actions.summarizeUtTimeEntries
         || action === actions.summarizeCatTimeEntries
-        || action === actions.breakdownClientByCatTimeEntries) {
+        || action === actions.breakdownClientByCatTimeEntries
+        || action === actions.breakdownCatByClientTimeEntries) {
         // writeToLog(`${currentStep.conversion.data}`, "output", logType.normal)
         console.log(currentStep.conversion.data)
         for (let i = 0; i <= currentStep.conversion.data.length - 1; i++) {
@@ -1288,14 +1325,16 @@ function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, csvType
             || actionType === actionTypes.sequenceExportExtract
             || actionType === actionTypes.sequenceExportSummarizeUt
             || actionType === actionTypes.sequenceExportSummarizeCat
-            || actionType === actionTypes.sequenceExportBreakdown) {
+            || actionType === actionTypes.sequenceExportBreakdownCat
+            || actionType === actionTypes.sequenceExportBreakdownClient) {
             if (!(dayjs(weekBegin, validDateFormats).isValid())) {
                 writeToLog("error: Invalid date for week beginning", "error", logType.error)
                 return false            
             }
             if (actionType === actionTypes.sequenceExportSummarizeUt
                 || actionType === actionTypes.sequenceExportSummarizeCat
-                || actionType === actionTypes.sequenceExportBreakdown) {
+                || actionType === actionTypes.sequenceExportBreakdownCat
+                || actionType === actionTypes.sequenceExportBreakdownClient) {
                 if (!(dayjs(dateEndPeriod, validDateFormats).isValid())) {
                     writeToLog("error: Invalid date for end of period", "error", logType.error)
                     return false            
@@ -1305,7 +1344,8 @@ function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, csvType
         if (actionType !== actionTypes.sequenceExportExtract
             && actionType !== actionTypes.sequenceExportSummarizeUt
             && actionType !== actionTypes.sequenceExportSummarizeCat
-            && actionType !== actionTypes.sequenceExportBreakdown) {
+            && actionType !== actionTypes.sequenceExportBreakdownCat
+            && actionType !== actionTypes.sequenceExportBreakdownClient) {
             if (csvType === csvTypes.import
                 || csvType === csvTypes.import2) {
                 if (typeof selectedFile === "undefined") {

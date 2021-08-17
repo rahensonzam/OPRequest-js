@@ -35,9 +35,11 @@ const actions = {
 	summarizeUtTimeEntries: "summarizeUtTimeEntries",
 	summarizeCatTimeEntries: "summarizeCatTimeEntries",
 	breakdownClientByCatTimeEntries: "breakdownClientByCatTimeEntries",
+	breakdownCatByClientTimeEntries: "breakdownCatByClientTimeEntries",
 	tabulateUtTimeEntries: "tabulateUtTimeEntries",
 	tabulateCatTimeEntries: "tabulateCatTimeEntries",
-	tabulateBreakdownTimeEntries: "tabulateBreakdownTimeEntries",
+	tabulateBreakdownClientByCatTimeEntries: "tabulateBreakdownClientByCatTimeEntries",
+	tabulateBreakdownCatByClientTimeEntries: "tabulateBreakdownCatByClientTimeEntries",
 	convertToWorkPackageIDs: "convertToWorkPackageIDs",
 	convertNamesToIDs: "convertNamesToIDs",
 	convertMembershipNamesToIDs: "convertMembershipNamesToIDs",
@@ -246,6 +248,8 @@ async function doActionAsync(paramsObj) {
 			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, unbilledOnly, projectList, categoryList, userList}))
 		} else if (action === actions.breakdownClientByCatTimeEntries) {
 			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, unbilledOnly, projectList, categoryList, userList}))
+		} else if (action === actions.breakdownCatByClientTimeEntries) {
+			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, unbilledOnly, projectList, categoryList, userList}))
 		} else if (action === actions.getProjects) {
 			taskList.push(getCurrentListPartAAsync(action, rowIndex, "", "GET", apiKey, "pageNum", rowIndex))
 		} else if (action === actions.getWorkPackages) {
@@ -272,7 +276,8 @@ async function doActionAsync(paramsObj) {
 
 	if (action === actions.extractTimeSheets
 		|| action === actions.condenseTimeSheets
-		|| action === actions.breakdownClientByCatTimeEntries) {
+		|| action === actions.breakdownClientByCatTimeEntries
+		|| action === actions.breakdownCatByClientTimeEntries) {
 		// console.log("convertedCSVResults", convertedCSVResults)
 		const outputObj = convertResultsToCsv2(action, convertedCSVResults)
 		return {conversion: outputObj}
@@ -317,7 +322,8 @@ function setCount(action, rows, numOfPages, timeEntryList) {
 	} else if (action === actions.extractTimeSheets
 		|| action === actions.summarizeUtTimeEntries
 		|| action === actions.summarizeCatTimeEntries
-		|| action === actions.breakdownClientByCatTimeEntries) {
+		|| action === actions.breakdownClientByCatTimeEntries
+		|| action === actions.breakdownCatByClientTimeEntries) {
 		return {start: 0, end: 0}
 	} else {
 		return {start: 0, end: rows.length - 1}
@@ -366,6 +372,8 @@ function validateCSV(action, rows, headerRow) {
 	} else if (action === actions.summarizeCatTimeEntries) {
 		console.log(`${action} CSV Validation not yet implemented`)
 	} else if (action === actions.breakdownClientByCatTimeEntries) {
+		console.log(`${action} CSV Validation not yet implemented`)
+	} else if (action === actions.breakdownCatByClientTimeEntries) {
 		console.log(`${action} CSV Validation not yet implemented`)
 	} else if (action === actions.getProjects
 		|| action === actions.getProjects
@@ -507,7 +515,8 @@ function convertResultsToCsv2(action, resultArray) {
 	const outputData = []
 	for (let i = 0; i <= temp.length - 1; i++) {
 		let temp6 = []
-		if(action === actions.breakdownClientByCatTimeEntries) {
+		if(action === actions.breakdownClientByCatTimeEntries
+			|| action === actions.breakdownCatByClientTimeEntries) {
 			const temp4 = temp[i].data
 			const temp3 = extractProp(temp4, "data")
 			temp6 = transposeResult(temp3)
@@ -744,7 +753,8 @@ function convertCsvAction(paramsObj) {
 		// console.log("filteredSortedList", filteredSortedList)
 	}
 
-	if (action === actions.breakdownClientByCatTimeEntries) {
+	if (action === actions.breakdownClientByCatTimeEntries
+		|| action === actions.breakdownCatByClientTimeEntries) {
 		let tempList2 = []
 		if (unbilledOnly === true) {
 			const tempList = filterListToUnbilledOnly(resultList)
@@ -752,7 +762,12 @@ function convertCsvAction(paramsObj) {
 		} else {
 			tempList2.push.apply(tempList2, filterListToDateRange(resultList, currentDate, dateEndPeriod))
 		}
-		filteredSortedList.push.apply(filteredSortedList, splitListByCategoryThenGrade(tempList2, categoryList, userList))
+
+		if (action === actions.breakdownClientByCatTimeEntries) {
+			filteredSortedList.push.apply(filteredSortedList, splitListByCategoryThenGrade(tempList2, categoryList, userList))
+		} else if (action === actions.breakdownCatByClientTimeEntries) {
+			filteredSortedList.push.apply(filteredSortedList, splitListByClientThenGrade(tempList2, projectList, userList))
+		}
 		// console.log("filteredSortedList", filteredSortedList)
 	}
 
@@ -773,7 +788,10 @@ function convertCsvAction(paramsObj) {
 
 	const clientTypes2List = []
 	if (action === actions.breakdownClientByCatTimeEntries) {
-		clientTypes2List.push.apply(clientTypes2List, filterClientTypes2(filteredSortedList))
+		clientTypes2List.push.apply(clientTypes2List, filterClientTypes2ClientByCat(filteredSortedList))
+	} else if (action === actions.breakdownCatByClientTimeEntries) {
+		//FIXME: Should be filterCategoryTypes2
+		clientTypes2List.push.apply(clientTypes2List, filterClientTypes2CatByClient(filteredSortedList))
 	}
 
 	// check data for errors
@@ -795,7 +813,8 @@ function convertCsvAction(paramsObj) {
 	let outputExt2
 
 	// FIXME: Teporary solution
-	if (action !== actions.breakdownClientByCatTimeEntries) {
+	if (action !== actions.breakdownClientByCatTimeEntries
+		&& action !== actions.breakdownCatByClientTimeEntries) {
 		// gather the data
 		const count = setConversionCount(action, retrievedListLength, filteredSortedList.length - 1)
 		for (let i = count.start; i <= count.end; i++) {
@@ -889,7 +908,8 @@ function convertCsvAction(paramsObj) {
 	}
 
 	const outputExt3 = []
-	if (action === actions.breakdownClientByCatTimeEntries) {
+	if (action === actions.breakdownClientByCatTimeEntries
+		|| action === actions.breakdownCatByClientTimeEntries) {
 
 		const count2 = setConversionCount(action, retrievedListLength, filteredSortedList.length - 1)
 		for (let i = count2.start; i <= count2.end; i++) {
@@ -910,16 +930,24 @@ function convertCsvAction(paramsObj) {
 
 
 	// if (action === actions.tabulateBreakdownTimeEntries) {
-	if (action === actions.breakdownClientByCatTimeEntries) {
-		console.log("outputExt3", outputExt3)
+	if (action === actions.breakdownClientByCatTimeEntries
+		|| action === actions.breakdownCatByClientTimeEntries) {
+		// console.log("outputExt3", outputExt3)
+		
+		let currentAction
+		if (action === actions.breakdownClientByCatTimeEntries) {
+			currentAction = actions.tabulateBreakdownClientByCatTimeEntries
+		} else if (action === actions.breakdownCatByClientTimeEntries) {
+			currentAction = actions.tabulateBreakdownCatByClientTimeEntries
+		}
 
-		const count2 = setConversionCount(actions.tabulateBreakdownTimeEntries, retrievedListLength, filteredSortedList.length - 1)
+		const count2 = setConversionCount(currentAction, retrievedListLength, filteredSortedList.length - 1)
 		for (let i = count2.start; i <= count2.end; i++) {
 			const outputArrayDataRow = []
-			const count3 = setConversionCount(actions.tabulateBreakdownTimeEntries, retrievedListLength, filteredSortedList[i].data.length - 1)
+			const count3 = setConversionCount(currentAction, retrievedListLength, filteredSortedList[i].data.length - 1)
 			for (let j = count3.start; j <= count3.end; j++) {
 				const outputArrayInnerDataRow = []
-				outputArrayInnerDataRow.push.apply(outputArrayInnerDataRow, setOutputArrayData(actions.tabulateBreakdownTimeEntries, row, rowIndex, j, currentDate, outputExt3[i].data, workPackageIDs, filteredSortedList, uniqueValuesList, clientTypesList, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList))
+				outputArrayInnerDataRow.push.apply(outputArrayInnerDataRow, setOutputArrayData(currentAction, row, rowIndex, j, currentDate, outputExt3[i].data, workPackageIDs, filteredSortedList, uniqueValuesList, clientTypesList, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList))
 				if (outputArrayInnerDataRow.length !== 0) {
 					outputArrayDataRow.push({data: outputArrayInnerDataRow[0]})
 				}
@@ -948,9 +976,11 @@ function setConversionCount(action, retrievedListLength, filteredSortedListLengt
 		|| action === actions.summarizeUtTimeEntries
 		|| action === actions.summarizeCatTimeEntries
 		|| action === actions.breakdownClientByCatTimeEntries
+		|| action === actions.breakdownCatByClientTimeEntries
 		|| action === actions.tabulateUtTimeEntries
 		|| action === actions.tabulateCatTimeEntries
-		|| action === actions.tabulateBreakdownTimeEntries) {
+		|| action === actions.tabulateBreakdownClientByCatTimeEntries
+		|| action === actions.tabulateBreakdownCatByClientTimeEntries) {
 		// same as uniqueValuesListLength
 		// same as clientTypesListLength
 		// same as categoryTypesListLength
@@ -1029,7 +1059,8 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, projectList
 	} else if (action === actions.extractTimeSheets
 		|| action === actions.summarizeUtTimeEntries
 		|| action === actions.summarizeCatTimeEntries
-		|| action === actions.breakdownClientByCatTimeEntries) {
+		|| action === actions.breakdownClientByCatTimeEntries
+		|| action === actions.breakdownCatByClientTimeEntries) {
 		if (filteredSortedList.length === 0) {
 			error.message = "error: No rows found for the selected weeks"
 			return {errors: error}
@@ -1124,6 +1155,9 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 		|| action === actions.breakdownClientByCatTimeEntries) {
 		return summarizeData(action, filteredSortedList, clientTypesList, i, "client")
 
+	} else if (action === actions.breakdownCatByClientTimeEntries) {
+		return summarizeData(action, filteredSortedList, clientTypesList, i, "category")
+
 	} else if (action === actions.summarizeCatTimeEntries) {
 		return summarizeData(action, filteredSortedList, categoryTypesList, i, "category")
 
@@ -1133,8 +1167,11 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 	} else if (action === actions.tabulateCatTimeEntries) {
 		return tabulateData(action, resultList, i, "category", "category/grade")
 
-	} else if (action === actions.tabulateBreakdownTimeEntries) {
+	} else if (action === actions.tabulateBreakdownClientByCatTimeEntries) {
 		return tabulateData(action, resultList, i, "client", "client/grade")
+
+	} else if (action === actions.tabulateBreakdownCatByClientTimeEntries) {
+		return tabulateData(action, resultList, i, "category", "category/grade")
 
 	} else if (action === actions.getProjects
 		|| action === actions.getWorkPackages
@@ -1298,6 +1335,35 @@ function splitListByCategoryThenGrade(resultList, categoryList, userList) {
 	return tempArray
 }
 
+function splitListByClientThenGrade(resultList, projectList, userList) {
+	const tempArray = []
+	for (let index = 0; index <= projectList.length - 1; index++) {
+		// if projectList[index].name is not found in tempArray[all].name
+		if (!(tempArray.some(function(e) {return e.name === projectList[index].name}))) {
+			const tempArrayData = []
+			for (let index2 = 0; index2 <= userList.length - 1; index2++) {
+				// if userList[index2].grade is not found in tempArrayData[all].name
+				if (!(tempArrayData.some(function(e) {return e.name === userList[index2].grade}))) {
+					const tempArrayinnerData = []
+					for (let index3 = 0; index3 <= resultList.length - 1; index3++) {
+						if (resultList[index3].grade === userList[index2].grade
+							&& resultList[index3].client === projectList[index].name) {
+							tempArrayinnerData.push(resultList[index3])
+						}
+					}
+					if (tempArrayinnerData.length !== 0) {
+						tempArrayData.push({name: userList[index2].grade, data: tempArrayinnerData})
+					}
+				}
+			}
+			if (tempArrayData.length !== 0) {
+				tempArray.push({name: projectList[index].name, data: tempArrayData})
+			}
+		}
+	}
+	return tempArray
+}
+
 function filterUniqueValues(resultList) {
 	const tempArray = []
 	for (let i = 0; i <= resultList.length - 1; i++) {
@@ -1365,7 +1431,15 @@ function filterClientTypes(resultList, projectList) {
 	return tempArray
 }
 
-function filterClientTypes2(resultList) {
+function filterClientTypes2ClientByCat(resultList) {
+	return filterClientTypes2(resultList, "client")
+}
+
+function filterClientTypes2CatByClient(resultList) {
+	return filterClientTypes2(resultList, "category")
+}
+
+function filterClientTypes2(resultList, prop) {
 	const tempArray = []
 	for (let i = 0; i <= resultList.length - 1; i++) {
 		const resultListData = resultList[i].data
@@ -1374,9 +1448,9 @@ function filterClientTypes2(resultList) {
 			const resultListInnerData = resultListData[j].data
 			const tempArrayInnerData = []
 			for (let k = 0; k <= resultListInnerData.length - 1; k++) {
-				// if resultListInnerData[k].client is not found in tempArrayInnerData[all].client
-				if (!(tempArrayInnerData.some(function(e) {return e.client === resultListInnerData[k].client}))) {
-					tempArrayInnerData.push({client: resultListInnerData[k].client})
+				// if resultListInnerData[k][prop] is not found in tempArrayInnerData[all][prop]
+				if (!(tempArrayInnerData.some(function(e) {return e[prop] === resultListInnerData[k][prop]}))) {
+					tempArrayInnerData.push({[prop]: resultListInnerData[k][prop]})
 				}
 			}
 			tempArrayData.push({name: resultListData[j].name, data: tempArrayInnerData.slice()})
@@ -1463,9 +1537,9 @@ function summarizeData(action, listA, listB, i, prop) {
 		return summarizeDataInner(listDataA, listDataB, reduceFunctionA, reduceObjectFunctionA)
 	} else if (action === actions.summarizeUtTimeEntries) {
 		return summarizeDataInner(listDataA, listDataB, reduceFunctionB, reduceObjectFunctionB)
-	} else if (action === actions.summarizeCatTimeEntries) {
-		return summarizeDataInner(listDataA, listDataB, reduceFunctionC, reduceObjectFunctionB)
-	} else if (action === actions.breakdownClientByCatTimeEntries) {
+	} else if (action === actions.summarizeCatTimeEntries
+		|| action === actions.breakdownClientByCatTimeEntries
+		|| action === actions.breakdownCatByClientTimeEntries) {
 		return summarizeDataInner(listDataA, listDataB, reduceFunctionC, reduceObjectFunctionB)
 	}
 }
@@ -1485,7 +1559,7 @@ function tabulateData(action, resultList, i, prop, topLeft) {
 	const typesListData = filterTableTypes(resultList, prop)
 
 	if (action === actions.tabulateUtTimeEntries
-		|| action === actions.tabulateBreakdownTimeEntries) {
+		|| action === actions.tabulateBreakdownClientByCatTimeEntries) {
 		typesListData.sort(compareAlphabetical)
 		typesListData.sort(compareMoveCurlyToBottom)
 	}
@@ -1496,7 +1570,7 @@ function tabulateData(action, resultList, i, prop, topLeft) {
 
 function tabulateDataInner(resultListData, typesListData, innerTableData, prop) {
 	for (let j = 0; j <= typesListData.length - 1; j++) {
-		// if clientTypesListData[j][prop] is found in resultListData[all][prop]
+		// if typesListData[j][prop] is found in resultListData[all][prop]
 		if (resultListData.some(function(e) {return e[prop] === typesListData[j][prop]})) {
 			const resultListIndex = resultListData.findIndex(function(e) {return e[prop] === typesListData[j][prop]})
 			innerTableData[typesListData[j][prop]] = resultListData[resultListIndex].units
