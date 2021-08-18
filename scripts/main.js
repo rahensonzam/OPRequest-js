@@ -38,7 +38,7 @@ let actionType
 let csvType
 let fileSelect
 let staticLists
-let unbilledOnly
+let billingStatusReportFilter
 let workPackageListFileSelect
 let timeEntryListFileSelect
 let projectList
@@ -184,11 +184,11 @@ function showHideUI() {
         || actionType === actionTypes.sequenceExportBreakdownCat
         || actionType === actionTypes.sequenceExportBreakdownClient
         || actionType === actionTypes.single) {
-        showHideUtil("unbilledOnlyCheckbox", "inline")
-        showHideUtil("unbilledOnlyLabel", "inline")
+        showHideUtil("billingStatusReportFilterSelect", "inline")
+        showHideUtil("billingStatusReportFilterLabel", "inline")
     } else {
-        showHideUtil("unbilledOnlyCheckbox", "none")
-        showHideUtil("unbilledOnlyLabel", "none")
+        showHideUtil("billingStatusReportFilterSelect", "none")
+        showHideUtil("billingStatusReportFilterLabel", "none")
     }
 
     if (actionType === actionTypes.single) {
@@ -295,7 +295,7 @@ async function runActions() {
     dateEndPeriod = document.getElementById("dateEndPeriodBox").value
     fileSelect = document.getElementById("fileSelect")
     staticLists = document.getElementById("staticListsCheckbox").checked
-    unbilledOnly = document.getElementById("unbilledOnlyCheckbox").checked
+    billingStatusReportFilter = document.getElementById("billingStatusReportFilterSelect").value
     workPackageListFileSelect = document.getElementById("workPackageListFileSelect")
     timeEntryListFileSelect = document.getElementById("timeEntryListFileSelect")
 
@@ -1038,7 +1038,7 @@ function getActionOptions(action) {
         if (action === actions.summarizeCatTimeEntries
             || action === actions.breakdownClientByCatTimeEntries
             || action === actions.breakdownCatByClientTimeEntries) {
-            returnObj.unbilledOnly = unbilledOnly
+            returnObj.billingStatusReportFilter = billingStatusReportFilter
         }
         if (action === actions.convertToWorkPackageIDs
             || action === actions.convertNamesToIDs

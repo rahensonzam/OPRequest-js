@@ -65,6 +65,21 @@ const webErrorTypes = {
 	unknown: "unknown"
 }
 
+// FIXME: billingStatus values should be defined in one place
+const billingStatusEnum = {
+	Unbilled: "Unbilled",
+	Billed: "Billed",
+	WrittenOff: "Written off"
+}
+
+const billingStatusReportFilterEnum = {
+	All: "All",
+	BilledAndWrittenOff: "BilledAndWrittenOff",
+	Unbilled: "Unbilled",
+	Billed: "Billed",
+	WrittenOff: "WrittenOff"
+}
+
 const custom = {
 	billingStatus: "customField5",
 	feeNoteNumber: "customField6"
@@ -159,7 +174,7 @@ async function doActionAsync(paramsObj) {
 	const headerRow = checkIfPropertyExists(paramsObj, "headerRow")
 	const weekBegin = checkIfPropertyExists(paramsObj, "weekBegin")
 	const dateEndPeriod = checkIfPropertyExists(paramsObj, "dateEndPeriod")
-	const unbilledOnly = checkIfPropertyExists(paramsObj, "unbilledOnly")
+	const billingStatusReportFilter = checkIfPropertyExists(paramsObj, "billingStatusReportFilter")
 	const projectList = checkIfPropertyExists(paramsObj, "projectList")
 	const categoryList = checkIfPropertyExists(paramsObj, "categoryList")
 	const workPackageList = checkIfPropertyExists(paramsObj, "workPackageList")
@@ -245,11 +260,11 @@ async function doActionAsync(paramsObj) {
 		} else if (action === actions.summarizeUtTimeEntries) {
 			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, projectList, userList}))
 		} else if (action === actions.summarizeCatTimeEntries) {
-			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, unbilledOnly, projectList, categoryList, userList}))
+			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, billingStatusReportFilter, projectList, categoryList, userList}))
 		} else if (action === actions.breakdownClientByCatTimeEntries) {
-			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, unbilledOnly, projectList, categoryList, userList}))
+			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, billingStatusReportFilter, projectList, categoryList, userList}))
 		} else if (action === actions.breakdownCatByClientTimeEntries) {
-			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, unbilledOnly, projectList, categoryList, userList}))
+			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, billingStatusReportFilter, projectList, categoryList, userList}))
 		} else if (action === actions.getProjects) {
 			taskList.push(getCurrentListPartAAsync(action, rowIndex, "", "GET", apiKey, "pageNum", rowIndex))
 		} else if (action === actions.getWorkPackages) {
@@ -699,7 +714,7 @@ function convertCsvAction(paramsObj) {
 	const wpConvertUser = checkIfPropertyExists(paramsObj, "wpConvertUser")
 	const weekBegin = checkIfPropertyExists(paramsObj, "weekBegin")
 	const dateEndPeriod = checkIfPropertyExists(paramsObj, "dateEndPeriod")
-	const unbilledOnly = checkIfPropertyExists(paramsObj, "unbilledOnly")
+	const billingStatusReportFilter = checkIfPropertyExists(paramsObj, "billingStatusReportFilter")
 	const resultList = checkIfPropertyExists(paramsObj, "resultList")
 	const projectList = checkIfPropertyExists(paramsObj, "projectList")
 	const categoryList = checkIfPropertyExists(paramsObj, "categoryList")
@@ -742,26 +757,16 @@ function convertCsvAction(paramsObj) {
 	}
 
 	if (action === actions.summarizeCatTimeEntries) {
-		let tempList2 = []
-		if (unbilledOnly === true) {
-			const tempList = filterListToUnbilledOnly(resultList)
-			tempList2.push.apply(tempList2, filterListToDateRange(tempList, currentDate, dateEndPeriod))
-		} else {
-			tempList2.push.apply(tempList2, filterListToDateRange(resultList, currentDate, dateEndPeriod))
-		}
+		const tempList = filterListByBillingStatusReportFilter(resultList, billingStatusReportFilter)
+		const tempList2 = filterListToDateRange(tempList, currentDate, dateEndPeriod)
 		filteredSortedList.push.apply(filteredSortedList, splitListByGrade(tempList2, userList))
 		// console.log("filteredSortedList", filteredSortedList)
 	}
 
 	if (action === actions.breakdownClientByCatTimeEntries
 		|| action === actions.breakdownCatByClientTimeEntries) {
-		let tempList2 = []
-		if (unbilledOnly === true) {
-			const tempList = filterListToUnbilledOnly(resultList)
-			tempList2.push.apply(tempList2, filterListToDateRange(tempList, currentDate, dateEndPeriod))
-		} else {
-			tempList2.push.apply(tempList2, filterListToDateRange(resultList, currentDate, dateEndPeriod))
-		}
+		const tempList = filterListByBillingStatusReportFilter(resultList, billingStatusReportFilter)
+		const tempList2 = filterListToDateRange(tempList, currentDate, dateEndPeriod)
 
 		if (action === actions.breakdownClientByCatTimeEntries) {
 			filteredSortedList.push.apply(filteredSortedList, splitListByCategoryThenGrade(tempList2, categoryList, userList))
@@ -1246,11 +1251,28 @@ function filterListToNumberOfWeeks(resultList, weekBegin, numberOfWeeks) {
 	return filterList(resultList, weekBegin, (daysOfWeek.length - 1) * numberOfWeeks)
 }
 
-function filterListToUnbilledOnly(resultList) {
+function filterListByBillingStatusReportFilter(resultList, billingStatusReportFilter) {
 	const tempArray = []
 	for (let index = 0; index <= resultList.length - 1; index++) {
-		// FIXME: "Unbilled" should maybe be a variable
-		if (resultList[index].billingStatus === "Unbilled") {
+		let condition
+		if (billingStatusReportFilter === billingStatusReportFilterEnum.Billed) {
+			condition = resultList[index].billingStatus === billingStatusEnum.Billed
+
+		} else if (billingStatusReportFilter === billingStatusReportFilterEnum.Unbilled) {
+			condition = resultList[index].billingStatus === billingStatusEnum.Unbilled
+
+		} else if (billingStatusReportFilter === billingStatusReportFilterEnum.BilledAndWrittenOff) {
+			condition = resultList[index].billingStatus === billingStatusEnum.Billed
+			|| resultList[index].billingStatus === billingStatusEnum.WrittenOff
+
+		} else if (billingStatusReportFilter === billingStatusReportFilterEnum.WrittenOff) {
+			condition = resultList[index].billingStatus === billingStatusEnum.WrittenOff
+
+		} else if (billingStatusReportFilter === billingStatusReportFilterEnum.All) {
+			condition = true
+		}
+
+		if (condition) {
 			tempArray.push(resultList[index])
 		}
 	}

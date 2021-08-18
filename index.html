@@ -91,8 +91,14 @@
             <label id="actionSelectLogLabel" for="actionSelectLogCheckbox">Log data</label>
             <input type="checkbox" id="staticListsCheckbox" name="staticListsCheckbox">
             <label id="staticListsLabel" for="staticListsCheckbox">Static Lists</label>
-            <input type="checkbox" id="unbilledOnlyCheckbox" name="unbilledOnlyCheckbox">
-            <label id="unbilledOnlyLabel" for="unbilledOnlyCheckbox">Unbilled Only (Completion Record)</label>
+            <select id="billingStatusReportFilterSelect" name="billingStatusReportFilterSelect">
+                <option value="All">All</option>
+                <option value="BilledAndWrittenOff">Billed and written off</option>
+                <option value="Unbilled">Unbilled</option>
+                <option value="Billed">Billed</option>
+                <option value="WrittenOff">Written off</option>
+            </select>
+            <label id="billingStatusReportFilterLabel" for="billingStatusReportFilterSelect">Billing Status Report Filter</label>
         </div>
         <div class="pad">
             <label for="user">Select User:</label>
