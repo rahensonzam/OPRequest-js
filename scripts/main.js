@@ -1289,11 +1289,14 @@ function logData(action, currentStep) {
         || action === actions.summarizeCatTimeEntries
         || action === actions.breakdownClientByCatTimeEntries
         || action === actions.breakdownCatByClientTimeEntries) {
-        // writeToLog(`${currentStep.conversion.data}`, "output", logType.normal)
-        console.log(currentStep.conversion.data)
         for (let i = 0; i <= currentStep.conversion.data.length - 1; i++) {
-            writeToLog(`${currentStep.conversion.data[i].name}\n${currentStep.conversion.data[i].data}`, "output", logType.normal)
-            console.log(`${currentStep.conversion.data[i].name}\n${currentStep.conversion.data[i].data}`)
+            if (action === actions.extractTimeSheets) {
+                writeToLog(`${currentStep.conversion.data[i].name}\n${currentStep.conversion.data[i].data}`, "output", logType.normal)
+                console.log(`${currentStep.conversion.data[i].name}\n${currentStep.conversion.data[i].data}`)
+            } else {
+                writeToLog(`${currentStep.conversion.data[i].data}`, "output", logType.normal)
+                console.log(currentStep.conversion.data[i].data)
+            }
         }
         return
     }

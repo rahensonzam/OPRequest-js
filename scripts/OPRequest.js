@@ -526,6 +526,16 @@ function convertResultsToCsv2(action, resultArray) {
 		// FIXME: addEmptyDays modifies the orignal array
 		temp = addEmptyDays(temp)
 	}
+	if (action === actions.breakdownCatByClientTimeEntries) {
+		temp.sort(compareAlphabetical2)
+		temp.sort(compareMoveCurlyToBottom)
+	}
+	let columnHeader
+	if (action === actions.breakdownClientByCatTimeEntries) {
+		columnHeader = "category"
+	} else if (action === actions.breakdownCatByClientTimeEntries) {
+		columnHeader = "client"
+	}
 	const outputData = []
 	for (let i = 0; i <= temp.length - 1; i++) {
 		let temp6 = []
@@ -533,7 +543,8 @@ function convertResultsToCsv2(action, resultArray) {
 			|| action === actions.breakdownCatByClientTimeEntries) {
 			const temp4 = temp[i].data
 			const temp3 = extractProp(temp4, "data")
-			temp6 = transposeResult(temp3)
+			const temp7 = transposeResult(temp3)
+			temp6 = fillDownName(columnHeader, temp[i].name, temp7)
 		} else {
 			temp6 = temp[i].data
 		}
@@ -654,6 +665,14 @@ function transposeResult(inputArray) {
 		resultArray.push(tempObj)
 	}
 
+	return resultArray
+}
+
+function fillDownName(typeName, name, inputArray) {
+	const resultArray = []
+	for (let i = 0; i <= inputArray.length - 1; i++) {
+		resultArray.push({[typeName]: name, ...inputArray[i]})
+	}
 	return resultArray
 }
 
