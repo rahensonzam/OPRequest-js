@@ -598,7 +598,7 @@ function extractProp(resultArray, prop) {
 function extractPropInner(resultArray) {
 	const temp = []
 	for (let j = 0; j <= resultArray.length - 1; j++) {
-		temp.push.apply(temp, resultArray[j])
+		temp.push(...resultArray[j])
 	}
 	return temp
 }
@@ -745,20 +745,20 @@ function convertCsvAction(paramsObj) {
 	const filteredSortedList = []
 	if (action === actions.extractTimeSheets) {
 		const tempList = filterListToNumberOfWeeks(resultList, currentDate, 1)
-		filteredSortedList.push.apply(filteredSortedList, splitListByUser(tempList, userList))
+		filteredSortedList.push(...splitListByUser(tempList, userList))
 		// console.log("filteredSortedList", filteredSortedList)
 	}
 
 	if (action === actions.summarizeUtTimeEntries) {
 		const tempList = filterListToDateRange(resultList, currentDate, dateEndPeriod)
-		filteredSortedList.push.apply(filteredSortedList, splitListByUser(tempList, userList))
+		filteredSortedList.push(...splitListByUser(tempList, userList))
 		// console.log("filteredSortedList", filteredSortedList)
 	}
 
 	if (action === actions.summarizeCatTimeEntries) {
 		const tempList = filterListByBillingStatusReportFilter(resultList, billingStatusReportFilter)
 		const tempList2 = filterListToDateRange(tempList, currentDate, dateEndPeriod)
-		filteredSortedList.push.apply(filteredSortedList, splitListByGrade(tempList2, userList))
+		filteredSortedList.push(splitListByGrade(tempList2, userList))
 		// console.log("filteredSortedList", filteredSortedList)
 	}
 
@@ -768,34 +768,34 @@ function convertCsvAction(paramsObj) {
 		const tempList2 = filterListToDateRange(tempList, currentDate, dateEndPeriod)
 
 		if (action === actions.breakdownClientByCatTimeEntries) {
-			filteredSortedList.push.apply(filteredSortedList, splitListByCategoryThenGrade(tempList2, categoryList, userList))
+			filteredSortedList.push(...splitListByCategoryThenGrade(tempList2, categoryList, userList))
 		} else if (action === actions.breakdownCatByClientTimeEntries) {
-			filteredSortedList.push.apply(filteredSortedList, splitListByClientThenGrade(tempList2, projectList, userList))
+			filteredSortedList.push(...splitListByClientThenGrade(tempList2, projectList, userList))
 		}
 		// console.log("filteredSortedList", filteredSortedList)
 	}
 
 	const uniqueValuesList = []
 	// if (action === actions.condenseTimeEntries) {
-	// 	uniqueValuesList.push.apply(uniqueValuesList, filterUniqueValues(resultList))
+	// 	uniqueValuesList.push(...filterUniqueValues(resultList))
 	// }
 
 	const clientTypesList = []
 	if (action === actions.summarizeUtTimeEntries) {
-		clientTypesList.push.apply(clientTypesList, filterClientTypes(filteredSortedList, projectList))
+		clientTypesList.push(...filterClientTypes(filteredSortedList, projectList))
 	}
 
 	const categoryTypesList = []
 	if (action === actions.summarizeCatTimeEntries) {
-		categoryTypesList.push.apply(categoryTypesList, filterCategoryTypes(filteredSortedList, categoryList))
+		categoryTypesList.push(...filterCategoryTypes(filteredSortedList, categoryList))
 	}
 
 	const clientTypes2List = []
 	if (action === actions.breakdownClientByCatTimeEntries) {
-		clientTypes2List.push.apply(clientTypes2List, filterClientTypes2ClientByCat(filteredSortedList))
+		clientTypes2List.push(...filterClientTypes2ClientByCat(filteredSortedList))
 	} else if (action === actions.breakdownCatByClientTimeEntries) {
 		//FIXME: Should be filterCategoryTypes2
-		clientTypes2List.push.apply(clientTypes2List, filterClientTypes2CatByClient(filteredSortedList))
+		clientTypes2List.push(...filterClientTypes2CatByClient(filteredSortedList))
 	}
 
 	// check data for errors
@@ -824,7 +824,7 @@ function convertCsvAction(paramsObj) {
 		for (let i = count.start; i <= count.end; i++) {
 			const outputArrayDataRow = []
 
-			outputArrayDataRow.push.apply(outputArrayDataRow, setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, workPackageIDs, filteredSortedList, uniqueValuesList, clientTypesList, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList))
+			outputArrayDataRow.push(...setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, workPackageIDs, filteredSortedList, uniqueValuesList, clientTypesList, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList))
 			// console.log(action)
 			// console.log(action !== actions.extractTimeSheets
 			// 	&& action !== actions.condenseTimeSheets
@@ -871,12 +871,12 @@ function convertCsvAction(paramsObj) {
 	if (action === actions.extractTimeSheets) {
 		outputExt2 = addEmptyDays(outputExt)
 
-		uniqueValuesList.push.apply(uniqueValuesList, filterUniqueValues(outputExt2))
+		uniqueValuesList.push(...filterUniqueValues(outputExt2))
 
 		const count2 = setConversionCount(actions.condenseTimeSheets, retrievedListLength, filteredSortedList.length - 1)
 		for (let i = count2.start; i <= count2.end; i++) {
 			const outputArrayDataRow = []
-			outputArrayDataRow.push.apply(outputArrayDataRow, setOutputArrayData(actions.condenseTimeSheets, row, rowIndex, i, currentDate, outputExt2, workPackageIDs, filteredSortedList, uniqueValuesList, clientTypesList, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList))
+			outputArrayDataRow.push(...setOutputArrayData(actions.condenseTimeSheets, row, rowIndex, i, currentDate, outputExt2, workPackageIDs, filteredSortedList, uniqueValuesList, clientTypesList, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList))
 			if (outputArrayDataRow.length !== 0) {
 				outputArrayDataRow.sort(compareAlphabetical)
 				outputArrayDataRow.sort(compareMoveCurlyToBottom)
@@ -891,7 +891,7 @@ function convertCsvAction(paramsObj) {
 		const count2 = setConversionCount(actions.tabulateUtTimeEntries, retrievedListLength, filteredSortedList.length - 1)
 		for (let i = count2.start; i <= count2.end; i++) {
 			const outputArrayDataRow = []
-			outputArrayDataRow.push.apply(outputArrayDataRow, setOutputArrayData(actions.tabulateUtTimeEntries, row, rowIndex, i, currentDate, outputExt, workPackageIDs, filteredSortedList, uniqueValuesList, clientTypesList, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList))
+			outputArrayDataRow.push(...setOutputArrayData(actions.tabulateUtTimeEntries, row, rowIndex, i, currentDate, outputExt, workPackageIDs, filteredSortedList, uniqueValuesList, clientTypesList, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList))
 			if (outputArrayDataRow.length !== 0) {
 				outputArray.push({data: outputArrayDataRow[0]})
 			}
@@ -904,7 +904,7 @@ function convertCsvAction(paramsObj) {
 		const count2 = setConversionCount(actions.tabulateCatTimeEntries, retrievedListLength, filteredSortedList.length - 1)
 		for (let i = count2.start; i <= count2.end; i++) {
 			const outputArrayDataRow = []
-			outputArrayDataRow.push.apply(outputArrayDataRow, setOutputArrayData(actions.tabulateCatTimeEntries, row, rowIndex, i, currentDate, outputExt, workPackageIDs, filteredSortedList, uniqueValuesList, clientTypesList, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList))
+			outputArrayDataRow.push(...setOutputArrayData(actions.tabulateCatTimeEntries, row, rowIndex, i, currentDate, outputExt, workPackageIDs, filteredSortedList, uniqueValuesList, clientTypesList, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList))
 			if (outputArrayDataRow.length !== 0) {
 				outputArray.push({data: outputArrayDataRow[0]})
 			}
@@ -921,7 +921,7 @@ function convertCsvAction(paramsObj) {
 			const count3 = setConversionCount(action, retrievedListLength, filteredSortedList[i].data.length - 1)
 			for (let j = count3.start; j <= count3.end; j++) {
 				const outputArrayInnerDataRow = []
-				outputArrayInnerDataRow.push.apply(outputArrayInnerDataRow, setOutputArrayData(action, row, rowIndex, j, currentDate, resultList, workPackageIDs, filteredSortedList[i].data, uniqueValuesList, clientTypes2List[i].data, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList))
+				outputArrayInnerDataRow.push(...setOutputArrayData(action, row, rowIndex, j, currentDate, resultList, workPackageIDs, filteredSortedList[i].data, uniqueValuesList, clientTypes2List[i].data, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList))
 				if (outputArrayInnerDataRow.length !== 0) {
 					outputArrayDataRow.push({name: filteredSortedList[i].data[j].name, data: outputArrayInnerDataRow})
 				}
@@ -951,7 +951,7 @@ function convertCsvAction(paramsObj) {
 			const count3 = setConversionCount(currentAction, retrievedListLength, filteredSortedList[i].data.length - 1)
 			for (let j = count3.start; j <= count3.end; j++) {
 				const outputArrayInnerDataRow = []
-				outputArrayInnerDataRow.push.apply(outputArrayInnerDataRow, setOutputArrayData(currentAction, row, rowIndex, j, currentDate, outputExt3[i].data, workPackageIDs, filteredSortedList, uniqueValuesList, clientTypesList, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList))
+				outputArrayInnerDataRow.push(...setOutputArrayData(currentAction, row, rowIndex, j, currentDate, outputExt3[i].data, workPackageIDs, filteredSortedList, uniqueValuesList, clientTypesList, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList))
 				if (outputArrayInnerDataRow.length !== 0) {
 					outputArrayDataRow.push({data: outputArrayInnerDataRow[0]})
 				}
