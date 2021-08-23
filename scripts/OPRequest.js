@@ -274,7 +274,7 @@ async function doActionAsync(paramsObj) {
 		} else if (action === actions.getTimeEntries) {
 			taskList.push(getCurrentListPartAAsync(action, rowIndex, "", "GET", apiKey, "pageNum", rowIndex))
 		} else {
-			console.log("Invalid action")
+			throw new RangeError(`Invalid action: "${action}"`)
 		}
 	}
 
@@ -397,8 +397,7 @@ function validateCSV(action, rows, headerRow) {
 		|| action === actions.getTimeEntries) {
 		// No CSV to be validated
 	} else {
-		console.log("Invalid action")
-		return
+		throw new RangeError(`Invalid action: "${action}"`)
 	}
 	return {}
 	// convertToWorkPackageIDs: {
@@ -1080,7 +1079,7 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, projectList
 		// || action === actions.condenseTimeSheets) {
 		return false
 	} else {
-		return "Invalid action"
+		throw new RangeError(`Invalid action: "${action}"`)
 	}
 }
 
@@ -1237,7 +1236,7 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 			// cost: ,
 		}]
 	} else {
-		return "Invalid action"
+		throw new RangeError(`Invalid action: "${action}"`)
 	}
 }
 
@@ -1784,7 +1783,7 @@ function setFullUrl(action, row) {
 		|| action === actions.getTimeEntries) {
 		return `${baseURL}/time_entries`
 	} else {
-		return "Invalid action"
+		throw new RangeError(`Invalid action: "${action}"`)
 	}
 }
 
@@ -1932,7 +1931,7 @@ function setBody(action, row, lockVersion, rowIndex, wpConvertUser, billingStatu
 			filters: "[]"
 		}
 	} else {
-		return "Invalid action"
+		throw new RangeError(`Invalid action: "${action}"`)
 	}
 }
 
