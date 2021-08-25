@@ -3,6 +3,15 @@
 // import "./libs/jquery/jquery.module.js"
 // import $ from "./libs/jquery/jquery-3.5.1.js"
 import { passwordToApiKey } from "./apiKeyListFile.js"
+import {
+    getAdminUser1IdNumber,
+    getAdminUser2IdNumber,
+    getBillingStatusList,
+    // getProjectList,
+    getCategoryList,
+    getUserList,
+    getPeriodList
+} from "./otherConfigAndData.js"
 import { actions, webErrorTypes, doActionAsync, webErrorsPresent } from "./OPRequest.js"
 
 // import * as Papa from "./libs/papaparse/papaparse.js"
@@ -29,8 +38,8 @@ dayjs.extend(window.dayjs_plugin_customParseFormat)
 const logTextBox = document.getElementById("log").children[0]
 const validDateFormats = ["DD-MM-YYYY","DD/MM/YYYY"]
 let wpConvertUser
-const adminUser1 = 4
-const adminUser2 = 5
+const adminUser1 = getAdminUser1IdNumber()
+const adminUser2 = getAdminUser2IdNumber()
 let apiKey
 let weekBegin
 let dateEndPeriod
@@ -84,9 +93,7 @@ const preReqTypes = {
     password: "password",
 }
 
-const billingStatusList = JSON.parse(`[{"id": "1", "name": "Unbilled"},
-{"id": "2", "name": "Billed"},
-{"id": "3", "name": "Written off"}]`)
+const billingStatusList = getBillingStatusList()
 
 $(function() { 
     if (localStorage.getItem("userStore") !== null) {
@@ -427,66 +434,11 @@ async function runFirstHalf() {
 
     // console.log("step: 1/8 action: getProjects")
     // writeToLog("step: 1/8 action: getProjects", "step", logType.step)
-    // projectList = JSON.parse(`[{"id": "1", "identifier": "client-a", "name": "Client A"},
-    // {"id": "2", "identifier": "client-b", "name": "Client B"}]`)
-    categoryList = JSON.parse(`[{"id": "14", "name": "Audit"},
-    {"id": "15", "name": "Income Tax"},
-    {"id": "16", "name": "VAT"},
-    {"id": "17", "name": "Reverse Charge"},
-    {"id": "18", "name": "Accountancy"},
-    {"id": "19", "name": "Secretarial"},
-    {"id": "20", "name": "Property Administration"},
-    {"id": "31", "name": "PTT"},
-    {"id": "27", "name": "Tax"},
-    {"id": "21", "name": "PAYE"},
-    {"id": "22", "name": "NAPSA"},
-    {"id": "28", "name": "NHIMA"},
-    {"id": "29", "name": "WCF"},
-    {"id": "23", "name": "TOT"},
-    {"id": "24", "name": "WHT"},
-    {"id": "30", "name": "TLEVY"},
-    {"id": "25", "name": "Special Assignment"},
-    {"id": "26", "name": "Non-billable"}]`)
-    userList = JSON.parse(`[{"id": "4", "name": "Alice", "grade": "Supervisor", "order": "1"},
-    {"id": "5", "name": "Bob", "grade": "Trainee", "order": "3"},
-    {"id": "2", "name": "admin", "grade": "", "order": "0"},
-    {"id": "6", "name": "Carrol", "grade": "Trainee", "order": "2"}]`)
-    // billingStatusList = JSON.parse(`[{"id": "1", "name": "Unbilled"},
-    // {"id": "2", "name": "Billed"},
-    // {"id": "3", "name": "Written off"}]`)
-    periodList = [
-        "2021",
-        "2020",
-        "2019",
-        "2019/2020",
-        "2018",
-        "2017",
-        "January 2021",
-        "January 2020",
-        "February 2021",
-        "February 2020",
-        "March 2021",
-        "March 2020",
-        "April 2021",
-        "April 2020",
-        "May 2021",
-        "May 2020",
-        "June 2021",
-        "June 2020",
-        "July 2021",
-        "July 2020",
-        "August 2021",
-        "August 2020",
-        "September 2021",
-        "September 2020",
-        "October 2021",
-        "October 2020",
-        "November 2021",
-        "November 2020",
-        "December 2021",
-        "December 2020",
-        "Unknown"
-    ]
+    // projectList = getProjectList()
+    categoryList = getCategoryList()
+    userList = getUserList()
+    // billingStatusList = getBillingStatusList()
+    periodList = getPeriodList()
     return step1.halt
 }
 

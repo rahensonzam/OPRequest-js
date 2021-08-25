@@ -4,6 +4,7 @@
 // const got = require('got')
 // const papa = require('papaparse')
 // const fs = require('fs').promises
+import { getCustom } from "./otherConfigAndData.js"
 
 const hostURL = "http://127.0.0.1:9999"
 const apiURL = "/api/v3"
@@ -80,10 +81,7 @@ const billingStatusReportFilterEnum = {
 	WrittenOff: "WrittenOff"
 }
 
-const custom = {
-	billingStatus: "customField5",
-	feeNoteNumber: "customField6"
-}
+const custom = getCustom()
 
 // const CSV = {
 // 	updateWorkPackage: {
