@@ -777,7 +777,7 @@ function convertCsvAction(paramsObj) {
 	if (action === actions.summarizeCatTimeEntries) {
 		const tempList = filterListByBillingStatusReportFilter(resultList, billingStatusReportFilter)
 		const tempList2 = filterListToDateRange(tempList, currentDate, dateEndPeriod)
-		filteredSortedList.push(splitListByGrade(tempList2, userList))
+		filteredSortedList.push(...splitListByGrade(tempList2, userList))
 		// console.log("filteredSortedList", filteredSortedList)
 	}
 
