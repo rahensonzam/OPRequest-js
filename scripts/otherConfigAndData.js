@@ -39,10 +39,10 @@ function getCategoryList() {
 }
 
 function getUserList() {
-    return JSON.parse(`[{"id": "4", "name": "Alice", "grade": "Supervisor", "order": "1"},
-    {"id": "5", "name": "Bob", "grade": "Trainee", "order": "3"},
-    {"id": "2", "name": "admin", "grade": "", "order": "0"},
-    {"id": "6", "name": "Carrol", "grade": "Trainee", "order": "2"}]`)
+    return JSON.parse(`[{"id": "6", "name": "Alice", "grade": "T2", "order": "1"},
+    {"id": "7", "name": "Bob", "grade": "G2", "order": "3"},
+    {"id": "4", "name": "admin", "grade": "", "order": "0"},
+    {"id": "8", "name": "Carrol", "grade": "Supervisor", "order": "2"}]`)
 }
 
 function getPeriodList() {
