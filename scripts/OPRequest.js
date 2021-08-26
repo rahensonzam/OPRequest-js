@@ -524,10 +524,6 @@ function convertResultsToCsv2(action, resultArray) {
 		// FIXME: addEmptyDays modifies the orignal array
 		temp = addEmptyDays(temp)
 	}
-	if (action === actions.breakdownCatByClientTimeEntries) {
-		temp.sort(compareAlphabetical2)
-		temp.sort(compareMoveCurlyToBottom)
-	}
 	let columnHeader
 	if (action === actions.breakdownClientByCatTimeEntries) {
 		columnHeader = "category"
