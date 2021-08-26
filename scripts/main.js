@@ -435,6 +435,8 @@ async function runFirstHalf() {
     // console.log("step: 1/8 action: getProjects")
     // writeToLog("step: 1/8 action: getProjects", "step", logType.step)
     // projectList = getProjectList()
+    // console.log("step: 1/8 action: getProjects completed successfully")
+    // writeToLog("step: 1/8 action: getProjects completed successfully", "step", logType.finished)
     categoryList = getCategoryList()
     userList = getUserList()
     // billingStatusList = getBillingStatusList()

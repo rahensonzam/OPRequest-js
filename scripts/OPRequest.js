@@ -497,7 +497,7 @@ function innerValidateCSVConversion(expected, headerRow) {
 function convertResultsToCsv(action, resultArray) {
 	const temp = expandResults(resultArray)
 	let temp6 = []
-	if(action === actions.summarizeCatTimeEntries) {
+	if (action === actions.summarizeCatTimeEntries) {
 		const temp3 = extractProp(temp, "data")
 		temp6 = transposeResult(temp3)
 	} else {
@@ -1349,15 +1349,15 @@ function splitListByCategoryThenGrade(resultList, categoryList, userList) {
 			for (let index2 = 0; index2 <= userList.length - 1; index2++) {
 				// if userList[index2].grade is not found in tempArrayData[all].name
 				if (!(tempArrayData.some(function(e) {return e.name === userList[index2].grade}))) {
-					const tempArrayinnerData = []
+					const tempArrayInnerData = []
 					for (let index3 = 0; index3 <= resultList.length - 1; index3++) {
 						if (resultList[index3].grade === userList[index2].grade
 							&& resultList[index3].category === categoryList[index].name) {
-							tempArrayinnerData.push(resultList[index3])
+							tempArrayInnerData.push(resultList[index3])
 						}
 					}
-					if (tempArrayinnerData.length !== 0) {
-						tempArrayData.push({name: userList[index2].grade, data: tempArrayinnerData})
+					if (tempArrayInnerData.length !== 0) {
+						tempArrayData.push({name: userList[index2].grade, data: tempArrayInnerData})
 					}
 				}
 			}
@@ -1378,15 +1378,15 @@ function splitListByClientThenGrade(resultList, projectList, userList) {
 			for (let index2 = 0; index2 <= userList.length - 1; index2++) {
 				// if userList[index2].grade is not found in tempArrayData[all].name
 				if (!(tempArrayData.some(function(e) {return e.name === userList[index2].grade}))) {
-					const tempArrayinnerData = []
+					const tempArrayInnerData = []
 					for (let index3 = 0; index3 <= resultList.length - 1; index3++) {
 						if (resultList[index3].grade === userList[index2].grade
 							&& resultList[index3].client === projectList[index].name) {
-							tempArrayinnerData.push(resultList[index3])
+							tempArrayInnerData.push(resultList[index3])
 						}
 					}
-					if (tempArrayinnerData.length !== 0) {
-						tempArrayData.push({name: userList[index2].grade, data: tempArrayinnerData})
+					if (tempArrayInnerData.length !== 0) {
+						tempArrayData.push({name: userList[index2].grade, data: tempArrayInnerData})
 					}
 				}
 			}
