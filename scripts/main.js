@@ -10,6 +10,7 @@ import {
     // getProjectList,
     getCategoryList,
     getUserList,
+    addGradeOrderToUserList,
     getPeriodList
 } from "./otherConfigAndData.js"
 import { actions, webErrorTypes, doActionAsync, webErrorsPresent } from "./OPRequest.js"
@@ -439,6 +440,7 @@ async function runFirstHalf() {
     // writeToLog("step: 1/8 action: getProjects completed successfully", "step", logType.finished)
     categoryList = getCategoryList()
     userList = getUserList()
+    userList = addGradeOrderToUserList(userList)
     // billingStatusList = getBillingStatusList()
     periodList = getPeriodList()
     return step1.halt

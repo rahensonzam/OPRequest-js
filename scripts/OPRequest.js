@@ -1337,6 +1337,7 @@ function splitListByGrade(resultList, userList) {
 			}
 		}
 	}
+	arraySortByGradeOrder(tempArray, userList)
 	return tempArray
 }
 
@@ -1359,6 +1360,7 @@ function splitListByCategoryThenGrade(resultList, categoryList, userList) {
 					if (tempArrayInnerData.length !== 0) {
 						tempArrayData.push({name: userList[index2].grade, data: tempArrayInnerData})
 					}
+					arraySortByGradeOrder(tempArrayData, userList)
 				}
 			}
 			if (tempArrayData.length !== 0) {
@@ -1388,6 +1390,7 @@ function splitListByClientThenGrade(resultList, projectList, userList) {
 					if (tempArrayInnerData.length !== 0) {
 						tempArrayData.push({name: userList[index2].grade, data: tempArrayInnerData})
 					}
+					arraySortByGradeOrder(tempArrayData, userList)
 				}
 			}
 			if (tempArrayData.length !== 0) {
@@ -1685,6 +1688,27 @@ function compareMoveCurlyToBottom(a, b) {
 	return 0
 }
 
+function arraySortByGradeOrder(inputArray, userList) {
+
+	function compareGradeOrder(a, b) {
+		const gradeA = a.name
+		const gradeB = b.name
+		const indexA = findArrayIndexFromProp(userList, gradeA, "grade")
+		const indexB = findArrayIndexFromProp(userList, gradeB, "grade")
+
+		if (userList[indexA].gradeOrder < userList[indexB].gradeOrder) {
+			return -1
+		}
+		if (userList[indexA].gradeOrder > userList[indexB].gradeOrder) {
+			return 1
+		}
+		return 0
+	}
+
+	inputArray.sort(compareGradeOrder)
+	return inputArray
+}
+
 // function findIndexOfValue(list, value) {
 // 	return list.findIndex(function(item) {return item.name === value})
 // }
@@ -1709,8 +1733,12 @@ function findArrayIDFromName(items, condition) {
 }
 
 function findArrayIndexFromName(items, condition) {
+	return findArrayIndexFromProp(items, condition, "name")
+}
+
+function findArrayIndexFromProp(items, condition, prop) {
 	for (let i = 0; i <= items.length - 1; i++) {
-		if (items[i].name === condition) {
+		if (items[i][prop] === condition) {
 			return i
 		}
 	}
