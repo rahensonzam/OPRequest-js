@@ -898,7 +898,7 @@ function convertCsvAction(paramsObj) {
 		}
 	}
 
-	// if (action === actions.tabulateSumTimeEntries) {
+	// if (action === actions.tabulateUtTimeEntries) {
 	if (action === actions.summarizeUtTimeEntries) {
 
 		const count2 = setConversionCount(actions.tabulateUtTimeEntries, retrievedListLength, filteredSortedList.length - 1)
@@ -1513,7 +1513,7 @@ function filterTableTypes(resultList, prop) {
 	const temp = [{[prop]: resultList[0].data[0][prop]}]
 	for (let i = 0; i <= resultList.length - 1; i++) {
 		for (let j = 0; j <= resultList[i].data.length - 1; j++) {
-			// if resultList[i].data[j][prop] is found in temp[all][prop]
+			// if resultList[i].data[j][prop] is not found in temp[all][prop]
 			if (!(temp.some(function(e) {return e[prop] === resultList[i].data[j][prop]}))) {
 				temp.push({[prop]: resultList[i].data[j][prop]})
 			}
