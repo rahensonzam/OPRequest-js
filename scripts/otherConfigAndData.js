@@ -45,6 +45,19 @@ function getUserList() {
     {"id": "8", "name": "Carrol", "grade": "Supervisor", "order": "2"}]`)
 }
 
+function getGradeOrder() {
+    return [
+        "Assistant Manager",
+        "Supervisor",
+        "S2",
+        "S1",
+        "G2",
+        "G1",
+        "T2",
+        "T1"
+    ]
+}
+
 function addGradeOrderToUserList(inputArray) {
     const tempArray = []
     for (let i = 0; i <= inputArray.length - 1; i++) {
@@ -121,6 +134,7 @@ export {
     // getProjectList,
     getCategoryList,
     getUserList,
+    getGradeOrder,
     addGradeOrderToUserList,
     getPeriodList,
     getCustom

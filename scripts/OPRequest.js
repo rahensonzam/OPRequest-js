@@ -4,7 +4,7 @@
 // const got = require('got')
 // const papa = require('papaparse')
 // const fs = require('fs').promises
-import { getCustom } from "./otherConfigAndData.js"
+import { getCustom, getGradeOrder } from "./otherConfigAndData.js"
 
 const hostURL = "http://127.0.0.1:9999"
 const apiURL = "/api/v3"
@@ -737,6 +737,8 @@ function convertCsvAction(paramsObj) {
 	const outputArray = []
 	const error = {message: ""}
 	let currentDate = weekBegin
+	// FIXME: Fix location of includeEmptyGradesBool
+	const includeEmptyGradesBool = true
 
 	const workPackageIDs = []
 	if (action === actions.convertToWorkPackageIDs) {
@@ -771,7 +773,11 @@ function convertCsvAction(paramsObj) {
 	if (action === actions.summarizeCatTimeEntries) {
 		const tempList = filterListByBillingStatusReportFilter(resultList, billingStatusReportFilter)
 		const tempList2 = filterListToDateRange(tempList, currentDate, dateEndPeriod)
-		filteredSortedList.push(...splitListByGrade(tempList2, userList))
+		if (includeEmptyGradesBool) {
+			filteredSortedList.push(...splitListByGrade2(tempList2))
+		} else {
+			filteredSortedList.push(...splitListByGrade(tempList2, userList))
+		}
 		// console.log("filteredSortedList", filteredSortedList)
 	}
 
@@ -781,7 +787,11 @@ function convertCsvAction(paramsObj) {
 		const tempList2 = filterListToDateRange(tempList, currentDate, dateEndPeriod)
 
 		if (action === actions.breakdownClientByCatTimeEntries) {
-			filteredSortedList.push(...splitListByCategoryThenGrade(tempList2, categoryList, userList))
+			if (includeEmptyGradesBool) {
+				filteredSortedList.push(...splitListByCategoryThenGrade2(tempList2, categoryList))
+			} else {
+				filteredSortedList.push(...splitListByCategoryThenGrade(tempList2, categoryList, userList))
+			}
 		} else if (action === actions.breakdownCatByClientTimeEntries) {
 			filteredSortedList.push(...splitListByClientThenGrade(tempList2, projectList, userList))
 		}
@@ -935,11 +945,12 @@ function convertCsvAction(paramsObj) {
 			for (let j = count3.start; j <= count3.end; j++) {
 				const outputArrayInnerDataRow = []
 				outputArrayInnerDataRow.push(...setOutputArrayData(action, row, rowIndex, j, currentDate, resultList, workPackageIDs, filteredSortedList[i].data, uniqueValuesList, clientTypes2List[i].data, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList))
-				if (outputArrayInnerDataRow.length !== 0) {
-					outputArrayDataRow.push({name: filteredSortedList[i].data[j].name, data: outputArrayInnerDataRow})
-				}
+				outputArrayDataRow.push({name: filteredSortedList[i].data[j].name, data: outputArrayInnerDataRow})
 			}
-			if (outputArrayDataRow.length !== 0) {
+			// Calling array.every on an empty array returns true for any condition!
+			// Is ok in this case because condition is (array.length === 0)
+			// if outputArrayDataRow[all].data.length is not 0
+			if (!(outputArrayDataRow.every(function(e) {return e.data.length === 0}))) {
 				outputExt3.push({name: filteredSortedList[i].name, data: outputArrayDataRow})
 			}
 		}
@@ -1329,8 +1340,9 @@ function innerLoopA(listA, propA, listB, propB, indexB) {
 function splitListByGrade(resultList, userList) {
 	const tempArray = []
 	for (let index = 0; index <= userList.length - 1; index++) {
+		// FIXME: Confirm use of `if (typeof e.name !== "undefined") {`
 		// if userList[index].grade is not found in tempArray[all].name
-		if (!(tempArray.some(function(e) {return e.name === userList[index].grade}))) {
+		if (!(tempArray.some(function(e) {if (typeof e.name !== "undefined") {return e.name === userList[index].grade}}))) {
 			const tempArrayData = innerLoopA(resultList, "grade", userList, "grade", index)
 			if (tempArrayData.length !== 0) {
 				tempArray.push({name: userList[index].grade, data: tempArrayData})
@@ -1341,15 +1353,33 @@ function splitListByGrade(resultList, userList) {
 	return tempArray
 }
 
+function splitListByGrade2(resultList) {
+	// FIXME: Fix the place to introduce gradesList
+	const gradesList = getGradeOrder()
+	const tempArray = []
+	for (let index = 0; index <= gradesList.length - 1; index++) {
+		const tempArrayData = []
+		for (let index2 = 0; index2 <= resultList.length - 1; index2++) {
+			if (resultList[index2].grade === gradesList[index]) {
+				tempArrayData.push(resultList[index2])
+			}
+		}
+		tempArray.push({name: gradesList[index], data: tempArrayData})
+	}
+	return tempArray
+}
+
 function splitListByCategoryThenGrade(resultList, categoryList, userList) {
 	const tempArray = []
 	for (let index = 0; index <= categoryList.length - 1; index++) {
+		// FIXME: Confirm use of `if (typeof e.name !== "undefined") {`
 		// if categoryList[index].name is not found in tempArray[all].name
-		if (!(tempArray.some(function(e) {return e.name === categoryList[index].name}))) {
+		if (!(tempArray.some(function(e) {if (typeof e.name !== "undefined") {return e.name === categoryList[index].name}}))) {
 			const tempArrayData = []
 			for (let index2 = 0; index2 <= userList.length - 1; index2++) {
+				// FIXME: Confirm use of `if (typeof e.name !== "undefined") {`
 				// if userList[index2].grade is not found in tempArrayData[all].name
-				if (!(tempArrayData.some(function(e) {return e.name === userList[index2].grade}))) {
+				if (!(tempArrayData.some(function(e) {if (typeof e.name !== "undefined") {return e.name === userList[index2].grade}}))) {
 					const tempArrayInnerData = []
 					for (let index3 = 0; index3 <= resultList.length - 1; index3++) {
 						if (resultList[index3].grade === userList[index2].grade
@@ -1371,15 +1401,47 @@ function splitListByCategoryThenGrade(resultList, categoryList, userList) {
 	return tempArray
 }
 
+function splitListByCategoryThenGrade2(resultList, categoryList) {
+	// FIXME: Fix the place to introduce gradesList
+	const gradesList = getGradeOrder()
+	const tempArray = []
+	for (let index = 0; index <= categoryList.length - 1; index++) {
+		// FIXME: Confirm use of `if (typeof e.name !== "undefined") {`
+		// if categoryList[index].name is not found in tempArray[all].name
+		if (!(tempArray.some(function(e) {if (typeof e.name !== "undefined") {return e.name === categoryList[index].name}}))) {
+			const tempArrayData = []
+			for (let index2 = 0; index2 <= gradesList.length - 1; index2++) {
+				const tempArrayInnerData = []
+				for (let index3 = 0; index3 <= resultList.length - 1; index3++) {
+					if (resultList[index3].grade === gradesList[index2]
+						&& resultList[index3].category === categoryList[index].name) {
+						tempArrayInnerData.push(resultList[index3])
+					}
+				}
+				tempArrayData.push({name: gradesList[index2], data: tempArrayInnerData})
+			}
+			// Calling array.every on an empty array returns true for any condition!
+			// Is ok in this case because condition is (array.length === 0)
+			// if tempArrayData[all].data.length is not 0
+			if (!(tempArrayData.every(function(e) {return e.data.length === 0}))) {
+				tempArray.push({name: categoryList[index].name, data: tempArrayData})
+			}
+		}
+	}
+	return tempArray
+}
+
 function splitListByClientThenGrade(resultList, projectList, userList) {
 	const tempArray = []
 	for (let index = 0; index <= projectList.length - 1; index++) {
+		// FIXME: Confirm use of `if (typeof e.name !== "undefined") {`
 		// if projectList[index].name is not found in tempArray[all].name
-		if (!(tempArray.some(function(e) {return e.name === projectList[index].name}))) {
+		if (!(tempArray.some(function(e) {if (typeof e.name !== "undefined") {return e.name === projectList[index].name}}))) {
 			const tempArrayData = []
 			for (let index2 = 0; index2 <= userList.length - 1; index2++) {
+				// FIXME: Confirm use of `if (typeof e.name !== "undefined") {`
 				// if userList[index2].grade is not found in tempArrayData[all].name
-				if (!(tempArrayData.some(function(e) {return e.name === userList[index2].grade}))) {
+				if (!(tempArrayData.some(function(e) {if (typeof e.name !== "undefined") {return e.name === userList[index2].grade}}))) {
 					const tempArrayInnerData = []
 					for (let index3 = 0; index3 <= resultList.length - 1; index3++) {
 						if (resultList[index3].grade === userList[index2].grade
@@ -1485,8 +1547,9 @@ function filterClientTypes2(resultList, prop) {
 			const resultListInnerData = resultListData[j].data
 			const tempArrayInnerData = []
 			for (let k = 0; k <= resultListInnerData.length - 1; k++) {
+				// FIXME: Confirm use of `if (typeof e[prop] !== "undefined") {`
 				// if resultListInnerData[k][prop] is not found in tempArrayInnerData[all][prop]
-				if (!(tempArrayInnerData.some(function(e) {return e[prop] === resultListInnerData[k][prop]}))) {
+				if (!(tempArrayInnerData.some(function(e) {if (typeof e[prop] !== "undefined") {return e[prop] === resultListInnerData[k][prop]}}))) {
 					tempArrayInnerData.push({[prop]: resultListInnerData[k][prop]})
 				}
 			}
@@ -1510,11 +1573,18 @@ function filterCategoryTypes(resultList, categoryList) {
 }
 
 function filterTableTypes(resultList, prop) {
-	const temp = [{[prop]: resultList[0].data[0][prop]}]
+	const temp = []
+	for (let i = 0; i <= resultList.length - 1; i++) {
+		if (resultList[i].data.length !== 0) {
+			temp.push({[prop]: resultList[i].data[0][prop]})
+			break
+		}
+	}
 	for (let i = 0; i <= resultList.length - 1; i++) {
 		for (let j = 0; j <= resultList[i].data.length - 1; j++) {
+			// FIXME: Confirm use of `if (typeof e[prop] !== "undefined") {`
 			// if resultList[i].data[j][prop] is not found in temp[all][prop]
-			if (!(temp.some(function(e) {return e[prop] === resultList[i].data[j][prop]}))) {
+			if (!(temp.some(function(e) {if (typeof e[prop] !== "undefined") {return e[prop] === resultList[i].data[j][prop]}}))) {
 				temp.push({[prop]: resultList[i].data[j][prop]})
 			}
 		}
@@ -1607,8 +1677,9 @@ function tabulateData(action, resultList, i, prop, topLeft) {
 
 function tabulateDataInner(resultListData, typesListData, innerTableData, prop) {
 	for (let j = 0; j <= typesListData.length - 1; j++) {
+		// FIXME: Confirm use of `if (typeof e[prop] !== "undefined") {`
 		// if typesListData[j][prop] is found in resultListData[all][prop]
-		if (resultListData.some(function(e) {return e[prop] === typesListData[j][prop]})) {
+		if (resultListData.some(function(e) {if (typeof e[prop] !== "undefined") {return e[prop] === typesListData[j][prop]}})) {
 			const resultListIndex = resultListData.findIndex(function(e) {return e[prop] === typesListData[j][prop]})
 			innerTableData[typesListData[j][prop]] = resultListData[resultListIndex].units
 		} else {
