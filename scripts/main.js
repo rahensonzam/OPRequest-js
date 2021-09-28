@@ -2,7 +2,7 @@
 // import "./libs/jquery/jquery-3.5.1.js"
 // import "./libs/jquery/jquery.module.js"
 // import $ from "./libs/jquery/jquery-3.5.1.js"
-import { passwordToApiKey } from "./apiKeyListFile.js"
+import { passwordToApiKey, passwordAndApiKeyMatch } from "./apiKeyListFile.js"
 import {
     getAdminUser1IdNumber,
     getAdminUser2IdNumber,
@@ -31,7 +31,7 @@ document.getElementById("csvCreate").addEventListener("click", showHideUI)
 document.getElementById("csvImport").addEventListener("click", showHideUI)
 document.getElementById("csvImport2").addEventListener("click", showHideUI)
 document.getElementById("enterPassword").addEventListener("click", fillApiKey)
-document.getElementById("user").addEventListener("change", apiKeyMakeYellow)
+document.getElementById("user").addEventListener("change", checkApiKeyYellow)
 document.getElementById("go1Button").addEventListener("click", runActions)
 document.getElementById("go2Button").addEventListener("click", runSpreadsheetDone)
 
@@ -282,8 +282,17 @@ function apiKeyRemoveYellow() {
     document.getElementById("apiKeyBox").style.backgroundColor = "revert"
 }
 
+function checkApiKeyYellow() {
+    const user = document.getElementById("user").value
+    const apiKeyRetrived = document.getElementById("apiKeyBox").value
+    if (passwordAndApiKeyMatch(user, apiKeyRetrived)) {
+        apiKeyRemoveYellow()
+    } else {
+        apiKeyMakeYellow()
+    }
+}
+
 function fillApiKey() {
-    apiKeyRemoveYellow()
     const user = document.getElementById("user").value
     const password = document.getElementById("passwordBox").value
     const apiKeyRetrived = passwordToApiKey(user, password)
@@ -292,11 +301,12 @@ function fillApiKey() {
     if (preReq) {
         document.getElementById("apiKeyBox").value = apiKeyRetrived
     }
+    checkApiKeyYellow()
 }
 
 async function runActions() {
 
-    apiKeyRemoveYellow()
+    checkApiKeyYellow()
     wpConvertUser = document.getElementById("user").value
     apiKey = document.getElementById("apiKeyBox").value
     weekBegin = document.getElementById("weekBeginBox").value
