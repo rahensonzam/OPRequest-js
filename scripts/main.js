@@ -811,27 +811,11 @@ async function runSecondHalf(initCsvFileString) {
 
             timeEntryList = step3.conversion.data[0].data
         } else {
-            writeToLog("step: 2/4 action: getWorkPackages", "step", logType.step)
-            console.log("step: 2/4 action: getWorkPackages")
-
+            logFakeAction("step: 2/4 action: getWorkPackages")
             workPackageList = JSON.parse(await readFileReaderAsync(workPackageListFileSelect.files[0]))
 
-            writeToLog("CSV loaded", "log", logType.normal)
-            console.log("CSV loaded")
-            writeToLog("step: 2/4 action: getWorkPackages completed successfully", "step", logType.finished)
-            console.log("step: 2/4 action: getWorkPackages completed successfully")
-
-            // *************************  
-
-            writeToLog("step: 3/4 action: getTimeEntries", "step", logType.step)
-            console.log("step: 3/4 action: getTimeEntries")
-
+            logFakeAction("step: 3/4 action: getTimeEntries")
             timeEntryList = JSON.parse(await readFileReaderAsync(timeEntryListFileSelect.files[0]))
-
-            writeToLog("CSV loaded", "log", logType.normal)
-            console.log("CSV loaded")
-            writeToLog("step: 3/4 action: getTimeEntries completed successfully", "step", logType.finished)
-            console.log("step: 3/4 action: getTimeEntries completed successfully")
         }
 
         if (actionType === actionTypes.sequenceExportExtract) {
@@ -841,12 +825,7 @@ async function runSecondHalf(initCsvFileString) {
                 return
             }
 
-            writeToLog("step: 5/4 action: extractTimeSheets", "step", logType.step)
-            console.log("step: 5/4 action: extractTimeSheets")
-            writeToLog("CSV loaded", "log", logType.normal)
-            console.log("CSV loaded")
-            writeToLog("step: 5/4 action: extractTimeSheets completed successfully", "step", logType.finished)
-            console.log("step: 5/4 action: extractTimeSheets completed successfully")
+            logFakeAction("step: 5/4 action: extractTimeSheets")
 
             const step5 = await runCurrentAction(actions.extractTimeSheets, "step: 6/4 action: condenseTimeSheets", step4.conversion.data[0].data, true)
             if (step5.halt) {
@@ -869,12 +848,7 @@ async function runSecondHalf(initCsvFileString) {
                 return
             }
 
-            writeToLog("step: 5/4 action: summarizeUtTimeEntries", "step", logType.step)
-            console.log("step: 5/4 action: summarizeUtTimeEntries")
-            writeToLog("CSV loaded", "log", logType.normal)
-            console.log("CSV loaded")
-            writeToLog("step: 5/4 action: summarizeUtTimeEntries completed successfully", "step", logType.finished)
-            console.log("step: 5/4 action: summarizeUtTimeEntries completed successfully")
+            logFakeAction("step: 5/4 action: summarizeUtTimeEntries")
 
             const step5 = await runCurrentAction(actions.summarizeUtTimeEntries, "step: 6/4 action: tabulateUtTimeEntries", step4.conversion.data[0].data, true)
             if (step5.halt) {
@@ -892,12 +866,7 @@ async function runSecondHalf(initCsvFileString) {
                 return
             }
 
-            writeToLog("step: 5/4 action: summarizeCatTimeEntries", "step", logType.step)
-            console.log("step: 5/4 action: summarizeCatTimeEntries")
-            writeToLog("CSV loaded", "log", logType.normal)
-            console.log("CSV loaded")
-            writeToLog("step: 5/4 action: summarizeCatTimeEntries completed successfully", "step", logType.finished)
-            console.log("step: 5/4 action: summarizeCatTimeEntries completed successfully")
+            logFakeAction(("step: 5/4 action: summarizeCatTimeEntries")
 
             const step5 = await runCurrentAction(actions.summarizeCatTimeEntries, "step: 6/4 action: tabulateCatTimeEntries", step4.conversion.data[0].data, true)
             if (step5.halt) {
@@ -915,12 +884,7 @@ async function runSecondHalf(initCsvFileString) {
                 return
             }
 
-            writeToLog("step: 5/4 action: breakdownClientByCatTimeEntries", "step", logType.step)
-            console.log("step: 5/4 action: breakdownClientByCatTimeEntries")
-            writeToLog("CSV loaded", "log", logType.normal)
-            console.log("CSV loaded")
-            writeToLog("step: 5/4 action: breakdownClientByCatTimeEntries completed successfully", "step", logType.finished)
-            console.log("step: 5/4 action: breakdownClientByCatTimeEntries completed successfully")
+            logFakeAction("step: 5/4 action: breakdownClientByCatTimeEntries")
 
             const step5 = await runCurrentAction(actions.breakdownClientByCatTimeEntries, "step: 6/4 action: tabulateBreakdownClientByCatTimeEntries", step4.conversion.data[0].data, true)
             if (step5.halt) {
@@ -938,12 +902,7 @@ async function runSecondHalf(initCsvFileString) {
                 return
             }
 
-            writeToLog("step: 5/4 action: breakdownCatByClientTimeEntries", "step", logType.step)
-            console.log("step: 5/4 action: breakdownCatByClientTimeEntries")
-            writeToLog("CSV loaded", "log", logType.normal)
-            console.log("CSV loaded")
-            writeToLog("step: 5/4 action: breakdownCatByClientTimeEntries completed successfully", "step", logType.finished)
-            console.log("step: 5/4 action: breakdownCatByClientTimeEntries completed successfully")
+            logFakeAction("step: 5/4 action: breakdownCatByClientTimeEntries")
 
             const step5 = await runCurrentAction(actions.breakdownCatByClientTimeEntries, "step: 6/4 action: tabulateBreakdownCatByClientTimeEntries", step4.conversion.data[0].data, true)
             if (step5.halt) {
@@ -955,6 +914,17 @@ async function runSecondHalf(initCsvFileString) {
             writeSeparatorToLog()
         }
     }
+}
+
+function logFakeAction(logValue) {
+    console.log(logValue)
+    writeToLog(logValue, "step", logType.step)
+    
+    console.log("CSV loaded")
+    writeToLog("CSV loaded", "log", logType.normal)
+    
+    console.log(`${logValue} completed successfully`)
+    writeToLog(`${logValue} completed successfully`, "step", logType.finished)
 }
 
 async function runCurrentAction(action, logValue, myCsvFileObj, logDataBool) {
