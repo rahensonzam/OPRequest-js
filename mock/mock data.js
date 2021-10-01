@@ -86,7 +86,7 @@ module.exports = {
                 }
             }
         }
-        if (res.query.filters === `[{"assignee":{"operator":"=","values":["4"]}}]`) {
+        if (res.query.filters === `[{"assignee":{"operator":"=","values":["6"]}}]`) {
             return {
                 "_type": "Collection",
                 "total": 12,
@@ -116,7 +116,7 @@ module.exports = {
                 }
             }
         }
-        if (res.query.filters === `[{"assignee":{"operator":"=","values":["5"]}}]`) {
+        if (res.query.filters === `[{"assignee":{"operator":"=","values":["7"]}}]`) {
             return {
                 "_type": "Collection",
                 "total": 12,
@@ -146,7 +146,7 @@ module.exports = {
                 }
             }
         }
-        if (res.query.filters === `[{"assignee":{"operator":"=","values":["6"]}}]`) {
+        if (res.query.filters === `[{"assignee":{"operator":"=","values":["8"]}}]`) {
             return {
                 "_type": "Collection",
                 "total": 12,
