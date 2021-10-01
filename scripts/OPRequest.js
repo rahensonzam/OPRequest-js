@@ -208,14 +208,12 @@ async function doActionAsync(paramsObj) {
 	const taskList = []
 
 	let numOfPages
-	if (action === actions.getWorkPackages
+	if (action === actions.getProjects
+		|| action === actions.getWorkPackages
 		|| action === actions.getAllWorkPackages
 		|| action === actions.getTimeEntries) {
 		const result = await retrievePageCountAsync(action, apiKey, wpConvertUser)
 		// logWebResults(result)
-		// FIXME: Use array.every
-		// if (!(result.every(function (element) {element.error === ""}))) {
-		// above returns false regardless
 		if (webErrorsPresent(result)) {
 			return {web: result, conversion: {}}
 		}
@@ -324,12 +322,11 @@ async function doActionAsync(paramsObj) {
 }
 
 function setCount(action, rows, numOfPages, timeEntryList) {
-	if (action === actions.getWorkPackages
+	if (action === actions.getProjects
+		|| action === actions.getWorkPackages
 		|| action === actions.getAllWorkPackages
 		|| action === actions.getTimeEntries) {
 		return {start: 1, end: numOfPages}
-	} else if (action === actions.getProjects) {
-		return {start: 0, end: 0}
 	} else if (action === actions.exportTimeEntries) {
 		return {start: 0, end: timeEntryList.length - 1}
 	} else if (action === actions.extractTimeSheets
