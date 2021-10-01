@@ -305,8 +305,8 @@ async function doActionAsync(paramsObj) {
 		for (let rowIndex = 0; rowIndex <= resultList.length - 1; rowIndex++) {
 			convertedCSVResults.push(convertCsvAction({action, rowIndex, resultList}))
 		}
-		const coversionObj = convertResults(convertedCSVResults)
-		return {web: resultList, conversion: coversionObj}
+		const conversionObj = convertResults(convertedCSVResults)
+		return {web: resultList, conversion: conversionObj}
 		// const outputJsonString = JSON.stringify(outputJson)
 		// console.log(outputJsonString)
 		// FIXME: Use array.every
