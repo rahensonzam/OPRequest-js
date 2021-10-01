@@ -732,7 +732,7 @@ function convertCsvAction(paramsObj) {
 	const userList = checkIfPropertyExists(paramsObj, "userList")
 
 	const outputArray = []
-	const error = {message: ""}
+	let error
 	let currentDate = weekBegin
 	// FIXME: Fix location of includeEmptyGradesBool
 	const includeEmptyGradesBool = true
@@ -820,9 +820,11 @@ function convertCsvAction(paramsObj) {
 
 	// check data for errors
 	const conversionErrorResult = conversionErrorSelect(action, row, rowIndex, wpConvertUser, projectList, categoryList, workPackageIDs, filteredSortedList)
-	if (conversionErrorResult !== false) {
+	if (conversionErrorResult.errors.message !== "") {
 		return conversionErrorResult
 		// {data: outputArray, errors: error}
+	} else {
+		error = conversionErrorResult.errors
 	}
 
 	let retrievedListLength
@@ -1042,7 +1044,8 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, projectList
 			}
 			return {data: [{data: {}}], errors: error}
 		}
-		return false
+		error.message = ""
+		return {errors: error}
 	} else if (action === actions.convertNamesToIDs) {
 		const projectName = row.client
 		const projectIndex = findArrayIndexFromName(projectList, projectName)
@@ -1067,7 +1070,8 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, projectList
 			}})
 			return {data: outputArray, errors: error}
 		}
-		return false
+		error.message = ""
+		return {errors: error}
 	} else if (action === actions.convertMembershipNamesToIDs) {
 		const projectName = row.client
 		const projectIndex = findArrayIndexFromName(projectList, projectName)
@@ -1080,7 +1084,8 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, projectList
 			}})
 			return {data: outputArray, errors: error}
 		}
-		return false
+		error.message = ""
+		return {errors: error}
 	} else if (action === actions.extractTimeSheets
 		|| action === actions.summarizeUtTimeEntries
 		|| action === actions.summarizeCatTimeEntries
@@ -1090,7 +1095,8 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, projectList
 			error.message = "error: No rows found for the selected weeks"
 			return {errors: error}
 		}
-		return false
+		error.message = ""
+		return {errors: error}
 	} else if (action === actions.convertWeekToDays
 		|| action === actions.exportTimeEntries
 		|| action === actions.getProjects
@@ -1098,7 +1104,8 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, projectList
 		|| action === actions.getAllWorkPackages
 		|| action === actions.getTimeEntries) {
 		// || action === actions.condenseTimeSheets) {
-		return false
+		error.message = ""
+		return {errors: error}
 	} else {
 		throw new RangeError(`Invalid action: "${action}"`)
 	}
