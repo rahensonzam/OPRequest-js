@@ -1018,7 +1018,7 @@ function setConversionCount(action, retrievedListLength, filteredSortedListLengt
 		|| action === actions.getTimeEntries) {
 		return {start: 0, end: retrievedListLength}
 	} else {
-		return {}
+		throw new RangeError(`Invalid action: "${action}"`)
 	}
 }
 
