@@ -943,15 +943,21 @@ async function runCurrentAction(action, logValue, myCsvFileObj, logDataBool) {
 
 function getActionOptions(action) {
     // return params: hasWeb, hasConversion, hasFile, apiKey, wpConvertUser, projectList, categoryList, workPackageList, timeEntryList, userList, billingStatusList
+    const returnObj = {}
     if (action === actions.updateWorkPackage
         || action === actions.updateTimeEntry
         || action === actions.addMembership
         || action === actions.addWorkPackage
         || action === actions.addProject
         || action === actions.addTimeEntry) {
-        // action === actions.updateTimeEntry
-        // return {hasWeb: true, hasConversion: false, hasFile: true, apiKey, billingStatusList}
-        return {hasWeb: true, hasConversion: false, hasFile: true, apiKey}
+        returnObj.hasWeb = true
+        returnObj.hasConversion = false
+        returnObj.hasFile = true
+        returnObj.apiKey = apiKey
+        // if (action === actions.updateTimeEntry) {
+        //     returnObj.billingStatusList = billingStatusList
+        // }
+        return returnObj
     } else if (action === actions.convertToWorkPackageIDs
         || action === actions.convertNamesToIDs
         || action === actions.convertMembershipNamesToIDs
@@ -963,7 +969,9 @@ function getActionOptions(action) {
         || action === actions.summarizeCatTimeEntries
         || action === actions.breakdownClientByCatTimeEntries
         || action === actions.breakdownCatByClientTimeEntries) {
-        const returnObj = {hasWeb: false, hasConversion: true, hasFile: true}
+        returnObj.hasWeb = false
+        returnObj.hasConversion = true
+        returnObj.hasFile = true
         if (action === actions.exportTimeEntries) {
             // || action === actions.condenseTimeSheets
             returnObj.hasFile = false
@@ -1013,10 +1021,14 @@ function getActionOptions(action) {
         || action === actions.getWorkPackages
         || action === actions.getAllWorkPackages
         || action === actions.getTimeEntries) {
+        returnObj.hasWeb = true
+        returnObj.hasConversion = true
+        returnObj.hasFile = false
+        returnObj.apiKey = apiKey
         if (action === actions.getWorkPackages) {
-            return {hasWeb: true, hasConversion: true, hasFile: false, apiKey, wpConvertUser}
+            returnObj.wpConvertUser = wpConvertUser
         }
-        return {hasWeb: true, hasConversion: true, hasFile: false, apiKey}
+        return returnObj
     } else {
 		throw new RangeError(`Invalid action: "${action}"`)
     }
