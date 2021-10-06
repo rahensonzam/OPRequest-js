@@ -1018,7 +1018,7 @@ function getActionOptions(action) {
         }
         return {hasWeb: true, hasConversion: true, hasFile: false, apiKey}
     } else {
-        return {}
+		throw new RangeError(`Invalid action: "${action}"`)
     }
 }
 
