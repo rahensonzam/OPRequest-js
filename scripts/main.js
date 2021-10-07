@@ -427,31 +427,52 @@ async function runSingleAction() {
     // writeToLog("Run Individual Actions: Coming soon", "log", logType.normal)
     const actionSelectAction = document.getElementById("actionSelect").value
     const logDataBool = document.getElementById("actionSelectLogCheckbox").checked
-    const currentStep = await runCurrentAction(actionSelectAction, `step: 1 action: ${actionSelectAction}`, fileSelect.files[0], logDataBool)
-    if (currentStep.halt) {
-        return
+    const actionListArray = []
+    const actionListOptionsArray = [
+        // eslint-disable-next-line no-unused-vars
+        function(actionListArray) {return {action: actionSelectAction, logValue: `step: 1 action: ${actionSelectAction}`, myCsvFileObj: fileSelect.files[0], logDataBool}},
+   ]
+
+    for (let i = 0; i <= actionListOptionsArray.length - 1; i++) {
+        actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray).action, actionListOptionsArray[i](actionListArray).logValue, actionListOptionsArray[i](actionListArray).myCsvFileObj, actionListOptionsArray[i](actionListArray).logDataBool)
+        if (actionListArray[i].halt) {
+            return
+        }
     }
     writeSeparatorToLog()
 }
 
 async function runFirstHalf() {
 
-    const step1 = await runCurrentAction(actions.getProjects, "step: 1/8 action: getProjects", "", false)
-    if (step1.halt) {
-        return step1.halt
+	const actionListArray = []
+	const actionListOptionsArray = [
+		function() {return {}},
+        // eslint-disable-next-line no-unused-vars
+		function(actionListArray) {return {action: actions.getProjects, logValue: "step: 1/8 action: getProjects", myCsvFileObj: "", logDataBool: false}}
+	]
+
+	// if (true) {
+    for (let i = 0; i <= actionListOptionsArray.length - 1; i++) {
+        actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray).action, actionListOptionsArray[i](actionListArray).logValue, actionListOptionsArray[i](actionListArray).myCsvFileObj, actionListOptionsArray[i](actionListArray).logDataBool)
+        if (actionListArray[i].halt) {
+            return
+        }
+
+        if (i === 1) {
+            projectList = actionListArray[i].conversion.data[0].data
+        }
     }
-
-    projectList = step1.conversion.data[0].data
-
-    // logFakeAction("step: 1/8 action: getProjects", false)
-    // projectList = getProjectList()
+	// } else {
+	// 	logFakeAction("step: 1/8 action: getProjects", false)
+	// 	projectList = getProjectList()
+	// }
 
     categoryList = getCategoryList()
     userList = getUserList()
     userList = addGradeOrderToUserList(userList)
     // billingStatusList = getBillingStatusList()
     periodList = getPeriodList()
-    return step1.halt
+    return actionListArray[1].halt
 }
 
 function getJustNames(inputArray, sort) {
@@ -724,37 +745,31 @@ function arrayToCsv(initCsvFile) {
 async function runSecondHalf(initCsvFileString) {
 
     if (actionType === actionTypes.sequenceWeekly) {
+        const actionListArray = []
+        const actionListOptionsArray = [
+            function() {return {}},
+            function() {return {}},
+            function() {return {}},
+            // eslint-disable-next-line no-unused-vars
+            function(actionListArray) {return {action: actions.convertNamesToIDs, logValue: "step: 3/8 action: name validation using convertNamesToIDs", myCsvFileObj: initCsvFileString, logDataBool: false}},
+            // eslint-disable-next-line no-unused-vars
+            function(actionListArray) {return {action: actions.convertWeekToDays, logValue: "step: 4/8 action: convertWeekToDays", myCsvFileObj: initCsvFileString, logDataBool: true}},
+            function(actionListArray) {return {action: actions.convertNamesToIDs, logValue: "step: 5/8 action: convertNamesToIDs", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true}},
+            // eslint-disable-next-line no-unused-vars
+            function(actionListArray) {return {action: actions.getWorkPackages, logValue: "step: 6/8 action: getWorkPackages (please wait, this step takes a bit of time)", myCsvFileObj: "", logDataBool: false}},
+            function(actionListArray) {return {action: actions.convertToWorkPackageIDs, logValue: "step: 7/8 action: convertToWorkPackageIDs", myCsvFileObj: actionListArray[5].conversion.data[0].data, logDataBool: true}},
+            function(actionListArray) {return {action: actions.addTimeEntry, logValue: "step: 8/8 action: addTimeEntry", myCsvFileObj: actionListArray[7].conversion.data[0].data, logDataBool: false}}
+        ]
 
-        const step3 = await runCurrentAction(actions.convertNamesToIDs, "step: 3/8 action: name validation using convertNamesToIDs", initCsvFileString, false)
-        if (step3.halt) {
-            return
-        }
+        for (let i = 3; i <= actionListOptionsArray.length - 1; i++) {
+            actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray).action, actionListOptionsArray[i](actionListArray).logValue, actionListOptionsArray[i](actionListArray).myCsvFileObj, actionListOptionsArray[i](actionListArray).logDataBool)
+            if (actionListArray[i].halt) {
+                return
+            }
 
-        const step4 = await runCurrentAction(actions.convertWeekToDays, "step: 4/8 action: convertWeekToDays", initCsvFileString, true)
-        if (step4.halt) {
-            return
-        }
-
-        const step5 = await runCurrentAction(actions.convertNamesToIDs, "step: 5/8 action: convertNamesToIDs", step4.conversion.data[0].data, true)
-        if (step5.halt) {
-            return
-        }
-
-        const step6 = await runCurrentAction(actions.getWorkPackages, "step: 6/8 action: getWorkPackages (please wait, this step takes a bit of time)", "", false)
-        if (step6.halt) {
-            return
-        }
-
-        workPackageList = step6.conversion.data[0].data
-
-        const step7 = await runCurrentAction(actions.convertToWorkPackageIDs, "step: 7/8 action: convertToWorkPackageIDs", step5.conversion.data[0].data, true)
-        if (step7.halt) {
-            return
-        }
-
-        const step8 = await runCurrentAction(actions.addTimeEntry, "step: 8/8 action: addTimeEntry", step7.conversion.data[0].data, false)
-        if (step8.halt) {
-            return
+            if (i === 6) {
+                workPackageList = actionListArray[i].conversion.data[0].data
+            }
         }
 
         writeToLog("Sequence completed successfully", "step", logType.finished)
@@ -763,26 +778,28 @@ async function runSecondHalf(initCsvFileString) {
     }
     if (actionType === actionTypes.sequenceDaily) {
     
-        const step3 = await runCurrentAction(actions.convertNamesToIDs, "step: 3/6 action: convertNamesToIDs", initCsvFileString, true)
-        if (step3.halt) {
-            return
-        }
+        const actionListArray = []
+        const actionListOptionsArray = [
+            function() {return {}},
+            function() {return {}},
+            function() {return {}},
+            // eslint-disable-next-line no-unused-vars
+            function(actionListArray) {return {action: actions.convertNamesToIDs, logValue: "step: 3/6 action: convertNamesToIDs", myCsvFileObj: initCsvFileString, logDataBool: true}},
+            // eslint-disable-next-line no-unused-vars
+            function(actionListArray) {return {action: actions.getWorkPackages, logValue: "step: 4/6 action: getWorkPackages (please wait, this step takes a bit of time)", myCsvFileObj: "", logDataBool: false}},
+            function(actionListArray) {return {action: actions.convertToWorkPackageIDs, logValue: "step: 5/6 action: convertToWorkPackageIDs", myCsvFileObj: actionListArray[3].conversion.data[0].data, logDataBool: true}},
+            function(actionListArray) {return {action: actions.addTimeEntry, logValue: "step: 6/6 action: addTimeEntry", myCsvFileObj: actionListArray[5].conversion.data[0].data, logDataBool: false}}
+        ]
 
-        const step4 = await runCurrentAction(actions.getWorkPackages, "step: 4/6 action: getWorkPackages (please wait, this step takes a bit of time)", "", false)
-        if (step4.halt) {
-            return
-        }
+        for (let i = 3; i <= actionListOptionsArray.length - 1; i++) {
+            actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray).action, actionListOptionsArray[i](actionListArray).logValue, actionListOptionsArray[i](actionListArray).myCsvFileObj, actionListOptionsArray[i](actionListArray).logDataBool)
+            if (actionListArray[i].halt) {
+                return
+            }
 
-        workPackageList = step4.conversion.data[0].data
-
-        const step5 = await runCurrentAction(actions.convertToWorkPackageIDs, "step: 5/6 action: convertToWorkPackageIDs", step3.conversion.data[0].data, true)
-        if (step5.halt) {
-            return
-        }
-
-        const step6 = await runCurrentAction(actions.addTimeEntry, "step: 6/6 action: addTimeEntry", step5.conversion.data[0].data, false)
-        if (step6.halt) {
-            return
+            if (i === 4) {
+                workPackageList = actionListArray[i].conversion.data[0].data
+            }
         }
 
         writeToLog("Sequence completed successfully", "step", logType.finished)
@@ -794,20 +811,47 @@ async function runSecondHalf(initCsvFileString) {
         || actionType === actionTypes.sequenceExportSummarizeCat
         || actionType === actionTypes.sequenceExportBreakdownCat
         || actionType === actionTypes.sequenceExportBreakdownClient) {
+
+        const actionListArray = []
+        const actionListOptionsArray = []
+
+        // eslint-disable-next-line no-unused-vars
+        actionListOptionsArray[2] = function(actionListArray) {return {action: actions.getAllWorkPackages, logValue: "step: 2/4 action: getWorkPackages (please wait, this step takes a bit of time)", myCsvFileObj: "", logDataBool: false}}
+        // eslint-disable-next-line no-unused-vars
+        actionListOptionsArray[3] = function(actionListArray) {return {action: actions.getTimeEntries, logValue: "step: 3/4 action: getTimeEntries", myCsvFileObj: "", logDataBool: false}}
+        // eslint-disable-next-line no-unused-vars
+        actionListOptionsArray[4] = function(actionListArray) {return {action: actions.exportTimeEntries, logValue: "step: 4/4 action: exportTimeEntries", myCsvFileObj: "", logDataBool: true}}
+
+        if (actionType === actionTypes.sequenceExportExtract) {
+            actionListOptionsArray[5] = function(actionListArray) {return {action: actions.extractTimeSheets, logValue: "step: 6/4 action: condenseTimeSheets", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true}}
+        }
+        if (actionType === actionTypes.sequenceExportSummarizeUt) {
+            actionListOptionsArray[5] = function(actionListArray) {return {action: actions.summarizeUtTimeEntries, logValue: "step: 6/4 action: tabulateUtTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true}}
+        }
+        if (actionType === actionTypes.sequenceExportSummarizeCat) {
+            actionListOptionsArray[5] = function(actionListArray) {return {action: actions.summarizeCatTimeEntries, logValue: "step: 6/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true}}
+        }
+        if (actionType === actionTypes.sequenceExportBreakdownCat) {
+            actionListOptionsArray[5] = function(actionListArray) {return {action: actions.breakdownClientByCatTimeEntries, logValue: "step: 6/4 action: tabulateBreakdownClientByCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true}}
+        }
+        if (actionType === actionTypes.sequenceExportBreakdownClient) {
+            actionListOptionsArray[5] = function(actionListArray) {return {action: actions.breakdownCatByClientTimeEntries, logValue: "step: 6/4 action: tabulateBreakdownCatByClientTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true}}
+        }
+
         if (staticLists === false) {
-            const step2 = await runCurrentAction(actions.getAllWorkPackages, "step: 2/4 action: getWorkPackages (please wait, this step takes a bit of time)", "", false)
-            if (step2.halt) {
-                return
+            for (let i = 2; i <= 3; i++) {
+                actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray).action, actionListOptionsArray[i](actionListArray).logValue, actionListOptionsArray[i](actionListArray).myCsvFileObj, actionListOptionsArray[i](actionListArray).logDataBool)
+                if (actionListArray[i].halt) {
+                    return
+                }
+
+                if (i === 2) {
+                    workPackageList = actionListArray[i].conversion.data[0].data
+                }
+                if (i === 3) {
+                    timeEntryList = actionListArray[i].conversion.data[0].data
+                }
             }
-
-            workPackageList = step2.conversion.data[0].data
-
-            const step3 = await runCurrentAction(actions.getTimeEntries, "step: 3/4 action: getTimeEntries", "", false)
-            if (step3.halt) {
-                return
-            }
-
-            timeEntryList = step3.conversion.data[0].data
         } else {
             logFakeAction("step: 2/4 action: getWorkPackages", true)
             workPackageList = JSON.parse(await readFileReaderAsync(workPackageListFileSelect.files[0]))
@@ -816,101 +860,34 @@ async function runSecondHalf(initCsvFileString) {
             timeEntryList = JSON.parse(await readFileReaderAsync(timeEntryListFileSelect.files[0]))
         }
 
-        if (actionType === actionTypes.sequenceExportExtract) {
-        
-            const step4 = await runCurrentAction(actions.exportTimeEntries, "step: 4/4 action: exportTimeEntries", "", true)
-            if (step4.halt) {
-                return
+        for (let i = 4; i <= actionListOptionsArray.length - 1; i++) {
+            if (i === 5) {
+                if (actionType === actionTypes.sequenceExportExtract) {
+                    logFakeAction("step: 5/4 action: extractTimeSheets", true)
+                }
+                if (actionType === actionTypes.sequenceExportSummarizeUt) {
+                    logFakeAction("step: 5/4 action: summarizeUtTimeEntries", true)
+                }
+                if (actionType === actionTypes.sequenceExportSummarizeCat) {
+                    logFakeAction("step: 5/4 action: summarizeCatTimeEntries", true)
+                }
+                if (actionType === actionTypes.sequenceExportBreakdownCat) {
+                    logFakeAction("step: 5/4 action: breakdownClientByCatTimeEntries", true)
+                }
+                if (actionType === actionTypes.sequenceExportBreakdownClient) {
+                    logFakeAction("step: 5/4 action: breakdownCatByClientTimeEntries", true)
+                }
             }
 
-            logFakeAction("step: 5/4 action: extractTimeSheets", true)
-
-            const step5 = await runCurrentAction(actions.extractTimeSheets, "step: 6/4 action: condenseTimeSheets", step4.conversion.data[0].data, true)
-            if (step5.halt) {
+            actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray).action, actionListOptionsArray[i](actionListArray).logValue, actionListOptionsArray[i](actionListArray).myCsvFileObj, actionListOptionsArray[i](actionListArray).logDataBool)
+            if (actionListArray[i].halt) {
                 return
             }
-
-            // const step6 = await runCurrentAction(actions.condenseTimeSheets, "step: 6/4 action: condenseTimeSheets", step5.conversion.data, true)
-            // if (step6.halt) {
-            //     return
-            // }
-
-            writeToLog("Sequence completed successfully", "step", logType.finished)
-            console.log("Sequence completed successfully")
-            writeSeparatorToLog()
         }
-        if (actionType === actionTypes.sequenceExportSummarizeUt) {
 
-            const step4 = await runCurrentAction(actions.exportTimeEntries, "step: 4/4 action: exportTimeEntries", "", true)
-            if (step4.halt) {
-                return
-            }
-
-            logFakeAction("step: 5/4 action: summarizeUtTimeEntries", true)
-
-            const step5 = await runCurrentAction(actions.summarizeUtTimeEntries, "step: 6/4 action: tabulateUtTimeEntries", step4.conversion.data[0].data, true)
-            if (step5.halt) {
-                return
-            }
-
-            writeToLog("Sequence completed successfully", "step", logType.finished)
-            console.log("Sequence completed successfully")
-            writeSeparatorToLog()
-        }
-        if (actionType === actionTypes.sequenceExportSummarizeCat) {
-        
-            const step4 = await runCurrentAction(actions.exportTimeEntries, "step: 4/4 action: exportTimeEntries", "", true)
-            if (step4.halt) {
-                return
-            }
-
-            logFakeAction("step: 5/4 action: summarizeCatTimeEntries", true)
-
-            const step5 = await runCurrentAction(actions.summarizeCatTimeEntries, "step: 6/4 action: tabulateCatTimeEntries", step4.conversion.data[0].data, true)
-            if (step5.halt) {
-                return
-            }
-
-            writeToLog("Sequence completed successfully", "step", logType.finished)
-            console.log("Sequence completed successfully")
-            writeSeparatorToLog()
-        }
-        if (actionType === actionTypes.sequenceExportBreakdownCat) {
-        
-            const step4 = await runCurrentAction(actions.exportTimeEntries, "step: 4/4 action: exportTimeEntries", "", true)
-            if (step4.halt) {
-                return
-            }
-
-            logFakeAction("step: 5/4 action: breakdownClientByCatTimeEntries", true)
-
-            const step5 = await runCurrentAction(actions.breakdownClientByCatTimeEntries, "step: 6/4 action: tabulateBreakdownClientByCatTimeEntries", step4.conversion.data[0].data, true)
-            if (step5.halt) {
-                return
-            }
-
-            writeToLog("Sequence completed successfully", "step", logType.finished)
-            console.log("Sequence completed successfully")
-            writeSeparatorToLog()
-        }
-        if (actionType === actionTypes.sequenceExportBreakdownClient) {
-        
-            const step4 = await runCurrentAction(actions.exportTimeEntries, "step: 4/4 action: exportTimeEntries", "", true)
-            if (step4.halt) {
-                return
-            }
-
-            logFakeAction("step: 5/4 action: breakdownCatByClientTimeEntries", true)
-
-            const step5 = await runCurrentAction(actions.breakdownCatByClientTimeEntries, "step: 6/4 action: tabulateBreakdownCatByClientTimeEntries", step4.conversion.data[0].data, true)
-            if (step5.halt) {
-                return
-            }
-
-            writeToLog("Sequence completed successfully", "step", logType.finished)
-            console.log("Sequence completed successfully")
-            writeSeparatorToLog()
-        }
+        writeToLog("Sequence completed successfully", "step", logType.finished)
+        console.log("Sequence completed successfully")
+        writeSeparatorToLog()
     }
 }
 
