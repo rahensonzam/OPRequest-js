@@ -443,11 +443,9 @@ async function runFirstHalf() {
 
     projectList = step1.conversion.data[0].data
 
-    // console.log("step: 1/8 action: getProjects")
-    // writeToLog("step: 1/8 action: getProjects", "step", logType.step)
+    // logFakeAction("step: 1/8 action: getProjects", false)
     // projectList = getProjectList()
-    // console.log("step: 1/8 action: getProjects completed successfully")
-    // writeToLog("step: 1/8 action: getProjects completed successfully", "step", logType.finished)
+
     categoryList = getCategoryList()
     userList = getUserList()
     userList = addGradeOrderToUserList(userList)
@@ -811,10 +809,10 @@ async function runSecondHalf(initCsvFileString) {
 
             timeEntryList = step3.conversion.data[0].data
         } else {
-            logFakeAction("step: 2/4 action: getWorkPackages")
+            logFakeAction("step: 2/4 action: getWorkPackages", true)
             workPackageList = JSON.parse(await readFileReaderAsync(workPackageListFileSelect.files[0]))
 
-            logFakeAction("step: 3/4 action: getTimeEntries")
+            logFakeAction("step: 3/4 action: getTimeEntries", true)
             timeEntryList = JSON.parse(await readFileReaderAsync(timeEntryListFileSelect.files[0]))
         }
 
@@ -825,7 +823,7 @@ async function runSecondHalf(initCsvFileString) {
                 return
             }
 
-            logFakeAction("step: 5/4 action: extractTimeSheets")
+            logFakeAction("step: 5/4 action: extractTimeSheets", true)
 
             const step5 = await runCurrentAction(actions.extractTimeSheets, "step: 6/4 action: condenseTimeSheets", step4.conversion.data[0].data, true)
             if (step5.halt) {
@@ -848,7 +846,7 @@ async function runSecondHalf(initCsvFileString) {
                 return
             }
 
-            logFakeAction("step: 5/4 action: summarizeUtTimeEntries")
+            logFakeAction("step: 5/4 action: summarizeUtTimeEntries", true)
 
             const step5 = await runCurrentAction(actions.summarizeUtTimeEntries, "step: 6/4 action: tabulateUtTimeEntries", step4.conversion.data[0].data, true)
             if (step5.halt) {
@@ -866,7 +864,7 @@ async function runSecondHalf(initCsvFileString) {
                 return
             }
 
-            logFakeAction(("step: 5/4 action: summarizeCatTimeEntries")
+            logFakeAction("step: 5/4 action: summarizeCatTimeEntries", true)
 
             const step5 = await runCurrentAction(actions.summarizeCatTimeEntries, "step: 6/4 action: tabulateCatTimeEntries", step4.conversion.data[0].data, true)
             if (step5.halt) {
@@ -884,7 +882,7 @@ async function runSecondHalf(initCsvFileString) {
                 return
             }
 
-            logFakeAction("step: 5/4 action: breakdownClientByCatTimeEntries")
+            logFakeAction("step: 5/4 action: breakdownClientByCatTimeEntries", true)
 
             const step5 = await runCurrentAction(actions.breakdownClientByCatTimeEntries, "step: 6/4 action: tabulateBreakdownClientByCatTimeEntries", step4.conversion.data[0].data, true)
             if (step5.halt) {
@@ -902,7 +900,7 @@ async function runSecondHalf(initCsvFileString) {
                 return
             }
 
-            logFakeAction("step: 5/4 action: breakdownCatByClientTimeEntries")
+            logFakeAction("step: 5/4 action: breakdownCatByClientTimeEntries", true)
 
             const step5 = await runCurrentAction(actions.breakdownCatByClientTimeEntries, "step: 6/4 action: tabulateBreakdownCatByClientTimeEntries", step4.conversion.data[0].data, true)
             if (step5.halt) {
@@ -916,13 +914,15 @@ async function runSecondHalf(initCsvFileString) {
     }
 }
 
-function logFakeAction(logValue) {
+function logFakeAction(logValue, logMiddle) {
     console.log(logValue)
     writeToLog(logValue, "step", logType.step)
     
-    console.log("CSV loaded")
-    writeToLog("CSV loaded", "log", logType.normal)
-    
+    if (logMiddle) {
+        console.log("CSV loaded")
+        writeToLog("CSV loaded", "log", logType.normal)
+    }
+
     console.log(`${logValue} completed successfully`)
     writeToLog(`${logValue} completed successfully`, "step", logType.finished)
 }
