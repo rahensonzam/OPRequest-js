@@ -96,7 +96,7 @@ const preReqTypes = {
 
 const billingStatusList = getBillingStatusList()
 
-$(function() { 
+$(function() {
     if (localStorage.getItem("userStore") !== null) {
         document.getElementById("user").value = localStorage.getItem("userStore")
         document.getElementById("apiKeyBox").value = localStorage.getItem("apiKeyStore")
@@ -239,9 +239,9 @@ function showStaticFile() {
 
 function hideStaticFile() {
     showHideUtil("fileListWLabelP", "none")
-    showHideUtil("fileListWSelectP", "none")        
+    showHideUtil("fileListWSelectP", "none")
     showHideUtil("fileListTLabelP", "none")
-    showHideUtil("fileListTSelectP", "none")        
+    showHideUtil("fileListTSelectP", "none")
 }
 
 // function showLinks() {
@@ -337,7 +337,7 @@ async function runActions() {
         writeToLog(`error: In order to run again, reload the page. Otherwise you may continue.`, "error", logType.error)
         return
     }
-    
+
     firstHalfAlready = true
 
     showLoading()
@@ -375,7 +375,7 @@ async function runActions() {
             makeWeeklySpreadsheet(justProjectNamesList, periodList, justCategoryNamesList)
 
             // if (csvType === csvTypes.import) {
-                
+
             //     const myCsvFile = await parseCSVFile(fileSelect.files[0])
             //     //FIX: Move ad-hoc CSV Validation
             //     if (myCsvFile.rows[0].length !== 11) {
@@ -417,7 +417,7 @@ async function runActions() {
             // }
         }
     }
-    
+
     hideLoading()
     firstHalfDone = true
 
@@ -553,7 +553,7 @@ function makeSpreadsheet(spreadsheetData, myCols, myColHeaders, myColWidths, pro
 
     const changed = function(obj, cell, val) {
         const cellName = $(cell).prop('id').split('-')
-        
+
         if (cellName[0] === "0") {
             if (!(projectList.includes(val))) {
                 $('#spreadsheet1')["jexcel"]('setStyle', 'A'+(Number(cellName[1])+1), 'background-color', 'yellow')
@@ -634,7 +634,7 @@ function getCustomDropDown(list) {
         },
         setValue: function(cell, value) {
             $(cell).html(value)
-    
+
             return true
         }
     }
@@ -655,7 +655,7 @@ async function runSpreadsheetDone() {
     secondHalfNotFirstTime = true
 
     secondHalfRunning = true
-    
+
     // hideSpreadsheet()
 
     if (actionType === actionTypes.sequenceExportExtract
@@ -665,7 +665,7 @@ async function runSpreadsheetDone() {
         || actionType === actionTypes.sequenceExportBreakdownClient) {
         showLoading()
         await runSecondHalf("")
-        
+
         hideLoading()
         secondHalfRunning = false
         return
@@ -684,7 +684,7 @@ async function runSpreadsheetDone() {
         //console.log(initCsvFileString)
     } else {
         writeToLog("CSV created", "log", logType.normal)
-        
+
         let initCsvFile = $('#spreadsheet1')["jexcel"]('getData')
         let headers = $('#spreadsheet1')["jexcel"]('getHeaders', false)
         // if (actionType = "sequenceweekly") {
@@ -733,7 +733,7 @@ async function runSpreadsheetDone() {
 
 function arrayToCsv(initCsvFile) {
     const tempOuter = []
-    
+
     for (let i = 0; i <= initCsvFile.length - 1; i++) {
         const tempInner = []
         tempInner.push(`"${initCsvFile[i].join(`","`)}"`)
@@ -777,7 +777,7 @@ async function runSecondHalf(initCsvFileString) {
         writeSeparatorToLog()
     }
     if (actionType === actionTypes.sequenceDaily) {
-    
+
         const actionListArray = []
         const actionListOptionsArray = [
             function() {return {}},
@@ -894,7 +894,7 @@ async function runSecondHalf(initCsvFileString) {
 function logFakeAction(logValue, logMiddle) {
     console.log(logValue)
     writeToLog(logValue, "step", logType.step)
-    
+
     if (logMiddle) {
         console.log("CSV loaded")
         writeToLog("CSV loaded", "log", logType.normal)
@@ -1156,7 +1156,7 @@ function logWebResults(resultList) {
         }
     }
     // ReferenceError: logTextBox is not defined
-    // resultList.forEach(function (element) { 
+    // resultList.forEach(function (element) {
     // 	if (typeof element.error !== "undefined") {
     // 		console.log(element.prefix, element.status)
     // 		console.error(element.error)
@@ -1182,7 +1182,7 @@ function logConversionErrors(resultArray) {
         writeToLog(`${resultArray.errors[0].csv}`, "error", logType.error)
     }
     // ReferenceError: logTextBox is not defined
-    // resultArray.errors.forEach(function (element) { 
+    // resultArray.errors.forEach(function (element) {
     // 	if (element !== "") {
     // 		console.error(element)
     //      writeToLog(`${element}`, "error", logType.error)
@@ -1247,7 +1247,7 @@ function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, csvType
         }
         if (apiKey.length !== 64) {
             writeToLog("error: Invalid API Key", "error", logType.error)
-            return false            
+            return false
         }
         if (actionType === actionTypes.sequenceWeekly
             || actionType === actionTypes.sequenceExportExtract
@@ -1257,7 +1257,7 @@ function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, csvType
             || actionType === actionTypes.sequenceExportBreakdownClient) {
             if (!(dayjs(weekBegin, validDateFormats).isValid())) {
                 writeToLog("error: Invalid date for week beginning", "error", logType.error)
-                return false            
+                return false
             }
             if (actionType === actionTypes.sequenceExportSummarizeUt
                 || actionType === actionTypes.sequenceExportSummarizeCat
@@ -1265,7 +1265,7 @@ function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, csvType
                 || actionType === actionTypes.sequenceExportBreakdownClient) {
                 if (!(dayjs(dateEndPeriod, validDateFormats).isValid())) {
                     writeToLog("error: Invalid date for end of period", "error", logType.error)
-                    return false            
+                    return false
                 }
             }
         }

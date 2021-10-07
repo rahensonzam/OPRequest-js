@@ -960,7 +960,7 @@ function convertCsvAction(paramsObj) {
 	if (action === actions.breakdownClientByCatTimeEntries
 		|| action === actions.breakdownCatByClientTimeEntries) {
 		// console.log("outputExt3", outputExt3)
-		
+
 		let currentAction
 		if (action === actions.breakdownClientByCatTimeEntries) {
 			currentAction = actions.tabulateBreakdownClientByCatTimeEntries
