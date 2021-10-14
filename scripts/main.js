@@ -452,7 +452,7 @@ async function runFirstHalf() {
 	]
 
 	// if (true) {
-    for (let i = 0; i <= actionListOptionsArray.length - 1; i++) {
+    for (let i = 1; i <= actionListOptionsArray.length - 1; i++) {
         actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray).action, actionListOptionsArray[i](actionListArray).logValue, actionListOptionsArray[i](actionListArray).myCsvFileObj, actionListOptionsArray[i](actionListArray).logDataBool)
         if (actionListArray[i].halt) {
             return
