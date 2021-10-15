@@ -1177,9 +1177,13 @@ function logConversionErrors(resultArray) {
             writeToLog(`${resultArray.errors[i].message}`, "error", logType.error)
         }
     }
-    if (typeof resultArray.errors[0].csv !== "undefined") {
-        console.error(resultArray.errors[0].csv)
-        writeToLog(`${resultArray.errors[0].csv}`, "error", logType.error)
+    if (typeof resultArray.errors[0].csv1 !== "undefined") {
+        console.error(resultArray.errors[0].csv1)
+        writeToLog(`${resultArray.errors[0].csv1}`, "error", logType.error)
+    }
+    if (typeof resultArray.errors[0].csv2 !== "undefined") {
+        console.error(resultArray.errors[0].csv2)
+        writeToLog(`${resultArray.errors[0].csv2}`, "error", logType.error)
     }
     // ReferenceError: logTextBox is not defined
     // resultArray.errors.forEach(function (element) {

@@ -506,9 +506,13 @@ function convertResultsToCsv(action, resultArray) {
 		const temp4 = extractProp(temp2, "data")
 		if (temp4.length !== 0) {
 			const temp5 = filterUniqueValues2(temp4)
-			const errorsCsv = Papa.unparse(temp5, {quotes: true})
+			const temp7 = splitWorkPackageIDsArrays(temp5, "projectName")
+			const temp8 = splitWorkPackageIDsArrays(temp5, "project")
+			const errorsCsv1 = Papa.unparse(temp7, {quotes: true})
+			const errorsCsv2 = Papa.unparse(temp8, {quotes: true})
 			for (let i = 0; i <= temp2.length - 1; i++) {
-				temp2[i].csv = errorsCsv
+				temp2[i].csv1 = errorsCsv1
+				temp2[i].csv2 = errorsCsv2
 			}
 		}
 	}
@@ -1038,7 +1042,8 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, projectList
 			} else {
 				error.message += `\r\nfor "${projectName}","${period}"`
 				error.data = {}
-				error.data.project = projectName
+				error.data.projectName = projectName
+				error.data.project = row.client
 				error.data.subject = period
 				error.data.user = wpConvertUser
 			}
@@ -1501,6 +1506,7 @@ function filterUniqueValues2(resultArray) {
 	const tempArray = []
 	tempArray.push({
 		project: resultArray[0].project,
+		projectName: resultArray[0].projectName,
 		subject: resultArray[0].subject,
 		user: resultArray[0].user
 	})
@@ -1511,10 +1517,23 @@ function filterUniqueValues2(resultArray) {
 			&& e.user === resultArray[i].user)}))) {
 			tempArray.push({
 				project: resultArray[i].project,
+				projectName: resultArray[i].projectName,
 				subject: resultArray[i].subject,
 				user: resultArray[i].user
 			})
 		}
+	}
+	return tempArray
+}
+
+function splitWorkPackageIDsArrays(resultArray, prop) {
+	const tempArray = []
+	for (let i = 0; i <= resultArray.length - 1; i++) {
+		tempArray.push({
+			project: resultArray[i][prop],
+			subject: resultArray[i].subject,
+			user: resultArray[i].user
+		})
 	}
 	return tempArray
 }
