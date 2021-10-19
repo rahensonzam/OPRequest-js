@@ -1276,11 +1276,8 @@ function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, csvType
                 }
             }
         }
-        if (actionType !== actionTypes.sequenceExportExtract
-            && actionType !== actionTypes.sequenceExportSummarizeUt
-            && actionType !== actionTypes.sequenceExportSummarizeCat
-            && actionType !== actionTypes.sequenceExportBreakdownCat
-            && actionType !== actionTypes.sequenceExportBreakdownClient) {
+        if (actionType === actionTypes.sequenceWeekly
+            || actionType === actionTypes.sequenceDaily) {
             if (csvType === csvTypes.import
                 || csvType === csvTypes.import2) {
                 if (typeof selectedFile === "undefined") {
