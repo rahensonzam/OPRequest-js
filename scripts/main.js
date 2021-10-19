@@ -59,8 +59,11 @@ let timeEntryList
 let userList
 // let billingStatusList
 // let mySpreadsheet
-let firstHalfAlready = false
-let firstHalfDone = false
+// let firstHalfAlready = false
+let firstHalfUsingSpreadsheet = false
+let firstHalfNotFirstTime = false
+let firstHalfRunning = false
+let firstHalfSucessful = false
 let secondHalfNotFirstTime = false
 let secondHalfRunning = false
 
@@ -306,6 +309,24 @@ function fillApiKey() {
 
 async function runActions() {
 
+    // FIXME: integrate into checkPreReq()
+    if (firstHalfRunning === true) {
+        return
+    }
+
+    if (firstHalfUsingSpreadsheet === true) {
+        writeToLog(`error: In order to run again, reload the page. Otherwise you may continue.`, "error", logType.error)
+        return
+    }
+
+    if (firstHalfNotFirstTime) {
+        if (!(window.confirm("Run again from beginning, are you sure?"))) {
+            return
+        } else {
+            writeSeparatorToLog()
+        }
+    }
+
     checkApiKeyYellow()
     wpConvertUser = document.getElementById("user").value
     apiKey = document.getElementById("apiKeyBox").value
@@ -320,28 +341,31 @@ async function runActions() {
     actionType = getSelectedRadioButtonValue("actionType")
     csvType = getSelectedRadioButtonValue("csvType")
 
-    //TODO: Individual Action diverts here
-    if (actionType === actionTypes.single) {
-        showLoading()
-        const currentStep = await runSingleAction()
-        hideLoading()
-        if (currentStep.halt) {
-            return
-        }
-        return
-    }
-
     const preReq = checkPreReq(preReqTypes.sequence, wpConvertUser, apiKey, weekBegin, dateEndPeriod, csvType, fileSelect.files[0])
     if (!preReq) {
         return
     }
 
-    if (firstHalfAlready === true) {
-        writeToLog(`error: In order to run again, reload the page. Otherwise you may continue.`, "error", logType.error)
+    firstHalfNotFirstTime = true
+    firstHalfRunning = true
+    firstHalfSucessful = false
+
+    //TODO: Individual Action diverts here
+    if (actionType === actionTypes.single) {
+        showLoading()
+        const currentStep = await runSingleAction()
+        hideLoading()
+        firstHalfRunning = false
+        if (currentStep.halt) {
+            return
+        }
+        // firstHalfSucessful = true
         return
     }
 
-    firstHalfAlready = true
+    if (csvType === csvTypes.create) {
+        firstHalfUsingSpreadsheet = true
+    }
 
     showLoading()
 
@@ -357,7 +381,7 @@ async function runActions() {
     const stepFirstHalf = await runFirstHalf()
     if (stepFirstHalf.halt) {
         hideLoading()
-        firstHalfDone = true
+        firstHalfRunning = false
         return
     }
 
@@ -421,7 +445,8 @@ async function runActions() {
     }
 
     hideLoading()
-    firstHalfDone = true
+    firstHalfRunning = false
+    firstHalfSucessful = true
 
 }
 
@@ -658,6 +683,7 @@ async function runSpreadsheetDone() {
     secondHalfNotFirstTime = true
 
     secondHalfRunning = true
+    firstHalfSucessful = false
 
     // hideSpreadsheet()
 
@@ -1289,11 +1315,14 @@ function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, csvType
         return true
     }
     if (preReqType === preReqTypes.secondHalf) {
-        if (firstHalfDone === false) {
-            writeToLog(`error: Click "Go 1" first`, "error", logType.error)
+        if (firstHalfRunning === true) {
             return false
         }
         if (secondHalfRunning === true) {
+            return false
+        }
+        if (firstHalfSucessful === false) {
+            writeToLog(`error: Sucessfully run "Go 1" first`, "error", logType.error)
             return false
         }
         return true
