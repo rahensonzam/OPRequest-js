@@ -363,8 +363,11 @@ async function runActions() {
         return
     }
 
-    if (csvType === csvTypes.create) {
-        firstHalfUsingSpreadsheet = true
+    if (actionType === actionTypes.sequenceWeekly
+        || actionType === actionTypes.sequenceDaily) {
+        if (csvType === csvTypes.create) {
+            firstHalfUsingSpreadsheet = true
+        }
     }
 
     showLoading()
@@ -676,7 +679,15 @@ async function runSpreadsheetDone() {
     }
 
     if (secondHalfNotFirstTime) {
-        if (!(window.confirm("If time entries have already been entered,\nthis will enter time entries again."))) {
+        let msg = ""
+        if (actionType === actionTypes.sequenceWeekly
+            || actionType === actionTypes.sequenceDaily) {
+            msg = "If time entries have already been entered,\nthis will enter time entries again."
+        } else {
+            msg = "Run again, are you sure?"
+        }
+
+        if (!(window.confirm(msg))) {
             return
         }
     }
@@ -1321,9 +1332,12 @@ function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, csvType
         if (secondHalfRunning === true) {
             return false
         }
-        if (firstHalfSucessful === false) {
-            writeToLog(`error: Sucessfully run "Go 1" first`, "error", logType.error)
-            return false
+        if (actionType !== actionTypes.sequenceWeekly
+            && actionType !== actionTypes.sequenceDaily) {
+            if (firstHalfSucessful === false) {
+                writeToLog(`error: Sucessfully run "Go 1" first`, "error", logType.error)
+                return false
+            }
         }
         return true
     }
