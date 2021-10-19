@@ -323,8 +323,11 @@ async function runActions() {
     //TODO: Individual Action diverts here
     if (actionType === actionTypes.single) {
         showLoading()
-        await runSingleAction()
+        const currentStep = await runSingleAction()
         hideLoading()
+        if (currentStep.halt) {
+            return
+        }
         return
     }
 
@@ -351,8 +354,7 @@ async function runActions() {
     weekBegin = dayjs(weekBegin, validDateFormats).format('YYYY-MM-DD')
     dateEndPeriod = dayjs(dateEndPeriod, validDateFormats).format('YYYY-MM-DD')
 
-    const stepFirstHalf = {}
-    stepFirstHalf.halt = await runFirstHalf()
+    const stepFirstHalf = await runFirstHalf()
     if (stepFirstHalf.halt) {
         hideLoading()
         firstHalfDone = true
@@ -436,10 +438,11 @@ async function runSingleAction() {
     for (let i = 0; i <= actionListOptionsArray.length - 1; i++) {
         actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray).action, actionListOptionsArray[i](actionListArray).logValue, actionListOptionsArray[i](actionListArray).myCsvFileObj, actionListOptionsArray[i](actionListArray).logDataBool)
         if (actionListArray[i].halt) {
-            return
+            return {halt: actionListArray[i].halt}
         }
     }
     writeSeparatorToLog()
+    return {halt: actionListArray[0].halt}
 }
 
 async function runFirstHalf() {
@@ -455,7 +458,7 @@ async function runFirstHalf() {
     for (let i = 1; i <= actionListOptionsArray.length - 1; i++) {
         actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray).action, actionListOptionsArray[i](actionListArray).logValue, actionListOptionsArray[i](actionListArray).myCsvFileObj, actionListOptionsArray[i](actionListArray).logDataBool)
         if (actionListArray[i].halt) {
-            return
+            return {halt: actionListArray[i].halt}
         }
 
         if (i === 1) {
@@ -472,7 +475,7 @@ async function runFirstHalf() {
     userList = addGradeOrderToUserList(userList)
     // billingStatusList = getBillingStatusList()
     periodList = getPeriodList()
-    return actionListArray[1].halt
+    return {halt: actionListArray[1].halt}
 }
 
 function getJustNames(inputArray, sort) {
