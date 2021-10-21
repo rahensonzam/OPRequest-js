@@ -251,8 +251,8 @@ async function doActionAsync(paramsObj) {
 			convertedCSVResults.push(convertCsvAction({action, rowIndex, projectList, categoryList, workPackageList, timeEntryList, userList}))
 		} else if (action === actions.extractTimeSheets) {
 			convertedCSVResults.push(convertCsvAction({action, weekBegin, resultList: rows, userList}))
-			// } else if (action === actions.condenseTimeSheets) {
-			// 	convertedCSVResults.push(convertCsvAction({action, resultList: rows}))
+		} else if (action === actions.condenseTimeSheets) {
+			convertedCSVResults.push(convertCsvAction({action, resultList: rows}))
 		} else if (action === actions.summarizeUtTimeEntries) {
 			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, projectList, userList}))
 		} else if (action === actions.summarizeCatTimeEntries) {
@@ -330,6 +330,7 @@ function setCount(action, rows, numOfPages, timeEntryList) {
 	} else if (action === actions.exportTimeEntries) {
 		return {start: 0, end: timeEntryList.length - 1}
 	} else if (action === actions.extractTimeSheets
+		|| action === actions.condenseTimeSheets
 		|| action === actions.summarizeUtTimeEntries
 		|| action === actions.summarizeCatTimeEntries
 		|| action === actions.breakdownClientByCatTimeEntries
@@ -376,7 +377,8 @@ function validateCSV(action, rows, headerRow) {
 		console.log(`${action} CSV Validation not yet implemented`)
 	} else if (action === actions.extractTimeSheets) {
 		console.log(`${action} CSV Validation not yet implemented`)
-		// } else if (action === actions.condenseTimeSheets) {
+	} else if (action === actions.condenseTimeSheets) {
+		console.log(`${action} CSV Validation not yet implemented`)
 	} else if (action === actions.summarizeUtTimeEntries) {
 		console.log(`${action} CSV Validation not yet implemented`)
 	} else if (action === actions.summarizeCatTimeEntries) {
@@ -521,7 +523,8 @@ function convertResultsToCsv(action, resultArray) {
 
 function convertResultsToCsv2(action, resultArray) {
 	let temp = expandResults(resultArray)
-	if (action === actions.extractTimeSheets) {
+	if (action === actions.extractTimeSheets
+		|| action === actions.condenseTimeSheets) {
 		// FIXME: addEmptyDays modifies the orignal array
 		temp = addEmptyDays(temp)
 	}
@@ -545,7 +548,11 @@ function convertResultsToCsv2(action, resultArray) {
 			temp6 = temp[i].data
 		}
 		const outputCsv = Papa.unparse(temp6, {quotes: true})
-		outputData.push({name: temp[i].name, data: outputCsv})
+		if (action === actions.extractTimeSheets) {
+			outputData.push({name: temp[i].name, data: temp6, csv: outputCsv})
+		} else {
+			outputData.push({name: temp[i].name, data: outputCsv})
+		}
 	}
 	const temp2 = extractErrors(resultArray)
 	return {data: outputData, errors: temp2}
@@ -801,9 +808,9 @@ function convertCsvAction(paramsObj) {
 	}
 
 	const uniqueValuesList = []
-	// if (action === actions.condenseTimeEntries) {
-	// 	uniqueValuesList.push(...filterUniqueValues(resultList))
-	// }
+	if (action === actions.condenseTimeSheets) {
+		uniqueValuesList.push(...filterUniqueValues(resultList))
+	}
 
 	const clientTypesList = []
 	if (action === actions.summarizeUtTimeEntries) {
@@ -841,13 +848,18 @@ function convertCsvAction(paramsObj) {
 	}
 
 	const outputExt = []
-	let outputExt2
 
 	// FIXME: Teporary solution
 	if (action !== actions.breakdownClientByCatTimeEntries
 		&& action !== actions.breakdownCatByClientTimeEntries) {
 		// gather the data
-		const count = setConversionCount(action, retrievedListLength, filteredSortedList.length - 1)
+		let count
+		if (action === actions.condenseTimeSheets) {
+			count = setConversionCount(action, retrievedListLength, resultList.length - 1)
+		} else {
+			count = setConversionCount(action, retrievedListLength, filteredSortedList.length - 1)
+		}
+
 		for (let i = count.start; i <= count.end; i++) {
 			const outputArrayDataRow = []
 
@@ -855,16 +867,18 @@ function convertCsvAction(paramsObj) {
 
 			if (outputArrayDataRow.length !== 0) {
 				if (action === actions.extractTimeSheets
+					|| action === actions.condenseTimeSheets
 					|| action === actions.summarizeUtTimeEntries
 					|| action === actions.summarizeCatTimeEntries) {
 
 					if (action === actions.extractTimeSheets
+						|| action === actions.condenseTimeSheets
 						|| action === actions.summarizeUtTimeEntries) {
 						outputArrayDataRow.sort(compareAlphabetical)
 						outputArrayDataRow.sort(compareMoveCurlyToBottom)
 					}
 					if (action === actions.extractTimeSheets) {
-						outputExt.push({name: filteredSortedList[i].name, data: outputArrayDataRow})
+						outputArray.push({name: filteredSortedList[i].name, data: outputArrayDataRow})
 					}
 					if (action === actions.summarizeUtTimeEntries) {
 						outputExt.push({name: filteredSortedList[i].name, data: outputArrayDataRow})
@@ -872,32 +886,15 @@ function convertCsvAction(paramsObj) {
 					if (action === actions.summarizeCatTimeEntries) {
 						outputExt.push({name: filteredSortedList[i].name, data: outputArrayDataRow})
 					}
-					// } else if (action === actions.condenseTimeSheets) {
-					// 	outputArray.push({name: resultList[i].name, data: outputArrayDataRow})
+					if (action === actions.condenseTimeSheets) {
+						outputArray.push({name: resultList[i].name, data: outputArrayDataRow})
+					}
 				} else {
 					outputArray.push({data: outputArrayDataRow[0]})
 				}
 			}
 			if (action === actions.convertWeekToDays) {
 				currentDate = dayjs(currentDate).add(1, "day").format('YYYY-MM-DD')
-			}
-		}
-	}
-
-	// if (action === actions.condenseTimeSheets) {
-	if (action === actions.extractTimeSheets) {
-		outputExt2 = addEmptyDays(outputExt)
-
-		uniqueValuesList.push(...filterUniqueValues(outputExt2))
-
-		const count2 = setConversionCount(actions.condenseTimeSheets, retrievedListLength, filteredSortedList.length - 1)
-		for (let i = count2.start; i <= count2.end; i++) {
-			const outputArrayDataRow = []
-			outputArrayDataRow.push(...setOutputArrayData(actions.condenseTimeSheets, row, rowIndex, i, currentDate, outputExt2, workPackageIDs, filteredSortedList, uniqueValuesList, clientTypesList, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList))
-			if (outputArrayDataRow.length !== 0) {
-				outputArrayDataRow.sort(compareAlphabetical)
-				outputArrayDataRow.sort(compareMoveCurlyToBottom)
-				outputArray.push({name: outputExt2[i].name, data: outputArrayDataRow})
 			}
 		}
 	}
@@ -1095,11 +1092,11 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, projectList
 		return {errors: error}
 	} else if (action === actions.convertWeekToDays
 		|| action === actions.exportTimeEntries
+		|| action === actions.condenseTimeSheets
 		|| action === actions.getProjects
 		|| action === actions.getWorkPackages
 		|| action === actions.getAllWorkPackages
 		|| action === actions.getTimeEntries) {
-		// || action === actions.condenseTimeSheets) {
 		error.message = ""
 		return {errors: error}
 	} else {

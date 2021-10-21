@@ -863,7 +863,8 @@ async function runSecondHalf(initCsvFileString) {
         actionListOptionsArray[4] = function(actionListArray) {return {action: actions.exportTimeEntries, logValue: "step: 4/4 action: exportTimeEntries", myCsvFileObj: "", logDataBool: true}}
 
         if (actionType === actionTypes.sequenceExportExtract) {
-            actionListOptionsArray[5] = function(actionListArray) {return {action: actions.extractTimeSheets, logValue: "step: 6/4 action: condenseTimeSheets", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true}}
+            actionListOptionsArray[5] = function(actionListArray) {return {action: actions.extractTimeSheets, logValue: "step: 5/4 action: extractTimeSheets", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: false}}
+            actionListOptionsArray[6] = function(actionListArray) {return {action: actions.condenseTimeSheets, logValue: "step: 6/4 action: condenseTimeSheets", myCsvFileObj: actionListArray[5].conversion.data, logDataBool: true}}
         }
         if (actionType === actionTypes.sequenceExportSummarizeUt) {
             actionListOptionsArray[5] = function(actionListArray) {return {action: actions.summarizeUtTimeEntries, logValue: "step: 6/4 action: tabulateUtTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true}}
@@ -902,9 +903,9 @@ async function runSecondHalf(initCsvFileString) {
 
         for (let i = 4; i <= actionListOptionsArray.length - 1; i++) {
             if (i === 5) {
-                if (actionType === actionTypes.sequenceExportExtract) {
-                    logFakeAction("step: 5/4 action: extractTimeSheets", true)
-                }
+                // if (actionType === actionTypes.sequenceExportExtract) {
+                //     logFakeAction("step: 5/4 action: extractTimeSheets", true)
+                // }
                 if (actionType === actionTypes.sequenceExportSummarizeUt) {
                     logFakeAction("step: 5/4 action: summarizeUtTimeEntries", true)
                 }
@@ -1055,7 +1056,7 @@ async function runOneAction(paramsObj) {
     // params: action, logValue, myCsvFileObj, hasWeb, hasConversion, hasFile, logDataBool, apiKey, wpConvertUser, projectList, categoryList, workPackageList, timeEntryList, userList, billingStatusList
     writeToLog(paramsObj.logValue, "step", logType.step)
     console.log(paramsObj.logValue)
-    const myCsvFile = await checkGetFile(paramsObj.hasFile, paramsObj.myCsvFileObj)
+    const myCsvFile = await checkGetFile(paramsObj.action, paramsObj.hasFile, paramsObj.myCsvFileObj)
     // doActionAsync params: action,apiKey,wpConvertUser,rows,headerRow,weekBegin,dateEndPeriod,projectList,categoryList,workPackageList,timeEntryList,userList,billingStatusList
     const doActionAsyncParamsObj = paramsObj
     doActionAsyncParamsObj.rows = myCsvFile.rows
@@ -1090,10 +1091,14 @@ async function runOneAction(paramsObj) {
     return currentStep
 }
 
-async function checkGetFile(hasFile, myCsvFileObj) {
+async function checkGetFile(action, hasFile, myCsvFileObj) {
     if (hasFile) {
-        const myCsvFile = await parseCSVFile(myCsvFileObj)
-        return myCsvFile
+        if (action === actions.condenseTimeSheets) {
+            return {rows: myCsvFileObj, headerRow: []}
+        } else {
+            const myCsvFile = await parseCSVFile(myCsvFileObj)
+            return myCsvFile
+        }
     } else {
         return {rows: [], headerRow: []}
     }
@@ -1260,6 +1265,9 @@ function logData(action, currentStep) {
         || action === actions.breakdownCatByClientTimeEntries) {
         for (let i = 0; i <= currentStep.conversion.data.length - 1; i++) {
             if (action === actions.extractTimeSheets) {
+                writeToLog(`${currentStep.conversion.data[i].name}\n${currentStep.conversion.data[i].csv}`, "output", logType.normal)
+                console.log(`${currentStep.conversion.data[i].name}\n${currentStep.conversion.data[i].csv}`)
+            } else if (action === actions.condenseTimeSheets) {
                 writeToLog(`${currentStep.conversion.data[i].name}\n${currentStep.conversion.data[i].data}`, "output", logType.normal)
                 console.log(`${currentStep.conversion.data[i].name}\n${currentStep.conversion.data[i].data}`)
             } else {
