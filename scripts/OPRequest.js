@@ -547,6 +547,10 @@ function convertResultsToCsv2(action, resultArray) {
 		} else {
 			temp6 = temp[i].data
 		}
+		if (action === actions.condenseTimeSheets) {
+			temp6 = totalTimesheetUnitsRight(temp6)
+			temp6 = totalTimesheetUnitsBottom(temp6)
+		}
 		const outputCsv = Papa.unparse(temp6, {quotes: true})
 		if (action === actions.extractTimeSheets) {
 			outputData.push({name: temp[i].name, data: temp6, csv: outputCsv})
@@ -669,6 +673,57 @@ function transposeResult(inputArray) {
 	}
 
 	return resultArray
+}
+
+function totalTimesheetUnitsRight(inputArray) {
+	//modifies the original array
+	for (let i = 0; i <= inputArray.length - 1; i++) {
+		let totaled = 0
+		for (let j = 0; j <= daysOfWeek.length - 1; j++) {
+			totaled += Number(inputArray[i][daysOfWeek[j]])
+		}
+		if (totaled === 0) {
+			inputArray[i].total = ""
+		} else {
+			inputArray[i].total = String(totaled)
+		}
+	}
+	return inputArray
+}
+
+function totalTimesheetUnitsBottom(inputArray) {
+	//modifies the original array
+	let totaledObj = {}
+	for (let i = 0; i <= daysOfWeek.length - 1; i++) {
+		let totaled = 0
+		for (let j = 0; j <= inputArray.length - 1; j++) {
+			totaled += Number(inputArray[j][daysOfWeek[i]])
+		}
+		if (totaled === 0) {
+			totaledObj[daysOfWeek[i]] = ""
+		} else {
+			totaledObj[daysOfWeek[i]] = String(totaled)
+		}
+	}
+
+	let grandTotal = 0
+	for (let i = 0; i <= inputArray.length - 1; i++) {
+		grandTotal += Number(inputArray[i].total)
+	}
+	if (grandTotal === 0) {
+		totaledObj.total = ""
+	} else {
+		totaledObj.total = String(grandTotal)
+	}
+
+	const outputObj = {client: "total", period: "", category: "", natureOfWork: ""}
+	for (let i = 0; i <= daysOfWeek.length - 1; i++) {
+		outputObj[daysOfWeek[i]] = totaledObj[daysOfWeek[i]]
+	}
+	outputObj.total = totaledObj.total
+
+	inputArray.push(outputObj)
+	return inputArray
 }
 
 function fillDownName(typeName, name, inputArray) {
