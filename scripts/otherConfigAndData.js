@@ -116,7 +116,8 @@ function getPeriodList() {
         "November 2020",
         "December 2021",
         "December 2020",
-        "Unknown"
+        "Unknown",
+        "N/A"
     ]
 }
 
