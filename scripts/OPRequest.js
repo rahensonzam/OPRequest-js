@@ -525,6 +525,7 @@ function convertResultsToCsv2(action, resultArray) {
 		// FIXME: addEmptyDays modifies the orignal array
 		temp = addEmptyDays(temp)
 	}
+
 	let columnHeader
 	if (action === actions.breakdownClientByCatTimeEntries) {
 		columnHeader = "category"
@@ -534,7 +535,7 @@ function convertResultsToCsv2(action, resultArray) {
 	const outputData = []
 	for (let i = 0; i <= temp.length - 1; i++) {
 		let temp6 = []
-		if(action === actions.breakdownClientByCatTimeEntries
+		if (action === actions.breakdownClientByCatTimeEntries
 			|| action === actions.breakdownCatByClientTimeEntries) {
 			const temp4 = temp[i].data
 			const temp3 = extractProp(temp4, "data")
@@ -851,33 +852,23 @@ function convertCsvAction(paramsObj) {
 			const outputArrayDataRow = []
 
 			outputArrayDataRow.push(...setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, workPackageIDs, filteredSortedList, uniqueValuesList, clientTypesList, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList))
-			// console.log(action)
-			// console.log(action !== actions.extractTimeSheets
-			// 	&& action !== actions.condenseTimeSheets
-			// 	&& action !== actions.summarizeUtTimeEntries)
-			// console.log("retrievedList", resultList[rowIndex].data["_embedded"]["elements"])
-			// console.log("outputArrayDataRow", outputArrayDataRow)
 
 			if (outputArrayDataRow.length !== 0) {
 				if (action === actions.extractTimeSheets
 					|| action === actions.summarizeUtTimeEntries
 					|| action === actions.summarizeCatTimeEntries) {
+
 					if (action === actions.extractTimeSheets
 						|| action === actions.summarizeUtTimeEntries) {
 						outputArrayDataRow.sort(compareAlphabetical)
 						outputArrayDataRow.sort(compareMoveCurlyToBottom)
 					}
-					// if (action === actions.extractTimeSheets
-					// 	|| action === actions.summarizeUtTimeEntries) {
 					if (action === actions.extractTimeSheets) {
 						outputExt.push({name: filteredSortedList[i].name, data: outputArrayDataRow})
 					}
 					if (action === actions.summarizeUtTimeEntries) {
 						outputExt.push({name: filteredSortedList[i].name, data: outputArrayDataRow})
 					}
-					// if (action === actions.summarizeCatTimeEntries) {
-					// 	outputExt.push({name: filteredSortedList[i].name, data: outputArrayDataRow})
-					// }
 					if (action === actions.summarizeCatTimeEntries) {
 						outputExt.push({name: filteredSortedList[i].name, data: outputArrayDataRow})
 					}
