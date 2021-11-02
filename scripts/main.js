@@ -44,6 +44,7 @@ const adminUser2 = getAdminUser2IdNumber()
 let apiKey
 let weekBegin
 let dateEndPeriod
+let numberOfWeeks
 let actionType
 let csvType
 let fileSelect
@@ -134,6 +135,17 @@ function showHideUI() {
         //showWeek
         showHideUtil("weekBeginLabel", "inline")
         showHideUtil("weekBeginBox", "inline")
+    }
+
+    if (actionType === actionTypes.sequenceExportExtract
+        || actionType === actionTypes.single) {
+        //showNumberOfWeeks
+        showHideUtil("numberOfWeeksLabel", "inline")
+        showHideUtil("numberOfWeeksBox", "inline")
+    } else {
+        //hideNumberOfWeeks
+        showHideUtil("numberOfWeeksLabel", "none")
+        showHideUtil("numberOfWeeksBox", "none")
     }
 
     if (actionType === actionTypes.sequenceExportSummarizeUt
@@ -300,7 +312,7 @@ function fillApiKey() {
     const password = document.getElementById("passwordBox").value
     const apiKeyRetrived = passwordToApiKey(user, password)
 
-    const preReq = checkPreReq(preReqTypes.password, user, apiKeyRetrived, "", "", "", "")
+    const preReq = checkPreReq(preReqTypes.password, user, apiKeyRetrived, "", "", "", "", "")
     if (preReq) {
         document.getElementById("apiKeyBox").value = apiKeyRetrived
     }
@@ -332,6 +344,7 @@ async function runActions() {
     apiKey = document.getElementById("apiKeyBox").value
     weekBegin = document.getElementById("weekBeginBox").value
     dateEndPeriod = document.getElementById("dateEndPeriodBox").value
+    numberOfWeeks = document.getElementById("numberOfWeeksBox").value
     fileSelect = document.getElementById("fileSelect")
     staticLists = document.getElementById("staticListsCheckbox").checked
     billingStatusReportFilter = document.getElementById("billingStatusReportFilterSelect").value
@@ -341,7 +354,7 @@ async function runActions() {
     actionType = getSelectedRadioButtonValue("actionType")
     csvType = getSelectedRadioButtonValue("csvType")
 
-    const preReq = checkPreReq(preReqTypes.sequence, wpConvertUser, apiKey, weekBegin, dateEndPeriod, csvType, fileSelect.files[0])
+    const preReq = checkPreReq(preReqTypes.sequence, wpConvertUser, apiKey, weekBegin, dateEndPeriod, numberOfWeeks, csvType, fileSelect.files[0])
     if (!preReq) {
         return
     }
@@ -673,7 +686,7 @@ function getCustomDropDown(list) {
 
 async function runSpreadsheetDone() {
 
-    const preReq = checkPreReq(preReqTypes.secondHalf, "", "", "", "", "", "")
+    const preReq = checkPreReq(preReqTypes.secondHalf, "", "", "", "", "", "", "")
     if (!preReq) {
         return
     }
@@ -1063,6 +1076,7 @@ async function runOneAction(paramsObj) {
     doActionAsyncParamsObj.headerRow = myCsvFile.headerRow
     doActionAsyncParamsObj.weekBegin = weekBegin
     doActionAsyncParamsObj.dateEndPeriod = dateEndPeriod
+    doActionAsyncParamsObj.numberOfWeeks = numberOfWeeks
 
     const currentStep = await doActionAsync(doActionAsyncParamsObj)
     if (paramsObj.hasWeb) {
@@ -1265,11 +1279,19 @@ function logData(action, currentStep) {
         || action === actions.breakdownCatByClientTimeEntries) {
         for (let i = 0; i <= currentStep.conversion.data.length - 1; i++) {
             if (action === actions.extractTimeSheets) {
-                writeToLog(`${currentStep.conversion.data[i].name}\n${currentStep.conversion.data[i].csv}`, "output", logType.normal)
-                console.log(`${currentStep.conversion.data[i].name}\n${currentStep.conversion.data[i].csv}`)
+                writeToLog(`${currentStep.conversion.data[i].name}`, "output", logType.normal)
+                console.log(`${currentStep.conversion.data[i].name}`)
+                for (let j = 0; j <= currentStep.conversion.data[i].data.length - 1; j++) {
+                    writeToLog(`${currentStep.conversion.data[i].data[j].name}\n${currentStep.conversion.data[i].data[j].csv}`, "output", logType.normal)
+                    console.log(`${currentStep.conversion.data[i].data[j].name}\n${currentStep.conversion.data[i].data[j].csv}`)
+                }
             } else if (action === actions.condenseTimeSheets) {
-                writeToLog(`${currentStep.conversion.data[i].name}\n${currentStep.conversion.data[i].data}`, "output", logType.normal)
-                console.log(`${currentStep.conversion.data[i].name}\n${currentStep.conversion.data[i].data}`)
+                writeToLog(`${currentStep.conversion.data[i].name}`, "output", logType.normal)
+                console.log(`${currentStep.conversion.data[i].name}`)
+                for (let j = 0; j <= currentStep.conversion.data[i].data.length - 1; j++) {
+                    writeToLog(`${currentStep.conversion.data[i].data[j].name}\n${currentStep.conversion.data[i].data[j].data}`, "output", logType.normal)
+                    console.log(`${currentStep.conversion.data[i].data[j].name}\n${currentStep.conversion.data[i].data[j].data}`)
+                }
             } else {
                 writeToLog(`${currentStep.conversion.data[i].data}`, "output", logType.normal)
                 console.log(currentStep.conversion.data[i].data)
@@ -1288,7 +1310,7 @@ function writeSeparatorToLog() {
     writeToLog("------------------------------------------------------------------------------------------------------------------------","",logType.step)
 }
 
-function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, csvType, selectedFile) {
+function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, numberOfWeeks, csvType, selectedFile) {
     if (preReqType === preReqTypes.sequence) {
         if (actionType === actionTypes.sequenceWeekly
             || actionType === actionTypes.sequenceDaily) {
@@ -1311,12 +1333,25 @@ function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, csvType
                 writeToLog("error: Invalid date for week beginning", "error", logType.error)
                 return false
             }
+            // if (actionType === actionTypes.sequenceExportExtract) {
+            //     const MONDAY = 1
+            //     if (!(dayjs(weekBegin).day() === MONDAY)) {
+            //         writeToLog(`error: Invalid date for week beginning\nMust be a Monday for "Export & extract from time entries"`, "error", logType.error)
+            //         return false
+            //     }
+            // }
             if (actionType === actionTypes.sequenceExportSummarizeUt
                 || actionType === actionTypes.sequenceExportSummarizeCat
                 || actionType === actionTypes.sequenceExportBreakdownCat
                 || actionType === actionTypes.sequenceExportBreakdownClient) {
                 if (!(dayjs(dateEndPeriod, validDateFormats).isValid())) {
                     writeToLog("error: Invalid date for end of period", "error", logType.error)
+                    return false
+                }
+            }
+            if (actionType === actionTypes.sequenceExportExtract) {
+                if (Number.isInteger(numberOfWeeks) && numberOfWeeks > 0) {
+                    writeToLog("error: Invalid value for number of weeks", "error", logType.error)
                     return false
                 }
             }

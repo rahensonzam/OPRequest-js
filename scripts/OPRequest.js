@@ -172,6 +172,7 @@ async function doActionAsync(paramsObj) {
 	const headerRow = checkIfPropertyExists(paramsObj, "headerRow")
 	const weekBegin = checkIfPropertyExists(paramsObj, "weekBegin")
 	const dateEndPeriod = checkIfPropertyExists(paramsObj, "dateEndPeriod")
+	const numberOfWeeks = checkIfPropertyExists(paramsObj, "numberOfWeeks")
 	const billingStatusReportFilter = checkIfPropertyExists(paramsObj, "billingStatusReportFilter")
 	const projectList = checkIfPropertyExists(paramsObj, "projectList")
 	const categoryList = checkIfPropertyExists(paramsObj, "categoryList")
@@ -221,7 +222,7 @@ async function doActionAsync(paramsObj) {
 		numOfPages = Math.ceil(Number(result[0].data["total"]) / 100)
 	}
 
-	const count = setCount(action, rows, numOfPages, timeEntryList)
+	const count = setCount(action, rows, numOfPages, numberOfWeeks, timeEntryList)
 
 	for (let rowIndex = count.start; rowIndex <= count.end; rowIndex++) {
 		const row = rows[rowIndex]
@@ -250,9 +251,15 @@ async function doActionAsync(paramsObj) {
 		} else if (action === actions.exportTimeEntries) {
 			convertedCSVResults.push(convertCsvAction({action, rowIndex, projectList, categoryList, workPackageList, timeEntryList, userList}))
 		} else if (action === actions.extractTimeSheets) {
-			convertedCSVResults.push(convertCsvAction({action, weekBegin, resultList: rows, userList}))
+			const currentDate = getCurrentDateFromWeekBegin(weekBegin, rowIndex)
+			const extractObj = convertCsvAction({action, weekBegin: currentDate, resultList: rows, userList})
+			extractObj.name = dayjs(currentDate).format("DD-MM-YYYY")
+			convertedCSVResults.push(extractObj)
 		} else if (action === actions.condenseTimeSheets) {
-			convertedCSVResults.push(convertCsvAction({action, resultList: rows}))
+			const currentDate = getCurrentDateFromWeekBegin(weekBegin, rowIndex)
+			const extractObj = convertCsvAction({action, resultList: rows[rowIndex].data})
+			extractObj.name = dayjs(currentDate).format("DD-MM-YYYY")
+			convertedCSVResults.push(extractObj)
 		} else if (action === actions.summarizeUtTimeEntries) {
 			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, projectList, userList}))
 		} else if (action === actions.summarizeCatTimeEntries) {
@@ -285,12 +292,16 @@ async function doActionAsync(paramsObj) {
 		return {conversion: outputObj}
 	}
 
-	if (action === actions.extractTimeSheets
-		|| action === actions.condenseTimeSheets
-		|| action === actions.breakdownClientByCatTimeEntries
+	if (action === actions.breakdownClientByCatTimeEntries
 		|| action === actions.breakdownCatByClientTimeEntries) {
 		// console.log("convertedCSVResults", convertedCSVResults)
 		const outputObj = convertResultsToCsv2(action, convertedCSVResults)
+		return {conversion: outputObj}
+	}
+
+	if (action === actions.extractTimeSheets
+		|| action === actions.condenseTimeSheets) {
+		const outputObj = convertResultsToCsv3(action, convertedCSVResults)
 		return {conversion: outputObj}
 	}
 
@@ -321,7 +332,7 @@ async function doActionAsync(paramsObj) {
 
 }
 
-function setCount(action, rows, numOfPages, timeEntryList) {
+function setCount(action, rows, numOfPages, numberOfWeeks, timeEntryList) {
 	if (action === actions.getProjects
 		|| action === actions.getWorkPackages
 		|| action === actions.getAllWorkPackages
@@ -330,8 +341,9 @@ function setCount(action, rows, numOfPages, timeEntryList) {
 	} else if (action === actions.exportTimeEntries) {
 		return {start: 0, end: timeEntryList.length - 1}
 	} else if (action === actions.extractTimeSheets
-		|| action === actions.condenseTimeSheets
-		|| action === actions.summarizeUtTimeEntries
+		|| action === actions.condenseTimeSheets) {
+		return {start: 0, end: numberOfWeeks - 1}
+	} else if (action === actions.summarizeUtTimeEntries
 		|| action === actions.summarizeCatTimeEntries
 		|| action === actions.breakdownClientByCatTimeEntries
 		|| action === actions.breakdownCatByClientTimeEntries) {
@@ -547,15 +559,41 @@ function convertResultsToCsv2(action, resultArray) {
 		} else {
 			temp6 = temp[i].data
 		}
-		if (action === actions.condenseTimeSheets) {
-			temp6 = totalTimesheetUnitsRight(temp6)
-			temp6 = totalTimesheetUnitsBottom(temp6)
-		}
 		const outputCsv = Papa.unparse(temp6, {quotes: true})
+		outputData.push({name: temp[i].name, data: outputCsv})
+	}
+	const temp2 = extractErrors(resultArray)
+	return {data: outputData, errors: temp2}
+}
+
+function convertResultsToCsv3(action, resultArray) {
+	const outputData = []
+	for (let i = 0; i <= resultArray.length - 1; i++) {
+		resultArray[i].data
+		if (action === actions.extractTimeSheets
+			|| action === actions.condenseTimeSheets) {
+			// FIXME: addEmptyDays modifies the orignal array
+			resultArray[i].data = addEmptyDays(resultArray[i].data)
+		}
+		let temp6 = []
+		const temp9 = resultArray[i].data
+		for (let j = 0; j <= temp9.length - 1; j++) {
+			let temp10 = temp9[j].data
+			if (action === actions.condenseTimeSheets) {
+				temp10 = totalTimesheetUnitsRight(temp10)
+				temp10 = totalTimesheetUnitsBottom(temp10)
+			}
+			const outputCsv2 = Papa.unparse(temp10, {quotes: true})
+			if (action === actions.extractTimeSheets) {
+				temp6.push({name: temp9[j].name, data: temp10, csv: outputCsv2})
+			} else if (action === actions.condenseTimeSheets) {
+				temp6.push({name: temp9[j].name, data: outputCsv2})
+			}
+		}
 		if (action === actions.extractTimeSheets) {
-			outputData.push({name: temp[i].name, data: temp6, csv: outputCsv})
-		} else {
-			outputData.push({name: temp[i].name, data: outputCsv})
+			outputData.push({name: resultArray[i].name, data: temp6})
+		} else if (action === actions.condenseTimeSheets) {
+			outputData.push({name: resultArray[i].name, data: temp6})
 		}
 	}
 	const temp2 = extractErrors(resultArray)
@@ -1326,6 +1364,25 @@ function filterListToNumberOfWeeks(resultList, weekBegin, numberOfWeeks) {
 	return filterList(resultList, weekBegin, (daysOfWeek.length - 1) * numberOfWeeks)
 }
 
+function filterList(resultList, weekBegin, upperBound) {
+	let currentDate = weekBegin
+	const tempArray = []
+	for (let index = 0; index <= upperBound; index++) {
+		for (let index2 = 0; index2 <= resultList.length - 1; index2++) {
+			if (resultList[index2].spentOn === currentDate) {
+				tempArray.push(resultList[index2])
+			}
+		}
+		currentDate = dayjs(currentDate).add(1, "day").format("YYYY-MM-DD")
+	}
+	return tempArray
+}
+
+function getCurrentDateFromWeekBegin(weekBegin, rowIndex) {
+	const offset = (daysOfWeek.length) * rowIndex
+	return dayjs(weekBegin).add(offset, "day").format("YYYY-MM-DD")
+}
+
 function filterListByBillingStatusReportFilter(resultList, billingStatusReportFilter) {
 	const tempArray = []
 	for (let index = 0; index <= resultList.length - 1; index++) {
@@ -1350,20 +1407,6 @@ function filterListByBillingStatusReportFilter(resultList, billingStatusReportFi
 		if (condition) {
 			tempArray.push(resultList[index])
 		}
-	}
-	return tempArray
-}
-
-function filterList(resultList, weekBegin, upperBound) {
-	let currentDate = weekBegin
-	const tempArray = []
-	for (let index = 0; index <= upperBound; index++) {
-		for (let index2 = 0; index2 <= resultList.length - 1; index2++) {
-			if (resultList[index2].spentOn === currentDate) {
-				tempArray.push(resultList[index2])
-			}
-		}
-		currentDate = dayjs(currentDate).add(1, "day").format("YYYY-MM-DD")
 	}
 	return tempArray
 }

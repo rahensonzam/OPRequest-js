@@ -28,7 +28,7 @@ p {
     display: none;
 }
 
-#dateEndPeriodLabel, #dateEndPeriodBox {
+#dateEndPeriodLabel, #dateEndPeriodBox, #numberOfWeeksLabel, #numberOfWeeksBox {
     display: none;
 }
 
