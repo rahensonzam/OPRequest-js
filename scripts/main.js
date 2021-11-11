@@ -45,6 +45,7 @@ let apiKey
 let weekBegin
 let dateEndPeriod
 let numberOfWeeks
+let filterToOneUserBool
 let actionType
 let csvType
 let fileSelect
@@ -142,10 +143,16 @@ function showHideUI() {
         //showNumberOfWeeks
         showHideUtil("numberOfWeeksLabel", "inline")
         showHideUtil("numberOfWeeksBox", "inline")
+        //showfilterToOneUser
+        showHideUtil("filterToOneUserCheckbox", "inline")
+        showHideUtil("filterToOneUserLabel", "inline")
     } else {
         //hideNumberOfWeeks
         showHideUtil("numberOfWeeksLabel", "none")
         showHideUtil("numberOfWeeksBox", "none")
+        //hidefilterToOneUser
+        showHideUtil("filterToOneUserCheckbox", "none")
+        showHideUtil("filterToOneUserLabel", "none")
     }
 
     if (actionType === actionTypes.sequenceExportSummarizeUt
@@ -347,6 +354,7 @@ async function runActions() {
     numberOfWeeks = Number(document.getElementById("numberOfWeeksBox").value)
     fileSelect = document.getElementById("fileSelect")
     staticLists = document.getElementById("staticListsCheckbox").checked
+    filterToOneUserBool = document.getElementById("filterToOneUserCheckbox").checked
     billingStatusReportFilter = document.getElementById("billingStatusReportFilterSelect").value
     workPackageListFileSelect = document.getElementById("workPackageListFileSelect")
     timeEntryListFileSelect = document.getElementById("timeEntryListFileSelect")
@@ -1006,7 +1014,8 @@ function getActionOptions(action) {
         if (action === actions.exportTimeEntries) {
             returnObj.hasFile = false
         }
-        if (action === actions.convertToWorkPackageIDs) {
+        if (action === actions.convertToWorkPackageIDs
+            || action === actions.extractTimeSheets) {
             returnObj.wpConvertUser = wpConvertUser
         }
         if (action === actions.summarizeCatTimeEntries
@@ -1076,6 +1085,7 @@ async function runOneAction(paramsObj) {
     doActionAsyncParamsObj.weekBegin = weekBegin
     doActionAsyncParamsObj.dateEndPeriod = dateEndPeriod
     doActionAsyncParamsObj.numberOfWeeks = numberOfWeeks
+    doActionAsyncParamsObj.filterToOneUserBool = filterToOneUserBool
 
     const currentStep = await doActionAsync(doActionAsyncParamsObj)
     if (paramsObj.hasWeb) {

@@ -173,6 +173,7 @@ async function doActionAsync(paramsObj) {
 	const weekBegin = checkIfPropertyExists(paramsObj, "weekBegin")
 	const dateEndPeriod = checkIfPropertyExists(paramsObj, "dateEndPeriod")
 	const numberOfWeeks = checkIfPropertyExists(paramsObj, "numberOfWeeks")
+	const filterToOneUserBool = checkIfPropertyExists(paramsObj, "filterToOneUserBool")
 	const billingStatusReportFilter = checkIfPropertyExists(paramsObj, "billingStatusReportFilter")
 	const projectList = checkIfPropertyExists(paramsObj, "projectList")
 	const categoryList = checkIfPropertyExists(paramsObj, "categoryList")
@@ -252,7 +253,7 @@ async function doActionAsync(paramsObj) {
 			convertedCSVResults.push(convertCsvAction({action, rowIndex, projectList, categoryList, workPackageList, timeEntryList, userList}))
 		} else if (action === actions.extractTimeSheets) {
 			const currentDate = getCurrentDateFromWeekBegin(weekBegin, rowIndex)
-			const extractObj = convertCsvAction({action, weekBegin: currentDate, resultList: rows, userList})
+			const extractObj = convertCsvAction({action, weekBegin: currentDate, resultList: rows, userList, wpConvertUser, filterToOneUserBool})
 			extractObj.name = dayjs(currentDate).format("DD-MM-YYYY")
 			convertedCSVResults.push(extractObj)
 		} else if (action === actions.condenseTimeSheets) {
@@ -830,6 +831,7 @@ function convertCsvAction(paramsObj) {
 	const wpConvertUser = checkIfPropertyExists(paramsObj, "wpConvertUser")
 	const weekBegin = checkIfPropertyExists(paramsObj, "weekBegin")
 	const dateEndPeriod = checkIfPropertyExists(paramsObj, "dateEndPeriod")
+	const filterToOneUserBool = checkIfPropertyExists(paramsObj, "filterToOneUserBool")
 	const billingStatusReportFilter = checkIfPropertyExists(paramsObj, "billingStatusReportFilter")
 	const resultList = checkIfPropertyExists(paramsObj, "resultList")
 	const projectList = checkIfPropertyExists(paramsObj, "projectList")
@@ -863,8 +865,14 @@ function convertCsvAction(paramsObj) {
 
 	const filteredSortedList = []
 	if (action === actions.extractTimeSheets) {
-		const tempList = filterListToNumberOfWeeks(resultList, currentDate, 1)
-		filteredSortedList.push(...splitListByUser(tempList, userList))
+		let tempList2 = []
+		if (filterToOneUserBool) {
+			const tempList = filterListToOneUser(resultList, userList, wpConvertUser)
+			tempList2 = filterListToNumberOfWeeks(tempList, currentDate, 1)
+		} else {
+			tempList2 = filterListToNumberOfWeeks(resultList, currentDate, 1)
+		}
+		filteredSortedList.push(...splitListByUser(tempList2, userList))
 		// console.log("filteredSortedList", filteredSortedList)
 	}
 
@@ -926,7 +934,7 @@ function convertCsvAction(paramsObj) {
 	}
 
 	// check data for errors
-	const conversionErrorResult = conversionErrorSelect(action, row, rowIndex, wpConvertUser, projectList, categoryList, workPackageIDs, filteredSortedList)
+	const conversionErrorResult = conversionErrorSelect(action, row, rowIndex, wpConvertUser, filterToOneUserBool, projectList, categoryList, workPackageIDs, filteredSortedList)
 	if (conversionErrorResult.errors.message !== "") {
 		return conversionErrorResult
 		// {data: outputArray, errors: error}
@@ -1109,7 +1117,7 @@ function setConversionCount(action, retrievedListLength, filteredSortedListLengt
 	}
 }
 
-function conversionErrorSelect(action, row, rowIndex, wpConvertUser, projectList, categoryList, workPackageIDs, filteredSortedList) {
+function conversionErrorSelect(action, row, rowIndex, wpConvertUser, filterToOneUserBool, projectList, categoryList, workPackageIDs, filteredSortedList) {
 	const outputArray = []
 	let error = {}
 
@@ -1179,6 +1187,12 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, projectList
 		|| action === actions.summarizeCatTimeEntries
 		|| action === actions.breakdownClientByCatTimeEntries
 		|| action === actions.breakdownCatByClientTimeEntries) {
+		if (action === actions.extractTimeSheets) {
+			if (filterToOneUserBool) {
+				error.message = ""
+				return {errors: error}
+			}
+		}
 		if (filteredSortedList.length === 0) {
 			error.message = "error: No rows found for the selected weeks"
 			return {errors: error}
@@ -1407,6 +1421,16 @@ function filterListByBillingStatusReportFilter(resultList, billingStatusReportFi
 		}
 
 		if (condition) {
+			tempArray.push(resultList[index])
+		}
+	}
+	return tempArray
+}
+
+function filterListToOneUser(resultList, userList, wpConvertUser) {
+	const tempArray = []
+	for (let index = 0; index <= resultList.length - 1; index++) {
+		if (findArrayIDFromName(userList, resultList[index].user) === wpConvertUser) {
 			tempArray.push(resultList[index])
 		}
 	}

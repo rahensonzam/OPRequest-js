@@ -28,7 +28,11 @@ p {
     display: none;
 }
 
-#dateEndPeriodLabel, #dateEndPeriodBox, #numberOfWeeksLabel, #numberOfWeeksBox {
+#dateEndPeriodLabel, #dateEndPeriodBox {
+    display: none;
+}
+
+#numberOfWeeksLabel, #numberOfWeeksBox, #filterToOneUserLabel, #filterToOneUserCheckbox {
     display: none;
 }
 
