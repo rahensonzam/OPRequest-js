@@ -344,7 +344,7 @@ async function runActions() {
     apiKey = document.getElementById("apiKeyBox").value
     weekBegin = document.getElementById("weekBeginBox").value
     dateEndPeriod = document.getElementById("dateEndPeriodBox").value
-    numberOfWeeks = document.getElementById("numberOfWeeksBox").value
+    numberOfWeeks = Number(document.getElementById("numberOfWeeksBox").value)
     fileSelect = document.getElementById("fileSelect")
     staticLists = document.getElementById("staticListsCheckbox").checked
     billingStatusReportFilter = document.getElementById("billingStatusReportFilterSelect").value
@@ -1004,7 +1004,6 @@ function getActionOptions(action) {
         returnObj.hasConversion = true
         returnObj.hasFile = true
         if (action === actions.exportTimeEntries) {
-            // || action === actions.condenseTimeSheets
             returnObj.hasFile = false
         }
         if (action === actions.convertToWorkPackageIDs) {
@@ -1350,7 +1349,7 @@ function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, numberO
                 }
             }
             if (actionType === actionTypes.sequenceExportExtract) {
-                if (Number.isInteger(numberOfWeeks) && numberOfWeeks > 0) {
+                if (!(Number.isInteger(numberOfWeeks) && numberOfWeeks > 0)) {
                     writeToLog("error: Invalid value for number of weeks", "error", logType.error)
                     return false
                 }

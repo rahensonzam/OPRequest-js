@@ -569,7 +569,9 @@ function convertResultsToCsv2(action, resultArray) {
 function convertResultsToCsv3(action, resultArray) {
 	const outputData = []
 	for (let i = 0; i <= resultArray.length - 1; i++) {
-		resultArray[i].data
+		if (typeof resultArray[i].data === "undefined") {
+			continue
+		}
 		if (action === actions.extractTimeSheets
 			|| action === actions.condenseTimeSheets) {
 			// FIXME: addEmptyDays modifies the orignal array
@@ -1904,8 +1906,12 @@ function findArrayNameFromID(items, condition) {
 }
 
 function findArrayIDFromName(items, condition) {
+	return findArrayIDFromProp(items, condition, "name")
+}
+
+function findArrayIDFromProp(items, condition, prop) {
 	for (let i = 0; i <= items.length - 1; i++) {
-		if (items[i].name === condition) {
+		if (items[i][prop] === condition) {
 			return items[i].id
 		}
 	}
