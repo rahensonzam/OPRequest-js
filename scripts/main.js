@@ -475,14 +475,13 @@ async function runActions() {
 }
 
 async function runSingleAction() {
-    // writeToLog("Run Individual Actions: Coming soon", "log", logType.normal)
     const actionSelectAction = document.getElementById("actionSelect").value
     const logDataBool = document.getElementById("actionSelectLogCheckbox").checked
     const actionListArray = []
     const actionListOptionsArray = [
         // eslint-disable-next-line no-unused-vars
         function(actionListArray) {return {action: actionSelectAction, logValue: `step: 1 action: ${actionSelectAction}`, myCsvFileObj: fileSelect.files[0], logDataBool}},
-   ]
+    ]
 
     for (let i = 0; i <= actionListOptionsArray.length - 1; i++) {
         actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray).action, actionListOptionsArray[i](actionListArray).logValue, actionListOptionsArray[i](actionListArray).myCsvFileObj, actionListOptionsArray[i](actionListArray).logDataBool)
