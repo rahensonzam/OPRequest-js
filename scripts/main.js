@@ -414,7 +414,7 @@ async function runActions() {
 
     if (actionType === actionTypes.sequenceWeekly) {
         writeToLog("step: 2/8 action: csvInput", "step", logType.step)
-        console.log("step: 2/6 action: csvInput")
+        console.log("step: 2/8 action: csvInput")
 
         if (csvType === csvTypes.create
             || csvType === csvTypes.import) {
