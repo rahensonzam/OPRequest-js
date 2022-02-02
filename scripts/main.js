@@ -112,7 +112,7 @@ function showHideUI() {
 
     actionType = getSelectedRadioButtonValue("actionType")
     csvType = getSelectedRadioButtonValue("csvType")
-    const staticListsCheckbox = document.getElementById("staticListsCheckbox")
+    const staticListsCheckboxChecked = document.getElementById("staticListsCheckbox").checked
 
     if (actionType === actionTypes.single) {
         //showAction
@@ -224,7 +224,7 @@ function showHideUI() {
     if (actionType === actionTypes.single) {
         showStaticFile()
     } else {
-        if (staticListsCheckbox.checked) {
+        if (staticListsCheckboxChecked) {
             if (actionType === actionTypes.sequenceExportExtract
                 || actionType === actionTypes.sequenceExportSummarizeUt
                 || actionType === actionTypes.sequenceExportSummarizeCat
