@@ -263,6 +263,8 @@ async function doActionAsync(paramsObj) {
 			convertedCSVResults.push(extractObj)
 		} else if (action === actions.summarizeUtTimeEntries) {
 			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, projectList, userList}))
+		} else if (action === actions.tabulateUtTimeEntries) {
+			convertedCSVResults.push(convertCsvAction({action, resultList: rows}))
 		} else if (action === actions.summarizeCatTimeEntries) {
 			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, billingStatusReportFilter, projectList, categoryList, userList}))
 		} else if (action === actions.breakdownClientByCatTimeEntries) {
@@ -561,7 +563,13 @@ function convertResultsToCsv2(action, resultArray) {
 			temp6 = temp[i].data
 		}
 		const outputCsv = Papa.unparse(temp6, {quotes: true})
-		outputData.push({name: temp[i].name, data: outputCsv})
+		if (action === actions.extractTimeSheets) {
+			outputData.push({name: temp[i].name, data: temp6})
+		} else if (action === actions.condenseTimeSheets) {
+			outputData.push({name: temp[i].name, data: temp6})
+		} else {
+			outputData.push({name: temp[i].name, data: outputCsv})
+		}
 	}
 	const temp2 = extractErrors(resultArray)
 	return {data: outputData, errors: temp2}
@@ -1202,6 +1210,7 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, filterToOne
 	} else if (action === actions.convertWeekToDays
 		|| action === actions.exportTimeEntries
 		|| action === actions.condenseTimeSheets
+		|| action === actions.tabulateUtTimeEntries
 		|| action === actions.getProjects
 		|| action === actions.getWorkPackages
 		|| action === actions.getAllWorkPackages
