@@ -19,14 +19,13 @@ function getBillingStatusList() {
 
 function getCategoryList() {
     return JSON.parse(`[{"id": "14", "name": "Audit"},
-    {"id": "15", "name": "Income Tax"},
-    {"id": "16", "name": "VAT"},
-    {"id": "17", "name": "Reverse Charge"},
     {"id": "18", "name": "Accountancy"},
     {"id": "19", "name": "Secretarial"},
     {"id": "20", "name": "Property Administration"},
-    {"id": "31", "name": "PTT"},
     {"id": "27", "name": "Tax"},
+    {"id": "15", "name": "Income Tax"},
+    {"id": "16", "name": "VAT"},
+    {"id": "17", "name": "Reverse Charge"},
     {"id": "21", "name": "PAYE"},
     {"id": "22", "name": "NAPSA"},
     {"id": "28", "name": "NHIMA"},
@@ -34,6 +33,8 @@ function getCategoryList() {
     {"id": "23", "name": "TOT"},
     {"id": "24", "name": "WHT"},
     {"id": "30", "name": "TLEVY"},
+    {"id": "31", "name": "PTT"},
+    {"id": "32", "name": "TP"},
     {"id": "25", "name": "Special Assignment"},
     {"id": "26", "name": "Non-billable"}]`)
 }
