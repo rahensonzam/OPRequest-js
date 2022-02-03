@@ -399,8 +399,8 @@ async function runActions() {
         localStorage.setItem("apiKeyStore", apiKey)
     }
 
-    weekBegin = dayjs(weekBegin, validDateFormats).format('YYYY-MM-DD')
-    dateEndPeriod = dayjs(dateEndPeriod, validDateFormats).format('YYYY-MM-DD')
+    weekBegin = dayjs(weekBegin, validDateFormats).format("YYYY-MM-DD")
+    dateEndPeriod = dayjs(dateEndPeriod, validDateFormats).format("YYYY-MM-DD")
 
     const stepFirstHalf = await runFirstHalf()
     if (stepFirstHalf.halt) {
@@ -433,10 +433,10 @@ async function runActions() {
             //         return
             //     }
             //     for (let i = 0; i <= myCsvFile.rows.length - 1; i++) {
-            //         $('#spreadsheet1')["jexcel"]('insertRow', myCsvFile.rows[i], 1)
+            //         $("#spreadsheet1").jexcel("insertRow", myCsvFile.rows[i], 1)
             //     }
-            //     $('#spreadsheet1')["jexcel"]('deleteRow', 0)
-            //     $('#spreadsheet1')["jexcel"]('deleteRow', 0)
+            //     $("#spreadsheet1").jexcel("deleteRow", 0)
+            //     $("#spreadsheet1").jexcel("deleteRow", 0)
             // }
         }
     }
@@ -460,10 +460,10 @@ async function runActions() {
             //         return
             //     }
             //     for (let i = 0; i <= myCsvFile.rows.length - 1; i++) {
-            //         $('#spreadsheet1')["jexcel"]('insertRow', myCsvFile.rows[i], 1)
+            //         $("#spreadsheet1").jexcel("insertRow", myCsvFile.rows[i], 1)
             //     }
-            //     $('#spreadsheet1')["jexcel"]('deleteRow', 0)
-            //     $('#spreadsheet1')["jexcel"]('deleteRow', 0)
+            //     $("#spreadsheet1").jexcel("deleteRow", 0)
+            //     $("#spreadsheet1").jexcel("deleteRow", 0)
             // }
         }
     }
@@ -557,14 +557,14 @@ function makeWeeklySpreadsheet(projectList, periodList, categoryList) {
         {editor: customDropDown1},
         {editor: customDropDown2},
         {editor: customDropDown3},
-        {type: 'text'},
-        {type: 'text'},
-        {type: 'text'},
-        {type: 'text'},
-        {type: 'text'},
-        {type: 'text'},
-        {type: 'text'},
-        {type: 'text'}
+        {type: "text"},
+        {type: "text"},
+        {type: "text"},
+        {type: "text"},
+        {type: "text"},
+        {type: "text"},
+        {type: "text"},
+        {type: "text"}
     ]
     const myColHeaders = ["client","period","category","nature of work","monday","tuesday","wednesday","thursday","friday","saturday","sunday"]
     const spreadsheetData = [
@@ -586,9 +586,9 @@ function makeDailySpreadsheet(projectList, periodList, categoryList) {
         {editor: customDropDown1},
         {editor: customDropDown2},
         {editor: customDropDown3},
-        {type: 'text'},
-        {type: 'text'},
-        {type: 'text'}
+        {type: "text"},
+        {type: "text"},
+        {type: "text"}
     ]
     const myColHeaders = ["client","period","category","nature of work","spent on (YYYY-MM-DD)","units"]
     const spreadsheetData = [
@@ -603,32 +603,32 @@ function makeDailySpreadsheet(projectList, periodList, categoryList) {
 function makeSpreadsheet(spreadsheetData, myCols, myColHeaders, myColWidths, projectList, periodList, categoryList) {
 
     const changed = function(obj, cell, val) {
-        const cellName = $(cell).prop('id').split('-')
+        const cellName = $(cell).prop("id").split("-")
 
         if (cellName[0] === "0") {
             if (!(projectList.includes(val))) {
-                $('#spreadsheet1')["jexcel"]('setStyle', 'A'+(Number(cellName[1])+1), 'background-color', 'yellow')
+                $("#spreadsheet1").jexcel("setStyle", "A"+(Number(cellName[1])+1), "background-color", "yellow")
             } else {
-                $('#spreadsheet1')["jexcel"]('setStyle', 'A'+(Number(cellName[1])+1), 'background-color', 'revert')
+                $("#spreadsheet1").jexcel("setStyle", "A"+(Number(cellName[1])+1), "background-color", "revert")
             }
         }
         if (cellName[0] === "1") {
             if (!(periodList.includes(val))) {
-                $('#spreadsheet1')["jexcel"]('setStyle', 'B'+(Number(cellName[1])+1), 'background-color', 'yellow')
+                $("#spreadsheet1").jexcel("setStyle", "B"+(Number(cellName[1])+1), "background-color", "yellow")
             } else {
-                $('#spreadsheet1')["jexcel"]('setStyle', 'B'+(Number(cellName[1])+1), 'background-color', 'revert')
+                $("#spreadsheet1").jexcel("setStyle", "B"+(Number(cellName[1])+1), "background-color", "revert")
             }
         }
         if (cellName[0] === "2") {
             if (!(categoryList.includes(val))) {
-                $('#spreadsheet1')["jexcel"]('setStyle', 'C'+(Number(cellName[1])+1), 'background-color', 'yellow')
+                $("#spreadsheet1").jexcel("setStyle", "C"+(Number(cellName[1])+1), "background-color", "yellow")
             } else {
-                $('#spreadsheet1')["jexcel"]('setStyle', 'C'+(Number(cellName[1])+1), 'background-color', 'revert')
+                $("#spreadsheet1").jexcel("setStyle", "C"+(Number(cellName[1])+1), "background-color", "revert")
             }
         }
     }
 
-    $('#spreadsheet1')["jexcel"]({
+    $("#spreadsheet1").jexcel({
         // csv: spreadsheetCsvFilename,
         // csvHeaders: true,
         data: spreadsheetData,
@@ -664,7 +664,7 @@ function getCustomDropDown(list) {
             $(editor).prop("class", "editor")
             $(editor).val(currentValue)
             $(editor).on("blur", function() {
-                $('#' + $.fn["jexcel"].current)["jexcel"]('closeEditor', $(cell), true)
+                $("#" + $.fn.jexcel.current).jexcel("closeEditor", $(cell), true)
             })
             // Create the instance of the plugin
             $(editor)
@@ -745,8 +745,8 @@ async function runSpreadsheetDone() {
     } else {
         writeToLog("CSV created", "log", logType.normal)
 
-        let initCsvFile = $('#spreadsheet1')["jexcel"]('getData')
-        let headers = $('#spreadsheet1')["jexcel"]('getHeaders', false)
+        let initCsvFile = $("#spreadsheet1").jexcel("getData")
+        let headers = $("#spreadsheet1").jexcel("getHeaders", false)
         // if (actionType = "sequenceweekly") {
         //     if (initCsvFile[0].length > 11) {
         //         initCsvFile = trimArray(initCsvFile, 11)
