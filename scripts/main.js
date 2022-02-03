@@ -18,25 +18,29 @@ import { actions, webErrorTypes, doActionAsync, webErrorsPresent } from "./OPReq
 // import * as Papa from "./libs/papaparse/papaparse.js"
 // import { $ } from "./libs/jquery/jquery-3.5.1.js"
 
-document.getElementById("single").addEventListener("click", showHideUI)
-document.getElementById("sequenceWeekly").addEventListener("click", showHideUI)
-document.getElementById("sequenceDaily").addEventListener("click", showHideUI)
-document.getElementById("sequenceExportExtract").addEventListener("click", showHideUI)
-document.getElementById("sequenceExportSummarizeUt").addEventListener("click", showHideUI)
-document.getElementById("sequenceExportSummarizeCat").addEventListener("click", showHideUI)
-document.getElementById("sequenceExportBreakdownCat").addEventListener("click", showHideUI)
-document.getElementById("sequenceExportBreakdownClient").addEventListener("click", showHideUI)
-document.getElementById("staticListsCheckbox").addEventListener("change", showHideUI)
-document.getElementById("csvCreate").addEventListener("click", showHideUI)
-document.getElementById("csvImport").addEventListener("click", showHideUI)
-document.getElementById("csvImport2").addEventListener("click", showHideUI)
-document.getElementById("enterPassword").addEventListener("click", fillApiKey)
-document.getElementById("user").addEventListener("change", checkApiKeyYellow)
-document.getElementById("go1Button").addEventListener("click", runActions)
-document.getElementById("go2Button").addEventListener("click", runSpreadsheetDone)
+const CLI = false
+
+function addDomEventListeners() {
+    getDomElementById("single").addEventListener("click", showHideUI)
+    getDomElementById("sequenceWeekly").addEventListener("click", showHideUI)
+    getDomElementById("sequenceDaily").addEventListener("click", showHideUI)
+    getDomElementById("sequenceExportExtract").addEventListener("click", showHideUI)
+    getDomElementById("sequenceExportSummarizeUt").addEventListener("click", showHideUI)
+    getDomElementById("sequenceExportSummarizeCat").addEventListener("click", showHideUI)
+    getDomElementById("sequenceExportBreakdownCat").addEventListener("click", showHideUI)
+    getDomElementById("sequenceExportBreakdownClient").addEventListener("click", showHideUI)
+    getDomElementById("staticListsCheckbox").addEventListener("change", showHideUI)
+    getDomElementById("csvCreate").addEventListener("click", showHideUI)
+    getDomElementById("csvImport").addEventListener("click", showHideUI)
+    getDomElementById("csvImport2").addEventListener("click", showHideUI)
+    getDomElementById("enterPassword").addEventListener("click", fillApiKey)
+    getDomElementById("user").addEventListener("change", checkApiKeyYellow)
+    getDomElementById("go1Button").addEventListener("click", runActions)
+    getDomElementById("go2Button").addEventListener("click", runSpreadsheetDone)
+}
 
 dayjs.extend(window.dayjs_plugin_customParseFormat)
-const logTextBox = document.getElementById("log").children[0]
+const logTextBox = getDomElementChildById("log")
 const validDateFormats = ["DD-MM-YYYY","DD/MM/YYYY"]
 let wpConvertUser
 const adminUser1 = getAdminUser1IdNumber()
@@ -102,17 +106,17 @@ const preReqTypes = {
 const billingStatusList = getBillingStatusList()
 
 $(function() {
-    if (localStorage.getItem("userStore") !== null) {
-        document.getElementById("user").value = localStorage.getItem("userStore")
-        document.getElementById("apiKeyBox").value = localStorage.getItem("apiKeyStore")
+    if (!CLI) {
+        addDomEventListeners()
     }
+    getLocalStorage()
 })
 
 function showHideUI() {
 
     actionType = getSelectedRadioButtonValue("actionType")
     csvType = getSelectedRadioButtonValue("csvType")
-    const staticListsCheckboxChecked = document.getElementById("staticListsCheckbox").checked
+    const staticListsCheckboxChecked = getDomElementCheckedStateById("staticListsCheckbox")
 
     if (actionType === actionTypes.single) {
         //showAction
@@ -239,7 +243,7 @@ function showHideUI() {
 }
 
 function showHideUtil(element, value) {
-    document.getElementById(element).style.display = value;
+    getDomElementById(element).style.display = value;
 }
 
 function showLoadFile() {
@@ -296,17 +300,33 @@ function hideLoading() {
     showHideUtil("loading", "none")
 }
 
+function getLocalStorage() {
+    if (!CLI) {
+        if (localStorage.getItem("userStore") !== null) {
+            setDomElementValueById("user", localStorage.getItem("userStore"))
+            setDomElementValueById("apiKeyBox", localStorage.getItem("apiKeyStore"))
+        }
+    }
+}
+
+function setLocalStorage() {
+    if (!CLI) {
+        localStorage.setItem("userStore", wpConvertUser)
+        localStorage.setItem("apiKeyStore", apiKey)
+    }
+}
+
 function apiKeyMakeYellow() {
-    document.getElementById("apiKeyBox").style.backgroundColor = "yellow"
+    setDomElementBackgroundColorById("apiKeyBox", "yellow")
 }
 
 function apiKeyRemoveYellow() {
-    document.getElementById("apiKeyBox").style.backgroundColor = "revert"
+    setDomElementBackgroundColorById("apiKeyBox", "revert")
 }
 
 function checkApiKeyYellow() {
-    const user = document.getElementById("user").value
-    const apiKeyRetrived = document.getElementById("apiKeyBox").value
+    const user = getDomElementValueById("user")
+    const apiKeyRetrived = getDomElementValueById("apiKeyBox")
     if (passwordAndApiKeyMatch(user, apiKeyRetrived)) {
         apiKeyRemoveYellow()
     } else {
@@ -315,13 +335,13 @@ function checkApiKeyYellow() {
 }
 
 function fillApiKey() {
-    const user = document.getElementById("user").value
-    const password = document.getElementById("passwordBox").value
+    const user = getDomElementValueById("user")
+    const password = getDomElementValueById("passwordBox")
     const apiKeyRetrived = passwordToApiKey(user, password)
 
     const preReq = checkPreReq(preReqTypes.password, user, apiKeyRetrived, "", "", "", "", "")
     if (preReq) {
-        document.getElementById("apiKeyBox").value = apiKeyRetrived
+        setDomElementValueById("apiKeyBox", apiKeyRetrived)
     }
     checkApiKeyYellow()
 }
@@ -339,7 +359,8 @@ async function runActions() {
     }
 
     if (firstHalfNotFirstTime) {
-        if (!(window.confirm("Run again from beginning, are you sure?"))) {
+        const msg = "Run again from beginning, are you sure?"
+        if (!(promptForConfirmation(msg))) {
             return
         } else {
             writeSeparatorToLog()
@@ -347,22 +368,23 @@ async function runActions() {
     }
 
     checkApiKeyYellow()
-    wpConvertUser = document.getElementById("user").value
-    apiKey = document.getElementById("apiKeyBox").value
-    weekBegin = document.getElementById("weekBeginBox").value
-    dateEndPeriod = document.getElementById("dateEndPeriodBox").value
-    numberOfWeeks = Number(document.getElementById("numberOfWeeksBox").value)
-    fileSelect = document.getElementById("fileSelect")
-    staticLists = document.getElementById("staticListsCheckbox").checked
-    filterToOneUserBool = document.getElementById("filterToOneUserCheckbox").checked
-    billingStatusReportFilter = document.getElementById("billingStatusReportFilterSelect").value
-    workPackageListFileSelect = document.getElementById("workPackageListFileSelect")
-    timeEntryListFileSelect = document.getElementById("timeEntryListFileSelect")
+    wpConvertUser = getDomElementValueById("user")
+    apiKey = getDomElementValueById("apiKeyBox")
+    weekBegin = getDomElementValueById("weekBeginBox")
+    dateEndPeriod = getDomElementValueById("dateEndPeriodBox")
+    numberOfWeeks = Number(getDomElementValueById("numberOfWeeksBox"))
+    fileSelect = getDomElementObjById("fileSelect")
+    staticLists = getDomElementCheckedStateById("staticListsCheckbox")
+    filterToOneUserBool = getDomElementCheckedStateById("filterToOneUserCheckbox")
+    billingStatusReportFilter = getDomElementValueById("billingStatusReportFilterSelect")
+    workPackageListFileSelect = getDomElementObjById("workPackageListFileSelect")
+    timeEntryListFileSelect = getDomElementObjById("timeEntryListFileSelect")
+    let fileSelectFile = getDomElementFileListFileById(fileSelect)
 
-    actionType = getSelectedRadioButtonValue("actionType")
-    csvType = getSelectedRadioButtonValue("csvType")
+    actionType = getRadioOptionValue("actionType")
+    csvType = getRadioOptionValue("csvType")
 
-    const preReq = checkPreReq(preReqTypes.sequence, wpConvertUser, apiKey, weekBegin, dateEndPeriod, numberOfWeeks, csvType, fileSelect.files[0])
+    const preReq = checkPreReq(preReqTypes.sequence, wpConvertUser, apiKey, weekBegin, dateEndPeriod, numberOfWeeks, csvType, fileSelectFile)
     if (!preReq) {
         return
     }
@@ -395,8 +417,7 @@ async function runActions() {
 
     if (!(wpConvertUser == adminUser1
         || wpConvertUser == adminUser2)) {
-        localStorage.setItem("userStore", wpConvertUser)
-        localStorage.setItem("apiKeyStore", apiKey)
+        setLocalStorage()
     }
 
     weekBegin = dayjs(weekBegin, validDateFormats).format("YYYY-MM-DD")
@@ -426,7 +447,7 @@ async function runActions() {
 
             // if (csvType === csvTypes.import) {
 
-            //     const myCsvFile = await parseCSVFile(fileSelect.files[0])
+            //     const myCsvFile = await parseCSVFile(fileSelectFile)
             //     //FIX: Move ad-hoc CSV Validation
             //     if (myCsvFile.rows[0].length !== 11) {
             //         console.error("imported CSV wrong number of columns")
@@ -453,7 +474,7 @@ async function runActions() {
             makeDailySpreadsheet(justProjectNamesList, periodList, justCategoryNamesList)
 
             // if (csvType === csvTypes.import) {
-            //     const myCsvFile = await parseCSVFile(fileSelect.files[0])
+            //     const myCsvFile = await parseCSVFile(fileSelectFile)
             //     //FIX: Move ad-hoc CSV Validation
             //     if (myCsvFile.rows[0].length !== 6) {
             //         console.error("imported CSV wrong number of columns")
@@ -475,12 +496,13 @@ async function runActions() {
 }
 
 async function runSingleAction() {
-    const actionSelectAction = document.getElementById("actionSelect").value
-    const logDataBool = document.getElementById("actionSelectLogCheckbox").checked
+    const actionSelectAction = getDomElementValueById("actionSelect")
+    const logDataBool = getDomElementCheckedStateById("actionSelectLogCheckbox")
+    let fileSelectFile = getDomElementFileListFileById(fileSelect)
     const actionListArray = []
     const actionListOptionsArray = [
         // eslint-disable-next-line no-unused-vars
-        function(actionListArray) {return {action: actionSelectAction, logValue: `step: 1 action: ${actionSelectAction}`, myCsvFileObj: fileSelect.files[0], logDataBool}},
+        function(actionListArray) {return {action: actionSelectAction, logValue: `step: 1 action: ${actionSelectAction}`, myCsvFileObj: fileSelectFile, logDataBool}},
     ]
 
     for (let i = 0; i <= actionListOptionsArray.length - 1; i++) {
@@ -707,7 +729,7 @@ async function runSpreadsheetDone() {
             msg = "Run again, are you sure?"
         }
 
-        if (!(window.confirm(msg))) {
+        if (!(promptForConfirmation(msg))) {
             return
         }
     }
@@ -736,9 +758,9 @@ async function runSpreadsheetDone() {
     let initCsvFileString
 
     if (csvType === csvTypes.import2) {
-        writeToLog(`${fileSelect.files[0].name} CSV imported`, "log", logType.normal)
+        writeToLog(`${getDomElementFileListFilenameById(fileSelect)} CSV imported`, "log", logType.normal)
 
-        initCsvFileString = fileSelect.files[0]
+        initCsvFileString = getDomElementFileListFileById(fileSelect)
 
         //writeToLog(initCsvFileString.toString, "output", logType.normal)
         //console.log(initCsvFileString)
@@ -915,10 +937,12 @@ async function runSecondHalf(initCsvFileString) {
             }
         } else {
             logFakeAction("step: 2/4 action: getWorkPackages", true)
-            workPackageList = JSON.parse(await readFileReaderAsync(workPackageListFileSelect.files[0]))
+            let workPackageListFileSelectFile = getDomElementFileListFileById(workPackageListFileSelect)
+            workPackageList = JSON.parse(await readFileReaderAsync(workPackageListFileSelectFile))
 
             logFakeAction("step: 3/4 action: getTimeEntries", true)
-            timeEntryList = JSON.parse(await readFileReaderAsync(timeEntryListFileSelect.files[0]))
+            let timeEntryListFileSelectFile = getDomElementFileListFileById(timeEntryListFileSelect)
+            timeEntryList = JSON.parse(await readFileReaderAsync(timeEntryListFileSelectFile))
         }
 
         for (let i = 4; i <= actionListOptionsArray.length - 1; i++) {
@@ -1132,8 +1156,8 @@ async function parseCSVFile(myCsvFileObj) {
 
     //TODO: Validate CSV data here
 
-    //writeToLog(`${fileSelect.files[0].name} CSV loaded`, "log", logType.normal)
-    //console.log(`${fileSelect.files[0].name} CSV loaded`)
+    //writeToLog(`${getDomElementFileListFilenameById(fileSelect)} CSV loaded`, "log", logType.normal)
+    //console.log(`${getDomElementFileListFilenameById(fileSelect)} CSV loaded`)
     writeToLog("CSV loaded", "log", logType.normal)
     console.log("CSV loaded")
 
@@ -1160,6 +1184,22 @@ async function readFileReaderAsync(file) {
     })
 }
 
+function promptForConfirmation(msg) {
+    if (!CLI) {
+        return displayAlert(msg)
+    }
+}
+
+function displayAlert(msg) {
+    return window.confirm(msg)
+}
+
+function getRadioOptionValue(radioGroupName) {
+    if (!CLI) {
+        return getSelectedRadioButtonValue(radioGroupName)
+    }
+}
+
 function getSelectedRadioButtonValue(radioGroupName) {
     const radioGroup = document.getElementsByName(radioGroupName)
     for (let i = 0; i <= radioGroup.length - 1; i++) {
@@ -1167,6 +1207,58 @@ function getSelectedRadioButtonValue(radioGroupName) {
             return radioGroup[i].value
         }
     }
+}
+
+function getDomElementFileListFilenameById(eleName) {
+    if (!CLI) {
+        return getDomElementFileListFileById(eleName).name
+    }
+}
+
+function getDomElementFileListFileById(eleName) {
+    if (!CLI) {
+        return eleName.files[0]
+    }
+}
+
+function getDomElementObjById(eleName) {
+    if (!CLI) {
+        return getDomElementById(eleName)
+    }
+}
+
+function setDomElementBackgroundColorById(eleName, val) {
+    if (!CLI) {
+        getDomElementById(eleName).style.backgroundColor = val
+    }
+}
+
+function getDomElementChildById(eleName) {
+    if (!CLI) {
+        return getDomElementById(eleName).children[0]
+    }
+}
+
+function getDomElementCheckedStateById(eleName) {
+    if (!CLI) {
+        return getDomElementById(eleName).checked
+    }
+}
+
+function setDomElementValueById(eleName, val) {
+    if (!CLI) {
+        getDomElementById(eleName).value = val
+    }
+}
+
+function getDomElementValueById(eleName) {
+    if (!CLI) {
+        return getDomElementById(eleName).value
+    }
+}
+
+function getDomElementById(eleName) {
+    return document.getElementById(eleName)
 }
 
 function conversionErrorsPresent(resultArray) {
@@ -1409,6 +1501,12 @@ function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, numberO
 }
 
 function writeToLog(logValue, logFirstColumn, type) {
+    if (!CLI) {
+        return writeToLogDom(logValue, logFirstColumn, type)
+    }
+}
+
+function writeToLogDom(logValue, logFirstColumn, type) {
     const logElement = document.createElement("span")
     logElement.setAttribute("class", type)
     logElement.innerHTML = `<span class="cell"><!----></span><span class="cell content"><!----></span>`
