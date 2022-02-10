@@ -407,7 +407,7 @@ function getCustomDropDown(list) {
     }
 }
 
-function getSpreedsheetData() {
+function getSpreedsheetBody() {
     return $("#spreadsheet1").jexcel("getData")
 }
 
@@ -454,4 +454,4 @@ function writeToLogDom(logValue, logFirstColumn, type) {
     logTextBox.parentElement.scrollTop = logTextBox.parentElement.scrollHeight
 }
 
-export { addDomEventListeners, showSpreadsheet, showLoadingUI, hideLoadingUI, getLocalStorage, setLocalStorage, checkApiKeyYellow, makeWeeklySpreadsheet, makeDailySpreadsheet, makeSpreadsheet, getSpreedsheetData, getSpreedsheetHeaders, getSelectedRadioButtonValue, displayAlert, getDomElementById, writeToLogDom }
+export { addDomEventListeners, showSpreadsheet, showLoadingUI, hideLoadingUI, getLocalStorage, setLocalStorage, checkApiKeyYellow, makeWeeklySpreadsheet, makeDailySpreadsheet, makeSpreadsheet, getSpreedsheetBody, getSpreedsheetHeaders, getSelectedRadioButtonValue, displayAlert, getDomElementById, writeToLogDom }

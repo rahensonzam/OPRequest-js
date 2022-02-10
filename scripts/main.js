@@ -23,7 +23,7 @@ import {
     makeWeeklySpreadsheet,
     makeDailySpreadsheet,
     makeSpreadsheet,
-    getSpreedsheetData,
+    getSpreedsheetBody,
     getSpreedsheetHeaders,
     getSelectedRadioButtonValue,
     displayAlert,
@@ -326,7 +326,7 @@ async function runSpreadsheetDone() {
         } else {
             writeToLog("CSV created", "log", logType.normal)
 
-            let initCsvFile = getSpreedsheetData()
+            let initCsvFile = getSpreedsheetBody()
             let headers = getSpreedsheetHeaders()
             // if (actionType = "sequenceweekly") {
             //     if (initCsvFile[0].length > 11) {
