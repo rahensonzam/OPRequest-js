@@ -151,19 +151,6 @@ async function runActions() {
     firstHalfRunning = true
     firstHalfSucessful = false
 
-    //TODO: Individual Action diverts here
-    if (actionType === actionTypes.single) {
-        showLoading()
-        const currentStep = await runSingleAction()
-        hideLoading()
-        firstHalfRunning = false
-        if (currentStep.halt) {
-            return
-        }
-        // firstHalfSucessful = true
-        return
-    }
-
     if (actionType === actionTypes.sequenceWeekly
         || actionType === actionTypes.sequenceDaily) {
         if (csvType === csvTypes.create) {
@@ -173,25 +160,29 @@ async function runActions() {
 
     showLoading()
 
-    if (!(wpConvertUser == adminUser1
-        || wpConvertUser == adminUser2)) {
-            if (!CLI) {
-                setLocalStorage()
-            }
+    let justProjectNamesList
+    let justCategoryNamesList
+    if (!(actionType === actionTypes.single)) {    
+        if (!(wpConvertUser == adminUser1
+            || wpConvertUser == adminUser2)) {
+                if (!CLI) {
+                    setLocalStorage()
+                }
+        }
+
+        weekBegin = dayjs(weekBegin, validDateFormats).format("YYYY-MM-DD")
+        dateEndPeriod = dayjs(dateEndPeriod, validDateFormats).format("YYYY-MM-DD")
+
+        const stepFirstHalf = await runFirstHalf()
+        if (stepFirstHalf.halt) {
+            hideLoading()
+            firstHalfRunning = false
+            return
+        }
+
+        justProjectNamesList = getJustNames(projectList, true)
+        justCategoryNamesList = getJustNames(categoryList, false)
     }
-
-    weekBegin = dayjs(weekBegin, validDateFormats).format("YYYY-MM-DD")
-    dateEndPeriod = dayjs(dateEndPeriod, validDateFormats).format("YYYY-MM-DD")
-
-    const stepFirstHalf = await runFirstHalf()
-    if (stepFirstHalf.halt) {
-        hideLoading()
-        firstHalfRunning = false
-        return
-    }
-
-    const justProjectNamesList = getJustNames(projectList, true)
-    const justCategoryNamesList = getJustNames(categoryList, false)
 
     if (actionType === actionTypes.sequenceWeekly) {
         writeToLog("step: 2/8 action: csvInput", "step", logType.step)
@@ -222,10 +213,21 @@ async function runActions() {
 
         }
     }
+    if (actionType === actionTypes.single) {
+        const currentStep = await runSingleAction()
+        if (currentStep.halt) {
+            firstHalfRunning = false
+            return
+        }
+    }
 
     hideLoading()
     firstHalfRunning = false
     firstHalfSucessful = true
+
+    if (actionType === actionTypes.single) {
+        runSpreadsheetDone()
+    }
 
 }
 
@@ -308,65 +310,62 @@ async function runSpreadsheetDone() {
 
     // hideSpreadsheet()
 
+    showLoading()
+
+    if (actionType === actionTypes.sequenceWeekly
+        || actionType === actionTypes.sequenceDaily) {
+        let initCsvFileString
+
+        if (csvType === csvTypes.import2) {
+            writeToLog(`${getDomElementFileListFilenameById(fileSelect)} CSV imported`, "log", logType.normal)
+
+            initCsvFileString = getDomElementFileListFileById(fileSelect)
+
+            //writeToLog(initCsvFileString.toString, "output", logType.normal)
+            //console.log(initCsvFileString)
+        } else {
+            writeToLog("CSV created", "log", logType.normal)
+
+            let initCsvFile = getSpreedsheetData()
+            let headers = getSpreedsheetHeaders()
+            // if (actionType = "sequenceweekly") {
+            //     if (initCsvFile[0].length > 11) {
+            //         initCsvFile = trimArray(initCsvFile, 11)
+            //         headers = trimArray(headers, 11)
+            //     }
+            // } else if (actionType = "sequencedaily") {
+            //     if (initCsvFile[0].length > 6) {
+            //         initCsvFile = trimArray(initCsvFile, 6)
+            //         headers = trimArray(headers, 6)
+            //     }
+            // }
+
+            const temp = arrayToCsv(initCsvFile)
+            let tempHeaders = `"${headers.join(`","`)}"`
+            // FIXME: Do this properly: Get headers from validation collection
+            tempHeaders = tempHeaders.replaceAll("nature of work","natureOfWork")
+            tempHeaders = tempHeaders.replaceAll("spent on (YYYY-MM-DD)","spentOn")
+            initCsvFileString = `${tempHeaders}\r\n${temp}`
+            // const tempHeaders = arrayToCsv([headers])
+            // initCsvFileString = `${tempHeaders}\r\n${temp}`
+            console.log(initCsvFileString)
+
+            writeToLog(initCsvFileString, "output", logType.normal)
+            // console.log(initCsvFileString)
+        }
+
+        writeToLog("step: 2/8 action: csvInput completed successfully", "step", logType.finished)
+        console.log("step: 2/8 action: csvInput completed successfully")
+
+        await runSecondHalf(initCsvFileString)
+    }
     if (actionType === actionTypes.sequenceExportExtract
         || actionType === actionTypes.sequenceExportSummarizeUt
         || actionType === actionTypes.sequenceExportSummarizeCat
         || actionType === actionTypes.sequenceExportBreakdownCat
         || actionType === actionTypes.sequenceExportBreakdownClient) {
-        showLoading()
         await runSecondHalf("")
-
-        hideLoading()
-        secondHalfRunning = false
-        return
     }
-
-    showLoading()
-
-    let initCsvFileString
-
-    if (csvType === csvTypes.import2) {
-        writeToLog(`${getDomElementFileListFilenameById(fileSelect)} CSV imported`, "log", logType.normal)
-
-        initCsvFileString = getDomElementFileListFileById(fileSelect)
-
-        //writeToLog(initCsvFileString.toString, "output", logType.normal)
-        //console.log(initCsvFileString)
-    } else {
-        writeToLog("CSV created", "log", logType.normal)
-
-        let initCsvFile = getSpreedsheetData()
-        let headers = getSpreedsheetHeaders()
-        // if (actionType = "sequenceweekly") {
-        //     if (initCsvFile[0].length > 11) {
-        //         initCsvFile = trimArray(initCsvFile, 11)
-        //         headers = trimArray(headers, 11)
-        //     }
-        // } else if (actionType = "sequencedaily") {
-        //     if (initCsvFile[0].length > 6) {
-        //         initCsvFile = trimArray(initCsvFile, 6)
-        //         headers = trimArray(headers, 6)
-        //     }
-        // }
-
-        const temp = arrayToCsv(initCsvFile)
-        let tempHeaders = `"${headers.join(`","`)}"`
-        // FIXME: Do this properly: Get headers from validation collection
-        tempHeaders = tempHeaders.replaceAll("nature of work","natureOfWork")
-        tempHeaders = tempHeaders.replaceAll("spent on (YYYY-MM-DD)","spentOn")
-        initCsvFileString = `${tempHeaders}\r\n${temp}`
-        // const tempHeaders = arrayToCsv([headers])
-        // initCsvFileString = `${tempHeaders}\r\n${temp}`
-        console.log(initCsvFileString)
-
-        writeToLog(initCsvFileString, "output", logType.normal)
-        // console.log(initCsvFileString)
-    }
-
-    writeToLog("step: 2/8 action: csvInput completed successfully", "step", logType.finished)
-    console.log("step: 2/8 action: csvInput completed successfully")
-
-    await runSecondHalf(initCsvFileString)
 
     hideLoading()
     secondHalfRunning = false
