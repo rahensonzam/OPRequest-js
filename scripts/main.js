@@ -23,8 +23,7 @@ import {
     makeWeeklySpreadsheet,
     makeDailySpreadsheet,
     makeSpreadsheet,
-    getSpreedsheetBody,
-    getSpreedsheetHeaders,
+    getSpreedsheetData,
     getSelectedRadioButtonValue,
     displayAlert,
     getDomElementById,
@@ -312,9 +311,9 @@ async function runSpreadsheetDone() {
 
     showLoading()
 
+    let initCsvFileString
     if (actionType === actionTypes.sequenceWeekly
         || actionType === actionTypes.sequenceDaily) {
-        let initCsvFileString
 
         if (csvType === csvTypes.import2) {
             writeToLog(`${getDomElementFileListFilenameById(fileSelect)} CSV imported`, "log", logType.normal)
@@ -326,69 +325,29 @@ async function runSpreadsheetDone() {
         } else {
             writeToLog("CSV created", "log", logType.normal)
 
-            let initCsvFile = getSpreedsheetBody()
-            let headers = getSpreedsheetHeaders()
-            // if (actionType = "sequenceweekly") {
-            //     if (initCsvFile[0].length > 11) {
-            //         initCsvFile = trimArray(initCsvFile, 11)
-            //         headers = trimArray(headers, 11)
-            //     }
-            // } else if (actionType = "sequencedaily") {
-            //     if (initCsvFile[0].length > 6) {
-            //         initCsvFile = trimArray(initCsvFile, 6)
-            //         headers = trimArray(headers, 6)
-            //     }
-            // }
+            initCsvFileString = getSpreedsheetData()
 
-            const temp = arrayToCsv(initCsvFile)
-            let tempHeaders = `"${headers.join(`","`)}"`
-            // FIXME: Do this properly: Get headers from validation collection
-            tempHeaders = tempHeaders.replaceAll("nature of work","natureOfWork")
-            tempHeaders = tempHeaders.replaceAll("spent on (YYYY-MM-DD)","spentOn")
-            initCsvFileString = `${tempHeaders}\r\n${temp}`
-            // const tempHeaders = arrayToCsv([headers])
-            // initCsvFileString = `${tempHeaders}\r\n${temp}`
             console.log(initCsvFileString)
-
             writeToLog(initCsvFileString, "output", logType.normal)
-            // console.log(initCsvFileString)
         }
 
         writeToLog("step: 2/8 action: csvInput completed successfully", "step", logType.finished)
         console.log("step: 2/8 action: csvInput completed successfully")
-
-        await runSecondHalf(initCsvFileString)
     }
     if (actionType === actionTypes.sequenceExportExtract
         || actionType === actionTypes.sequenceExportSummarizeUt
         || actionType === actionTypes.sequenceExportSummarizeCat
         || actionType === actionTypes.sequenceExportBreakdownCat
         || actionType === actionTypes.sequenceExportBreakdownClient) {
-        await runSecondHalf("")
+        initCsvFileString = ""
+    }
+    //FIXME: Hack, needs rearranging
+    if (!(actionType === actionTypes.single)) {
+        await runSecondHalf(initCsvFileString)
     }
 
     hideLoading()
     secondHalfRunning = false
-}
-
-// function trimArray(initCsvFile, numOfColumns) {
-//     const temp = []
-
-//     for (let i = 0; i <= initCsvFile.length - 1; i++) {
-//         temp.push(initCsvFile[i].slice(0, numOfColumns))
-//     }
-//     return temp
-// }
-
-function arrayToCsv(initCsvFile) {
-    const tempOuter = []
-
-    for (let i = 0; i <= initCsvFile.length - 1; i++) {
-        const tempInner = []
-        tempInner.push(`"${initCsvFile[i].join(`","`)}"`)
-        tempOuter.push(tempInner)
-    }
-    return tempOuter.join("\r\n")
 }
 
 async function runSecondHalf(initCsvFileString) {

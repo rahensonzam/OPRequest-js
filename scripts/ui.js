@@ -407,6 +407,51 @@ function getCustomDropDown(list) {
     }
 }
 
+function getSpreedsheetData() {
+    let initCsvFile = getSpreedsheetBody()
+    let headers = getSpreedsheetHeaders()
+    // if (actionType = "sequenceweekly") {
+    //     if (initCsvFile[0].length > 11) {
+    //         initCsvFile = trimArray(initCsvFile, 11)
+    //         headers = trimArray(headers, 11)
+    //     }
+    // } else if (actionType = "sequencedaily") {
+    //     if (initCsvFile[0].length > 6) {
+    //         initCsvFile = trimArray(initCsvFile, 6)
+    //         headers = trimArray(headers, 6)
+    //     }
+    // }
+
+    const temp = arrayToCsv(initCsvFile)
+    let tempHeaders = `"${headers.join(`","`)}"`
+    // FIXME: Do this properly: Get headers from validation collection
+    tempHeaders = tempHeaders.replaceAll("nature of work","natureOfWork")
+    tempHeaders = tempHeaders.replaceAll("spent on (YYYY-MM-DD)","spentOn")
+    return `${tempHeaders}\r\n${temp}`
+    // const tempHeaders = arrayToCsv([headers])
+    // return = `${tempHeaders}\r\n${temp}`
+}
+
+// function trimArray(initCsvFile, numOfColumns) {
+//     const temp = []
+
+//     for (let i = 0; i <= initCsvFile.length - 1; i++) {
+//         temp.push(initCsvFile[i].slice(0, numOfColumns))
+//     }
+//     return temp
+// }
+
+function arrayToCsv(initCsvFile) {
+    const tempOuter = []
+
+    for (let i = 0; i <= initCsvFile.length - 1; i++) {
+        const tempInner = []
+        tempInner.push(`"${initCsvFile[i].join(`","`)}"`)
+        tempOuter.push(tempInner)
+    }
+    return tempOuter.join("\r\n")
+}
+
 function getSpreedsheetBody() {
     return $("#spreadsheet1").jexcel("getData")
 }
@@ -454,4 +499,4 @@ function writeToLogDom(logValue, logFirstColumn, type) {
     logTextBox.parentElement.scrollTop = logTextBox.parentElement.scrollHeight
 }
 
-export { addDomEventListeners, showSpreadsheet, showLoadingUI, hideLoadingUI, getLocalStorage, setLocalStorage, checkApiKeyYellow, makeWeeklySpreadsheet, makeDailySpreadsheet, makeSpreadsheet, getSpreedsheetBody, getSpreedsheetHeaders, getSelectedRadioButtonValue, displayAlert, getDomElementById, writeToLogDom }
+export { addDomEventListeners, showSpreadsheet, showLoadingUI, hideLoadingUI, getLocalStorage, setLocalStorage, checkApiKeyYellow, makeWeeklySpreadsheet, makeDailySpreadsheet, makeSpreadsheet, getSpreedsheetData, getSelectedRadioButtonValue, displayAlert, getDomElementById, writeToLogDom }
