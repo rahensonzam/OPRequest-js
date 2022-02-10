@@ -123,25 +123,6 @@ function hideLoading() {
 
 async function runActions() {
 
-    // FIXME: integrate into checkPreReq()
-    if (firstHalfRunning === true) {
-        return
-    }
-
-    if (firstHalfUsingSpreadsheet === true) {
-        writeToLog(`error: In order to run again, reload the page. Otherwise you may continue.`, "error", logType.error)
-        return
-    }
-
-    if (firstHalfNotFirstTime) {
-        const msg = "Run again from beginning, are you sure?"
-        if (!(promptForConfirmation(msg))) {
-            return
-        } else {
-            writeSeparatorToLog()
-        }
-    }
-
     if (!CLI) {
         checkApiKeyYellow()
     }
@@ -320,19 +301,6 @@ async function runSpreadsheetDone() {
         return
     }
 
-    if (secondHalfNotFirstTime) {
-        let msg = ""
-        if (actionType === actionTypes.sequenceWeekly
-            || actionType === actionTypes.sequenceDaily) {
-            msg = "If time entries have already been entered,\nthis will enter time entries again."
-        } else {
-            msg = "Run again, are you sure?"
-        }
-
-        if (!(promptForConfirmation(msg))) {
-            return
-        }
-    }
     secondHalfNotFirstTime = true
 
     secondHalfRunning = true
@@ -977,6 +945,22 @@ function writeSeparatorToLog() {
 
 function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, numberOfWeeks, csvType, selectedFile) {
     if (preReqType === preReqTypes.sequence) {
+        if (firstHalfRunning === true) {
+            return false
+        }
+        if (firstHalfUsingSpreadsheet === true) {
+            writeToLog(`error: In order to run again, reload the page. Otherwise you may continue.`, "error", logType.error)
+            return false
+        }
+        if (firstHalfNotFirstTime) {
+            const msg = "Run again from beginning, are you sure?"
+            if (!(promptForConfirmation(msg))) {
+                return false
+            } else {
+                writeSeparatorToLog()
+            }
+        }
+
         if (actionType === actionTypes.sequenceWeekly
             || actionType === actionTypes.sequenceDaily) {
             if (user === "-1") {
@@ -1046,6 +1030,19 @@ function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, numberO
             && actionType !== actionTypes.sequenceDaily) {
             if (firstHalfSucessful === false) {
                 writeToLog(`error: Sucessfully run "Go 1" first`, "error", logType.error)
+                return false
+            }
+        }
+        if (secondHalfNotFirstTime) {
+            let msg = ""
+            if (actionType === actionTypes.sequenceWeekly
+                || actionType === actionTypes.sequenceDaily) {
+                msg = "If time entries have already been entered,\nthis will enter time entries again."
+            } else {
+                msg = "Run again, are you sure?"
+            }
+    
+            if (!(promptForConfirmation(msg))) {
                 return false
             }
         }
