@@ -407,6 +407,14 @@ function getCustomDropDown(list) {
     }
 }
 
+function getSpreedsheetData() {
+    return $("#spreadsheet1").jexcel("getData")
+}
+
+function getSpreedsheetHeaders() {
+    return $("#spreadsheet1").jexcel("getHeaders", false)
+}
+
 function getSelectedRadioButtonValue(radioGroupName) {
     const radioGroup = document.getElementsByName(radioGroupName)
     for (let i = 0; i <= radioGroup.length - 1; i++) {
@@ -446,4 +454,4 @@ function writeToLogDom(logValue, logFirstColumn, type) {
     logTextBox.parentElement.scrollTop = logTextBox.parentElement.scrollHeight
 }
 
-export { addDomEventListeners, showSpreadsheet, showLoadingUI, hideLoadingUI, getLocalStorage, setLocalStorage, checkApiKeyYellow, makeWeeklySpreadsheet, makeDailySpreadsheet, makeSpreadsheet, getSelectedRadioButtonValue, displayAlert, getDomElementById, writeToLogDom }
+export { addDomEventListeners, showSpreadsheet, showLoadingUI, hideLoadingUI, getLocalStorage, setLocalStorage, checkApiKeyYellow, makeWeeklySpreadsheet, makeDailySpreadsheet, makeSpreadsheet, getSpreedsheetData, getSpreedsheetHeaders, getSelectedRadioButtonValue, displayAlert, getDomElementById, writeToLogDom }

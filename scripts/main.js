@@ -23,6 +23,8 @@ import {
     makeWeeklySpreadsheet,
     makeDailySpreadsheet,
     makeSpreadsheet,
+    getSpreedsheetData,
+    getSpreedsheetHeaders,
     getSelectedRadioButtonValue,
     displayAlert,
     getDomElementById,
@@ -365,8 +367,8 @@ async function runSpreadsheetDone() {
     } else {
         writeToLog("CSV created", "log", logType.normal)
 
-        let initCsvFile = $("#spreadsheet1").jexcel("getData")
-        let headers = $("#spreadsheet1").jexcel("getHeaders", false)
+        let initCsvFile = getSpreedsheetData()
+        let headers = getSpreedsheetHeaders()
         // if (actionType = "sequenceweekly") {
         //     if (initCsvFile[0].length > 11) {
         //         initCsvFile = trimArray(initCsvFile, 11)
