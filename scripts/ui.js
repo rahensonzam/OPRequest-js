@@ -316,6 +316,27 @@ function makeDailySpreadsheet(projectList, periodList, categoryList) {
     makeSpreadsheet(spreadsheetData, myCols, myColHeaders, myColWidths, projectList, periodList, categoryList)
 }
 
+function makeFeeNoteSpreadsheet() {
+
+    const myCols = [
+        { type: "text" },
+        { type: "text" },
+        { type: "text" },
+        { type: "text" },
+        { type: "text" },
+        { type: "text" },
+        { type: "text" }
+    ]
+    const myColHeaders = ["fee note date", "fee note client name", "fee note period", "fee note category", "invoice number", "fee note fees", "description"]
+    const spreadsheetData = [
+        ["", "", "", "", "", "", ""],
+        ["", "", "", "", "", "", ""]
+    ]
+    const myColWidths = [100, 200, 120, 170, 120, 100, 200]
+
+    makeSpreadsheet2(spreadsheetData, myCols, myColHeaders, myColWidths)
+}
+
 function makeSpreadsheet(spreadsheetData, myCols, myColHeaders, myColWidths, projectList, periodList, categoryList) {
 
     const changed = function (obj, cell, val) {
@@ -353,6 +374,19 @@ function makeSpreadsheet(spreadsheetData, myCols, myColHeaders, myColWidths, pro
         columns: myCols,
         colWidths: myColWidths,
         onchange: changed
+    })
+}
+
+function makeSpreadsheet2(spreadsheetData, myCols, myColHeaders, myColWidths) {
+
+    $("#spreadsheet1").jexcel({
+        // csv: spreadsheetCsvFilename,
+        // csvHeaders: true,
+        data: spreadsheetData,
+        colHeaders: myColHeaders,
+        //tableOverflow: true,
+        columns: myCols,
+        colWidths: myColWidths,
     })
 }
 
@@ -427,6 +461,12 @@ function getSpreedsheetData() {
     // FIXME: Do this properly: Get headers from validation collection
     tempHeaders = tempHeaders.replaceAll("nature of work", "natureOfWork")
     tempHeaders = tempHeaders.replaceAll("spent on (YYYY-MM-DD)", "spentOn")
+    tempHeaders = tempHeaders.replaceAll("fee note date", "feeNoteDate")
+    tempHeaders = tempHeaders.replaceAll("fee note client name", "feeNoteClientName")
+    tempHeaders = tempHeaders.replaceAll("fee note period", "feeNotePeriod")
+    tempHeaders = tempHeaders.replaceAll("fee note category", "feeNoteCategory")
+    tempHeaders = tempHeaders.replaceAll("fee note fees", "feeNoteFees")
+    tempHeaders = tempHeaders.replaceAll("invoice number", "subject")
     return `${tempHeaders}\r\n${temp}`
     // const tempHeaders = arrayToCsv([headers])
     // return = `${tempHeaders}\r\n${temp}`
@@ -499,4 +539,4 @@ function writeToLogDom(logValue, logFirstColumn, type) {
     logTextBox.parentElement.scrollTop = logTextBox.parentElement.scrollHeight
 }
 
-export { addDomEventListeners, showSpreadsheet, showLoadingUI, hideLoadingUI, getLocalStorage, setLocalStorage, checkApiKeyYellow, makeWeeklySpreadsheet, makeDailySpreadsheet, makeSpreadsheet, getSpreedsheetData, getSelectedRadioButtonValue, displayAlert, getDomElementById, writeToLogDom }
+export { addDomEventListeners, showSpreadsheet, showLoadingUI, hideLoadingUI, getLocalStorage, setLocalStorage, checkApiKeyYellow, makeWeeklySpreadsheet, makeDailySpreadsheet, makeFeeNoteSpreadsheet, makeSpreadsheet, makeSpreadsheet2, getSpreedsheetData, getSelectedRadioButtonValue, displayAlert, getDomElementById, writeToLogDom }

@@ -10,7 +10,8 @@ import {
     getCategoryList,
     getUserList,
     addGradeOrderToUserList,
-    getPeriodList
+    getPeriodList,
+    getFeeNotesProjectID
 } from "./otherConfigAndData.js"
 import {
     addDomEventListeners,
@@ -22,7 +23,9 @@ import {
     checkApiKeyYellow,
     makeWeeklySpreadsheet,
     makeDailySpreadsheet,
+    makeFeeNoteSpreadsheet,
     makeSpreadsheet,
+    makeSpreadsheet2,
     getSpreedsheetData,
     getSelectedRadioButtonValue,
     displayAlert,
@@ -212,6 +215,20 @@ async function runActions() {
 
         }
     }
+    if (actionType === actionTypes.sequenceFeeNote) {
+        writeToLog("step: 2/8 action: csvInput", "step", logType.step)
+        console.log("step: 2/8 action: csvInput")
+
+        if (csvType === csvTypes.create
+            || csvType === csvTypes.import) {
+
+            if (!CLI) {
+                showSpreadsheet()
+
+                makeFeeNoteSpreadsheet()
+            }
+        }
+    }
     if (actionType === actionTypes.single) {
         const currentStep = await runSingleAction()
         if (currentStep.halt) {
@@ -332,7 +349,8 @@ async function runSpreadsheetDone() {
 
 function setHasInitCsvFileString() {
     if (actionType === actionTypes.sequenceWeekly
-        || actionType === actionTypes.sequenceDaily) {
+        || actionType === actionTypes.sequenceDaily
+        || actionType === actionTypes.sequenceFeeNote) {
         return true
     }
     if (actionType === actionTypes.sequenceExportExtract
@@ -347,6 +365,7 @@ function setHasInitCsvFileString() {
 function setDoRunSecondHalf() {
     if (actionType === actionTypes.sequenceWeekly
         || actionType === actionTypes.sequenceDaily
+        || actionType === actionTypes.sequenceFeeNote
         || actionType === actionTypes.sequenceExportExtract
         || actionType === actionTypes.sequenceExportSummarizeUt
         || actionType === actionTypes.sequenceExportSummarizeCat
@@ -367,12 +386,19 @@ async function setInitCsvFileString() {
 
         initCsvFileString = getDomElementFileListFileById(fileSelect)
 
+        if (actionType === actionTypes.sequenceFeeNote) {
+            initCsvFileString = await addColumnsToFeeNoteCsv(initCsvFileString)
+        }
         //writeToLog(initCsvFileString.toString, "output", logType.normal)
         //console.log(initCsvFileString)
     } else {
         writeToLog("CSV created", "log", logType.normal)
 
         initCsvFileString = getSpreedsheetData()
+
+        if (actionType === actionTypes.sequenceFeeNote) {
+            initCsvFileString = await addColumnsToFeeNoteCsv(initCsvFileString)
+        }
 
         console.log(initCsvFileString)
         writeToLog(initCsvFileString, "output", logType.normal)
@@ -382,6 +408,17 @@ async function setInitCsvFileString() {
     console.log("step: 2/8 action: csvInput completed successfully")
 
     return initCsvFileString
+}
+
+async function addColumnsToFeeNoteCsv(inputCsvString) {
+    const myCsvObj = await parseCSVFile(inputCsvString)
+    const myCsvArray = myCsvObj.rows
+    const tempArray = []
+    for (let i = 0; i <= myCsvArray.length - 1; i++) {
+        tempArray.push({ ...myCsvArray[i], project: getFeeNotesProjectID(), user: "nobody" })
+    }
+    const outputCsv = Papa.unparse(tempArray, { quotes: true })
+    return outputCsv
 }
 
 async function runSecondHalf(initCsvFileString) {
@@ -441,6 +478,28 @@ async function runSecondHalf(initCsvFileString) {
 
             if (i === 4) {
                 workPackageList = actionListArray[i].conversion.data[0].data
+            }
+        }
+
+        writeToLog("Sequence completed successfully", "step", logType.finished)
+        console.log("Sequence completed successfully")
+        writeSeparatorToLog()
+    }
+    if (actionType === actionTypes.sequenceFeeNote) {
+
+        const actionListArray = []
+        const actionListOptionsArray = [
+            function () { return {} },
+            function () { return {} },
+            function () { return {} },
+            // eslint-disable-next-line no-unused-vars
+            function (actionListArray) { return { action: actions.addWorkPackage, logValue: "step: 3/3 action: addWorkPackage", myCsvFileObj: initCsvFileString, logDataBool: true } },
+        ]
+
+        for (let i = 3; i <= actionListOptionsArray.length - 1; i++) {
+            actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray).action, actionListOptionsArray[i](actionListArray).logValue, actionListOptionsArray[i](actionListArray).myCsvFileObj, actionListOptionsArray[i](actionListArray).logDataBool)
+            if (actionListArray[i].halt) {
+                return
             }
         }
 

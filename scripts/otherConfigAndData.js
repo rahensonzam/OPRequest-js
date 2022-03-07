@@ -122,10 +122,19 @@ function getPeriodList() {
     ]
 }
 
+function getFeeNotesProjectID() {
+    return "327"
+}
+
 function getCustom() {
     return {
         billingStatus: "customField5",
-        feeNoteNumber: "customField6"
+        feeNoteNumber: "customField6",
+        feeNoteDate: "customField7",
+        feeNoteClientName: "customField8",
+        feeNotePeriod: "customField9",
+        feeNoteCategory: "customField10",
+        feeNoteFees: "customField11"
     }
 }
 
@@ -139,5 +148,6 @@ export {
     getGradeOrder,
     addGradeOrderToUserList,
     getPeriodList,
+    getFeeNotesProjectID,
     getCustom
 }

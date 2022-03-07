@@ -2167,6 +2167,21 @@ function setBody(action, row, lockVersion, rowIndex, wpConvertUser, billingStatu
 		tempWP["_links"]["project"] = {
 			"href": `${apiURL}/projects/${row.project}`
 		}
+		if (checkIfPropertyExists(row, "feeNoteDate")) {
+			tempWP[custom.feeNoteDate] = row.feeNoteDate
+		}
+		if (checkIfPropertyExists(row, "feeNoteClientName")) {
+			tempWP[custom.feeNoteClientName] = row.feeNoteClientName
+		}
+		if (checkIfPropertyExists(row, "feeNotePeriod")) {
+			tempWP[custom.feeNotePeriod] = row.feeNotePeriod
+		}
+		if (checkIfPropertyExists(row, "feeNoteCategory")) {
+			tempWP[custom.feeNoteCategory] = row.feeNoteCategory
+		}
+		if (checkIfPropertyExists(row, "feeNoteFees")) {
+			tempWP[custom.feeNoteFees] = row.feeNoteFees
+		}
 		return tempWP
 	} else if (action === actions.addProject) {
 		return {
