@@ -2140,17 +2140,26 @@ function setBody(action, row, lockVersion, rowIndex, wpConvertUser, billingStatu
 			]
 		}
 	} else if (action === actions.addWorkPackage) {
-		return {
-			"subject": row.subject,
-			"assignee": {
-				"href": `${apiURL}/users/${row.user}`
-			},
-			"_links": {
-				"project": {
-					"href": `${apiURL}/projects/${row.project}`
+		const tempWP = {}
+		tempWP["subject"] = row.subject
+		if (checkIfPropertyExists(row, "user")) {
+			if (row.user === "nobody") {
+				tempWP["_links"] = tempWP["_links"] ?? {}
+				tempWP["_links"]["assignee"] = {
+					"href": null
+				}
+			} else {
+				tempWP["_links"] = tempWP["_links"] ?? {}
+				tempWP["_links"]["assignee"] = {
+					"href": `${apiURL}/users/${row.user}`
 				}
 			}
 		}
+		tempWP["_links"] = tempWP["_links"] ?? {}
+		tempWP["_links"]["project"] = {
+			"href": `${apiURL}/projects/${row.project}`
+		}
+		return tempWP
 	} else if (action === actions.addProject) {
 		return {
 			"identifier": row.identifier,
