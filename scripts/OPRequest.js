@@ -195,13 +195,13 @@ async function doActionAsync(paramsObj) {
 		|| action === actions.addProject
 		|| action === actions.addTimeEntry) {
 		if (typeof isValid[0].errorType !== "undefined") {
-			return {web: isValid}
+			return { web: isValid }
 		}
 	}
 	if (action === actions.convertWeekToDays
 		|| action === actions.convertNamesToIDs) {
 		if (isValid.errors[0].message !== "") {
-			return {conversion: isValid}
+			return { conversion: isValid }
 		}
 	}
 
@@ -217,7 +217,7 @@ async function doActionAsync(paramsObj) {
 		const result = await retrievePageCountAsync(action, apiKey, wpConvertUser)
 		// logWebResults(result)
 		if (webErrorsPresent(result)) {
-			return {web: result, conversion: {}}
+			return { web: result, conversion: {} }
 		}
 		// FIXME: pageSize is hardcoded as 100
 		numOfPages = Math.ceil(Number(result[0].data["total"]) / 100)
@@ -242,35 +242,35 @@ async function doActionAsync(paramsObj) {
 		} else if (action === actions.addTimeEntry) {
 			taskList.push(doCurrentActionAsync(action, row, billingStatusList, "POST", false, apiKey, "workPackageID", row.workPackageID))
 		} else if (action === actions.convertToWorkPackageIDs) {
-			convertedCSVResults.push(convertCsvAction({action, row, rowIndex, wpConvertUser, projectList, workPackageList}))
+			convertedCSVResults.push(convertCsvAction({ action, row, rowIndex, wpConvertUser, projectList, workPackageList }))
 		} else if (action === actions.convertNamesToIDs) {
-			convertedCSVResults.push(convertCsvAction({action, row, rowIndex, projectList, categoryList}))
+			convertedCSVResults.push(convertCsvAction({ action, row, rowIndex, projectList, categoryList }))
 		} else if (action === actions.convertMembershipNamesToIDs) {
-			convertedCSVResults.push(convertCsvAction({action, row, rowIndex, projectList}))
+			convertedCSVResults.push(convertCsvAction({ action, row, rowIndex, projectList }))
 		} else if (action === actions.convertWeekToDays) {
-			convertedCSVResults.push(convertCsvAction({action, row, weekBegin}))
+			convertedCSVResults.push(convertCsvAction({ action, row, weekBegin }))
 		} else if (action === actions.exportTimeEntries) {
-			convertedCSVResults.push(convertCsvAction({action, rowIndex, projectList, categoryList, workPackageList, timeEntryList, userList}))
+			convertedCSVResults.push(convertCsvAction({ action, rowIndex, projectList, categoryList, workPackageList, timeEntryList, userList }))
 		} else if (action === actions.extractTimeSheets) {
 			const currentDate = getCurrentDateFromWeekBegin(weekBegin, rowIndex)
-			const extractObj = convertCsvAction({action, weekBegin: currentDate, resultList: rows, userList, wpConvertUser, filterToOneUserBool})
+			const extractObj = convertCsvAction({ action, weekBegin: currentDate, resultList: rows, userList, wpConvertUser, filterToOneUserBool })
 			extractObj.name = dayjs(currentDate).format("DD-MM-YYYY")
 			convertedCSVResults.push(extractObj)
 		} else if (action === actions.condenseTimeSheets) {
 			const currentDate = getCurrentDateFromWeekBegin(weekBegin, rowIndex)
-			const extractObj = convertCsvAction({action, resultList: rows[rowIndex].data})
+			const extractObj = convertCsvAction({ action, resultList: rows[rowIndex].data })
 			extractObj.name = dayjs(currentDate).format("DD-MM-YYYY")
 			convertedCSVResults.push(extractObj)
 		} else if (action === actions.summarizeUtTimeEntries) {
-			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, projectList, userList}))
+			convertedCSVResults.push(convertCsvAction({ action, weekBegin, dateEndPeriod, resultList: rows, projectList, userList }))
 		} else if (action === actions.tabulateUtTimeEntries) {
-			convertedCSVResults.push(convertCsvAction({action, resultList: rows}))
+			convertedCSVResults.push(convertCsvAction({ action, resultList: rows }))
 		} else if (action === actions.summarizeCatTimeEntries) {
-			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, billingStatusReportFilter, projectList, categoryList, userList}))
+			convertedCSVResults.push(convertCsvAction({ action, weekBegin, dateEndPeriod, resultList: rows, billingStatusReportFilter, projectList, categoryList, userList }))
 		} else if (action === actions.breakdownClientByCatTimeEntries) {
-			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, billingStatusReportFilter, projectList, categoryList, userList}))
+			convertedCSVResults.push(convertCsvAction({ action, weekBegin, dateEndPeriod, resultList: rows, billingStatusReportFilter, projectList, categoryList, userList }))
 		} else if (action === actions.breakdownCatByClientTimeEntries) {
-			convertedCSVResults.push(convertCsvAction({action, weekBegin, dateEndPeriod, resultList: rows, billingStatusReportFilter, projectList, categoryList, userList}))
+			convertedCSVResults.push(convertCsvAction({ action, weekBegin, dateEndPeriod, resultList: rows, billingStatusReportFilter, projectList, categoryList, userList }))
 		} else if (action === actions.getProjects) {
 			taskList.push(getCurrentListPartAAsync(action, rowIndex, "", "GET", apiKey, "pageNum", rowIndex))
 		} else if (action === actions.getWorkPackages) {
@@ -292,20 +292,20 @@ async function doActionAsync(paramsObj) {
 		|| action === actions.summarizeUtTimeEntries
 		|| action === actions.summarizeCatTimeEntries) {
 		const outputObj = convertResultsToCsv(action, convertedCSVResults)
-		return {conversion: outputObj}
+		return { conversion: outputObj }
 	}
 
 	if (action === actions.breakdownClientByCatTimeEntries
 		|| action === actions.breakdownCatByClientTimeEntries) {
 		// console.log("convertedCSVResults", convertedCSVResults)
 		const outputObj = convertResultsToCsv2(action, convertedCSVResults)
-		return {conversion: outputObj}
+		return { conversion: outputObj }
 	}
 
 	if (action === actions.extractTimeSheets
 		|| action === actions.condenseTimeSheets) {
 		const outputObj = convertResultsToCsv3(action, convertedCSVResults)
-		return {conversion: outputObj}
+		return { conversion: outputObj }
 	}
 
 	const resultList = await Promise.all(taskList)
@@ -317,10 +317,10 @@ async function doActionAsync(paramsObj) {
 		|| action === actions.getAllWorkPackages
 		|| action === actions.getTimeEntries) {
 		for (let rowIndex = 0; rowIndex <= resultList.length - 1; rowIndex++) {
-			convertedCSVResults.push(convertCsvAction({action, rowIndex, resultList}))
+			convertedCSVResults.push(convertCsvAction({ action, rowIndex, resultList }))
 		}
 		const conversionObj = convertResults(convertedCSVResults)
-		return {web: resultList, conversion: conversionObj}
+		return { web: resultList, conversion: conversionObj }
 		// const outputJsonString = JSON.stringify(outputJson)
 		// console.log(outputJsonString)
 		// FIXME: Use array.every
@@ -331,7 +331,7 @@ async function doActionAsync(paramsObj) {
 		// }
 	}
 
-	return {web: resultList}
+	return { web: resultList }
 
 }
 
@@ -340,19 +340,19 @@ function setCount(action, rows, numOfPages, numberOfWeeks, timeEntryList) {
 		|| action === actions.getWorkPackages
 		|| action === actions.getAllWorkPackages
 		|| action === actions.getTimeEntries) {
-		return {start: 1, end: numOfPages}
+		return { start: 1, end: numOfPages }
 	} else if (action === actions.exportTimeEntries) {
-		return {start: 0, end: timeEntryList.length - 1}
+		return { start: 0, end: timeEntryList.length - 1 }
 	} else if (action === actions.extractTimeSheets
 		|| action === actions.condenseTimeSheets) {
-		return {start: 0, end: numberOfWeeks - 1}
+		return { start: 0, end: numberOfWeeks - 1 }
 	} else if (action === actions.summarizeUtTimeEntries
 		|| action === actions.summarizeCatTimeEntries
 		|| action === actions.breakdownClientByCatTimeEntries
 		|| action === actions.breakdownCatByClientTimeEntries) {
-		return {start: 0, end: 0}
+		return { start: 0, end: 0 }
 	} else {
-		return {start: 0, end: rows.length - 1}
+		return { start: 0, end: rows.length - 1 }
 	}
 }
 
@@ -485,7 +485,7 @@ function innerValidateCSVConversion(expected, headerRow) {
 			}
 		}
 	}
-	return {errors: [{message: ""}]}
+	return { errors: [{ message: "" }] }
 }
 
 // async function getListFileAsync(action, listFilename) {
@@ -525,7 +525,7 @@ function convertResultsToCsv(action, resultArray) {
 	} else {
 		temp6 = extractProp(temp, "data")
 	}
-	const outputCsv = Papa.unparse(temp6, {quotes: true})
+	const outputCsv = Papa.unparse(temp6, { quotes: true })
 	const temp2 = extractErrors(resultArray)
 	if (action === actions.convertToWorkPackageIDs) {
 		const temp4 = extractProp(temp2, "data")
@@ -533,15 +533,15 @@ function convertResultsToCsv(action, resultArray) {
 			const temp5 = filterUniqueValues2(temp4)
 			const temp7 = splitWorkPackageIDsArrays(temp5, "projectName")
 			const temp8 = splitWorkPackageIDsArrays(temp5, "project")
-			const errorsCsv1 = Papa.unparse(temp7, {quotes: true})
-			const errorsCsv2 = Papa.unparse(temp8, {quotes: true})
+			const errorsCsv1 = Papa.unparse(temp7, { quotes: true })
+			const errorsCsv2 = Papa.unparse(temp8, { quotes: true })
 			for (let i = 0; i <= temp2.length - 1; i++) {
 				temp2[i].csv1 = errorsCsv1
 				temp2[i].csv2 = errorsCsv2
 			}
 		}
 	}
-	return {data: [{data: outputCsv}], errors: temp2}
+	return { data: [{ data: outputCsv }], errors: temp2 }
 }
 
 function convertResultsToCsv2(action, resultArray) {
@@ -570,17 +570,17 @@ function convertResultsToCsv2(action, resultArray) {
 		} else {
 			temp6 = temp[i].data
 		}
-		const outputCsv = Papa.unparse(temp6, {quotes: true})
+		const outputCsv = Papa.unparse(temp6, { quotes: true })
 		if (action === actions.extractTimeSheets) {
-			outputData.push({name: temp[i].name, data: temp6})
+			outputData.push({ name: temp[i].name, data: temp6 })
 		} else if (action === actions.condenseTimeSheets) {
-			outputData.push({name: temp[i].name, data: temp6})
+			outputData.push({ name: temp[i].name, data: temp6 })
 		} else {
-			outputData.push({name: temp[i].name, data: outputCsv})
+			outputData.push({ name: temp[i].name, data: outputCsv })
 		}
 	}
 	const temp2 = extractErrors(resultArray)
-	return {data: outputData, errors: temp2}
+	return { data: outputData, errors: temp2 }
 }
 
 function convertResultsToCsv3(action, resultArray) {
@@ -602,28 +602,28 @@ function convertResultsToCsv3(action, resultArray) {
 				temp10 = totalTimesheetUnitsRight(temp10)
 				temp10 = totalTimesheetUnitsBottom(temp10)
 			}
-			const outputCsv2 = Papa.unparse(temp10, {quotes: true})
+			const outputCsv2 = Papa.unparse(temp10, { quotes: true })
 			if (action === actions.extractTimeSheets) {
-				temp6.push({name: temp9[j].name, data: temp10, csv: outputCsv2})
+				temp6.push({ name: temp9[j].name, data: temp10, csv: outputCsv2 })
 			} else if (action === actions.condenseTimeSheets) {
-				temp6.push({name: temp9[j].name, data: outputCsv2})
+				temp6.push({ name: temp9[j].name, data: outputCsv2 })
 			}
 		}
 		if (action === actions.extractTimeSheets) {
-			outputData.push({name: resultArray[i].name, data: temp6})
+			outputData.push({ name: resultArray[i].name, data: temp6 })
 		} else if (action === actions.condenseTimeSheets) {
-			outputData.push({name: resultArray[i].name, data: temp6})
+			outputData.push({ name: resultArray[i].name, data: temp6 })
 		}
 	}
 	const temp2 = extractErrors(resultArray)
-	return {data: outputData, errors: temp2}
+	return { data: outputData, errors: temp2 }
 }
 
 function convertResults(resultArray) {
 	const temp = expandResults(resultArray)
 	const temp3 = extractProp(temp, "data")
 	const temp2 = extractErrors(resultArray)
-	return {data: [{data: temp3}], errors: temp2}
+	return { data: [{ data: temp3 }], errors: temp2 }
 }
 
 // function logConversionErrors(resultArray) {
@@ -721,7 +721,7 @@ function transposeResult(inputArray) {
 
 	//skip topLeft
 	for (let i = 0 + 1; i <= inputArrayProps.length - 1; i++) {
-		let tempObj = {[topLeft]: inputArrayProps[i]}
+		let tempObj = { [topLeft]: inputArrayProps[i] }
 		//skip topLeft
 		for (let j = 0 + 1; j <= resultArrayProps.length - 1; j++) {
 			tempObj[resultArrayProps[j]] = inputArray[j - 1][inputArrayProps[i]]
@@ -773,7 +773,7 @@ function totalTimesheetUnitsBottom(inputArray) {
 		totaledObj.total = String(grandTotal)
 	}
 
-	const outputObj = {client: "total", period: "", category: "", natureOfWork: ""}
+	const outputObj = { client: "total", period: "", category: "", natureOfWork: "" }
 	for (let i = 0; i <= daysOfWeek.length - 1; i++) {
 		outputObj[daysOfWeek[i]] = totaledObj[daysOfWeek[i]]
 	}
@@ -786,7 +786,7 @@ function totalTimesheetUnitsBottom(inputArray) {
 function fillDownName(typeName, name, inputArray) {
 	const resultArray = []
 	for (let i = 0; i <= inputArray.length - 1; i++) {
-		resultArray.push({[typeName]: name, ...inputArray[i]})
+		resultArray.push({ [typeName]: name, ...inputArray[i] })
 	}
 	return resultArray
 }
@@ -997,19 +997,19 @@ function convertCsvAction(paramsObj) {
 						outputArrayDataRow.sort(compareMoveCurlyToBottom)
 					}
 					if (action === actions.extractTimeSheets) {
-						outputArray.push({name: filteredSortedList[i].name, data: outputArrayDataRow})
+						outputArray.push({ name: filteredSortedList[i].name, data: outputArrayDataRow })
 					}
 					if (action === actions.summarizeUtTimeEntries) {
-						outputExt.push({name: filteredSortedList[i].name, data: outputArrayDataRow})
+						outputExt.push({ name: filteredSortedList[i].name, data: outputArrayDataRow })
 					}
 					if (action === actions.summarizeCatTimeEntries) {
-						outputExt.push({name: filteredSortedList[i].name, data: outputArrayDataRow})
+						outputExt.push({ name: filteredSortedList[i].name, data: outputArrayDataRow })
 					}
 					if (action === actions.condenseTimeSheets) {
-						outputArray.push({name: resultList[i].name, data: outputArrayDataRow})
+						outputArray.push({ name: resultList[i].name, data: outputArrayDataRow })
 					}
 				} else {
-					outputArray.push({data: outputArrayDataRow[0]})
+					outputArray.push({ data: outputArrayDataRow[0] })
 				}
 			}
 			if (action === actions.convertWeekToDays) {
@@ -1026,7 +1026,7 @@ function convertCsvAction(paramsObj) {
 			const outputArrayDataRow = []
 			outputArrayDataRow.push(...setOutputArrayData(actions.tabulateUtTimeEntries, row, rowIndex, i, currentDate, outputExt, workPackageIDs, filteredSortedList, uniqueValuesList, clientTypesList, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList))
 			if (outputArrayDataRow.length !== 0) {
-				outputArray.push({data: outputArrayDataRow[0]})
+				outputArray.push({ data: outputArrayDataRow[0] })
 			}
 		}
 	}
@@ -1039,7 +1039,7 @@ function convertCsvAction(paramsObj) {
 			const outputArrayDataRow = []
 			outputArrayDataRow.push(...setOutputArrayData(actions.tabulateCatTimeEntries, row, rowIndex, i, currentDate, outputExt, workPackageIDs, filteredSortedList, uniqueValuesList, clientTypesList, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList))
 			if (outputArrayDataRow.length !== 0) {
-				outputArray.push({data: outputArrayDataRow[0]})
+				outputArray.push({ data: outputArrayDataRow[0] })
 			}
 		}
 	}
@@ -1055,13 +1055,13 @@ function convertCsvAction(paramsObj) {
 			for (let j = count3.start; j <= count3.end; j++) {
 				const outputArrayInnerDataRow = []
 				outputArrayInnerDataRow.push(...setOutputArrayData(action, row, rowIndex, j, currentDate, resultList, workPackageIDs, filteredSortedList[i].data, uniqueValuesList, clientTypes2List[i].data, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList))
-				outputArrayDataRow.push({name: filteredSortedList[i].data[j].name, data: outputArrayInnerDataRow})
+				outputArrayDataRow.push({ name: filteredSortedList[i].data[j].name, data: outputArrayInnerDataRow })
 			}
 			// Calling array.every on an empty array returns true for any condition!
 			// Is ok in this case because condition is (array.length === 0)
 			// if outputArrayDataRow[all].data.length is not 0
-			if (!(outputArrayDataRow.every(function(e) {return e.data.length === 0}))) {
-				outputExt3.push({name: filteredSortedList[i].name, data: outputArrayDataRow})
+			if (!(outputArrayDataRow.every(function (e) { return e.data.length === 0 }))) {
+				outputExt3.push({ name: filteredSortedList[i].name, data: outputArrayDataRow })
 			}
 		}
 	}
@@ -1087,18 +1087,18 @@ function convertCsvAction(paramsObj) {
 				const outputArrayInnerDataRow = []
 				outputArrayInnerDataRow.push(...setOutputArrayData(currentAction, row, rowIndex, j, currentDate, outputExt3[i].data, workPackageIDs, filteredSortedList, uniqueValuesList, clientTypesList, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList))
 				if (outputArrayInnerDataRow.length !== 0) {
-					outputArrayDataRow.push({data: outputArrayInnerDataRow[0]})
+					outputArrayDataRow.push({ data: outputArrayInnerDataRow[0] })
 				}
 			}
 			if (outputArrayDataRow.length !== 0) {
-				outputArray.push({name: filteredSortedList[i].name, data: outputArrayDataRow})
+				outputArray.push({ name: filteredSortedList[i].name, data: outputArrayDataRow })
 			}
 		}
 	}
 
 	// console.log("convert", {data: outputArray, errors: error})
 
-	return {data: outputArray, errors: error}
+	return { data: outputArray, errors: error }
 }
 
 function setConversionCount(action, retrievedListLength, filteredSortedListLength) {
@@ -1106,9 +1106,9 @@ function setConversionCount(action, retrievedListLength, filteredSortedListLengt
 		|| action === actions.convertNamesToIDs
 		|| action === actions.convertMembershipNamesToIDs
 		|| action === actions.exportTimeEntries) {
-		return {start: 0, end: 0}
+		return { start: 0, end: 0 }
 	} else if (action === actions.convertWeekToDays) {
-		return {start: 0, end: daysOfWeek.length - 1}
+		return { start: 0, end: daysOfWeek.length - 1 }
 	} else if (action === actions.extractTimeSheets
 		|| action === actions.condenseTimeSheets
 		|| action === actions.summarizeUtTimeEntries
@@ -1122,12 +1122,12 @@ function setConversionCount(action, retrievedListLength, filteredSortedListLengt
 		// same as uniqueValuesListLength
 		// same as clientTypesListLength
 		// same as categoryTypesListLength
-		return {start: 0, end: filteredSortedListLength}
+		return { start: 0, end: filteredSortedListLength }
 	} else if (action === actions.getProjects
 		|| action === actions.getWorkPackages
 		|| action === actions.getAllWorkPackages
 		|| action === actions.getTimeEntries) {
-		return {start: 0, end: retrievedListLength}
+		return { start: 0, end: retrievedListLength }
 	} else {
 		throw new RangeError(`Invalid action: "${action}"`)
 	}
@@ -1154,10 +1154,10 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, filterToOne
 				error.data.subject = period
 				error.data.user = wpConvertUser
 			}
-			return {data: [{data: {}}], errors: error}
+			return { data: [{ data: {} }], errors: error }
 		}
 		error.message = ""
-		return {errors: error}
+		return { errors: error }
 	} else if (action === actions.convertNamesToIDs) {
 		const projectName = row.client
 		const projectIndex = findArrayIndexFromName(projectList, projectName)
@@ -1172,32 +1172,36 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, filterToOne
 			if (categoryIndex === -1) {
 				error.message = `error: index ${rowIndex + 2} "${categoryName}" not found`
 			}
-			outputArray.push({data: {
-				client: projectName,
-				period: row.period,
-				category: categoryName,
-				natureOfWork: row.natureOfWork,
-				spentOn: row.spentOn,
-				units: row.units
-			}})
-			return {data: outputArray, errors: error}
+			outputArray.push({
+				data: {
+					client: projectName,
+					period: row.period,
+					category: categoryName,
+					natureOfWork: row.natureOfWork,
+					spentOn: row.spentOn,
+					units: row.units
+				}
+			})
+			return { data: outputArray, errors: error }
 		}
 		error.message = ""
-		return {errors: error}
+		return { errors: error }
 	} else if (action === actions.convertMembershipNamesToIDs) {
 		const projectName = row.client
 		const projectIndex = findArrayIndexFromName(projectList, projectName)
 		if (projectIndex === -1) {
 			error.message = `error: index ${rowIndex + 2} "${projectName}" not found`
-			outputArray.push({data: {
-				project: projectName,
-				user: row.user,
-				role: row.role
-			}})
-			return {data: outputArray, errors: error}
+			outputArray.push({
+				data: {
+					project: projectName,
+					user: row.user,
+					role: row.role
+				}
+			})
+			return { data: outputArray, errors: error }
 		}
 		error.message = ""
-		return {errors: error}
+		return { errors: error }
 	} else if (action === actions.extractTimeSheets
 		|| action === actions.summarizeUtTimeEntries
 		|| action === actions.summarizeCatTimeEntries
@@ -1206,15 +1210,15 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, filterToOne
 		if (action === actions.extractTimeSheets) {
 			if (filterToOneUserBool) {
 				error.message = ""
-				return {errors: error}
+				return { errors: error }
 			}
 		}
 		if (filteredSortedList.length === 0) {
 			error.message = "error: No rows found for the selected weeks"
-			return {errors: error}
+			return { errors: error }
 		}
 		error.message = ""
-		return {errors: error}
+		return { errors: error }
 	} else if (action === actions.convertWeekToDays
 		|| action === actions.exportTimeEntries
 		|| action === actions.condenseTimeSheets
@@ -1224,7 +1228,7 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, filterToOne
 		|| action === actions.getAllWorkPackages
 		|| action === actions.getTimeEntries) {
 		error.message = ""
-		return {errors: error}
+		return { errors: error }
 	} else {
 		throw new RangeError(`Invalid action: "${action}"`)
 	}
@@ -1428,7 +1432,7 @@ function filterListByBillingStatusReportFilter(resultList, billingStatusReportFi
 
 		} else if (billingStatusReportFilter === billingStatusReportFilterEnum.BilledAndWrittenOff) {
 			condition = resultList[index].billingStatus === billingStatusEnum.Billed
-			|| resultList[index].billingStatus === billingStatusEnum.WrittenOff
+				|| resultList[index].billingStatus === billingStatusEnum.WrittenOff
 
 		} else if (billingStatusReportFilter === billingStatusReportFilterEnum.WrittenOff) {
 			condition = resultList[index].billingStatus === billingStatusEnum.WrittenOff
@@ -1459,7 +1463,7 @@ function splitListByUser(resultList, userList) {
 	for (let index = 0; index <= userList.length - 1; index++) {
 		const tempArrayData = innerLoopA(resultList, "user", userList, "name", index)
 		if (tempArrayData.length !== 0) {
-			tempArray.push({name: userList[index].name, data: tempArrayData})
+			tempArray.push({ name: userList[index].name, data: tempArrayData })
 		}
 	}
 	return tempArray
@@ -1480,10 +1484,10 @@ function splitListByGrade(resultList, userList) {
 	for (let index = 0; index <= userList.length - 1; index++) {
 		// FIXME: Confirm use of `if (typeof e.name !== "undefined") {`
 		// if userList[index].grade is not found in tempArray[all].name
-		if (!(tempArray.some(function(e) {if (typeof e.name !== "undefined") {return e.name === userList[index].grade}}))) {
+		if (!(tempArray.some(function (e) { if (typeof e.name !== "undefined") { return e.name === userList[index].grade } }))) {
 			const tempArrayData = innerLoopA(resultList, "grade", userList, "grade", index)
 			if (tempArrayData.length !== 0) {
-				tempArray.push({name: userList[index].grade, data: tempArrayData})
+				tempArray.push({ name: userList[index].grade, data: tempArrayData })
 			}
 		}
 	}
@@ -1502,7 +1506,7 @@ function splitListByGrade2(resultList) {
 				tempArrayData.push(resultList[index2])
 			}
 		}
-		tempArray.push({name: gradesList[index], data: tempArrayData})
+		tempArray.push({ name: gradesList[index], data: tempArrayData })
 	}
 	return tempArray
 }
@@ -1512,12 +1516,12 @@ function splitListByCategoryThenGrade(resultList, categoryList, userList) {
 	for (let index = 0; index <= categoryList.length - 1; index++) {
 		// FIXME: Confirm use of `if (typeof e.name !== "undefined") {`
 		// if categoryList[index].name is not found in tempArray[all].name
-		if (!(tempArray.some(function(e) {if (typeof e.name !== "undefined") {return e.name === categoryList[index].name}}))) {
+		if (!(tempArray.some(function (e) { if (typeof e.name !== "undefined") { return e.name === categoryList[index].name } }))) {
 			const tempArrayData = []
 			for (let index2 = 0; index2 <= userList.length - 1; index2++) {
 				// FIXME: Confirm use of `if (typeof e.name !== "undefined") {`
 				// if userList[index2].grade is not found in tempArrayData[all].name
-				if (!(tempArrayData.some(function(e) {if (typeof e.name !== "undefined") {return e.name === userList[index2].grade}}))) {
+				if (!(tempArrayData.some(function (e) { if (typeof e.name !== "undefined") { return e.name === userList[index2].grade } }))) {
 					const tempArrayInnerData = []
 					for (let index3 = 0; index3 <= resultList.length - 1; index3++) {
 						if (resultList[index3].grade === userList[index2].grade
@@ -1526,13 +1530,13 @@ function splitListByCategoryThenGrade(resultList, categoryList, userList) {
 						}
 					}
 					if (tempArrayInnerData.length !== 0) {
-						tempArrayData.push({name: userList[index2].grade, data: tempArrayInnerData})
+						tempArrayData.push({ name: userList[index2].grade, data: tempArrayInnerData })
 					}
 					arraySortByGradeOrder(tempArrayData, userList)
 				}
 			}
 			if (tempArrayData.length !== 0) {
-				tempArray.push({name: categoryList[index].name, data: tempArrayData})
+				tempArray.push({ name: categoryList[index].name, data: tempArrayData })
 			}
 		}
 	}
@@ -1546,7 +1550,7 @@ function splitListByCategoryThenGrade2(resultList, categoryList) {
 	for (let index = 0; index <= categoryList.length - 1; index++) {
 		// FIXME: Confirm use of `if (typeof e.name !== "undefined") {`
 		// if categoryList[index].name is not found in tempArray[all].name
-		if (!(tempArray.some(function(e) {if (typeof e.name !== "undefined") {return e.name === categoryList[index].name}}))) {
+		if (!(tempArray.some(function (e) { if (typeof e.name !== "undefined") { return e.name === categoryList[index].name } }))) {
 			const tempArrayData = []
 			for (let index2 = 0; index2 <= gradesList.length - 1; index2++) {
 				const tempArrayInnerData = []
@@ -1556,13 +1560,13 @@ function splitListByCategoryThenGrade2(resultList, categoryList) {
 						tempArrayInnerData.push(resultList[index3])
 					}
 				}
-				tempArrayData.push({name: gradesList[index2], data: tempArrayInnerData})
+				tempArrayData.push({ name: gradesList[index2], data: tempArrayInnerData })
 			}
 			// Calling array.every on an empty array returns true for any condition!
 			// Is ok in this case because condition is (array.length === 0)
 			// if tempArrayData[all].data.length is not 0
-			if (!(tempArrayData.every(function(e) {return e.data.length === 0}))) {
-				tempArray.push({name: categoryList[index].name, data: tempArrayData})
+			if (!(tempArrayData.every(function (e) { return e.data.length === 0 }))) {
+				tempArray.push({ name: categoryList[index].name, data: tempArrayData })
 			}
 		}
 	}
@@ -1574,12 +1578,12 @@ function splitListByClientThenGrade(resultList, projectList, userList) {
 	for (let index = 0; index <= projectList.length - 1; index++) {
 		// FIXME: Confirm use of `if (typeof e.name !== "undefined") {`
 		// if projectList[index].name is not found in tempArray[all].name
-		if (!(tempArray.some(function(e) {if (typeof e.name !== "undefined") {return e.name === projectList[index].name}}))) {
+		if (!(tempArray.some(function (e) { if (typeof e.name !== "undefined") { return e.name === projectList[index].name } }))) {
 			const tempArrayData = []
 			for (let index2 = 0; index2 <= userList.length - 1; index2++) {
 				// FIXME: Confirm use of `if (typeof e.name !== "undefined") {`
 				// if userList[index2].grade is not found in tempArrayData[all].name
-				if (!(tempArrayData.some(function(e) {if (typeof e.name !== "undefined") {return e.name === userList[index2].grade}}))) {
+				if (!(tempArrayData.some(function (e) { if (typeof e.name !== "undefined") { return e.name === userList[index2].grade } }))) {
 					const tempArrayInnerData = []
 					for (let index3 = 0; index3 <= resultList.length - 1; index3++) {
 						if (resultList[index3].grade === userList[index2].grade
@@ -1588,13 +1592,13 @@ function splitListByClientThenGrade(resultList, projectList, userList) {
 						}
 					}
 					if (tempArrayInnerData.length !== 0) {
-						tempArrayData.push({name: userList[index2].grade, data: tempArrayInnerData})
+						tempArrayData.push({ name: userList[index2].grade, data: tempArrayInnerData })
 					}
 					arraySortByGradeOrder(tempArrayData, userList)
 				}
 			}
 			if (tempArrayData.length !== 0) {
-				tempArray.push({name: projectList[index].name, data: tempArrayData})
+				tempArray.push({ name: projectList[index].name, data: tempArrayData })
 			}
 		}
 	}
@@ -1614,10 +1618,12 @@ function filterUniqueValues(resultList) {
 		})
 		for (let j = 0 + 1; j <= resultListData.length - 1; j++) {
 			// if ### is not equal to ### in tempArrayData[all].###
-			if (!(tempArrayData.some(function(e) {return (e.client === resultListData[j].client
-				&& e.period === resultListData[j].period
-				&& e.category === resultListData[j].category
-				&& e.natureOfWork === resultListData[j].natureOfWork)}))) {
+			if (!(tempArrayData.some(function (e) {
+				return (e.client === resultListData[j].client
+					&& e.period === resultListData[j].period
+					&& e.category === resultListData[j].category
+					&& e.natureOfWork === resultListData[j].natureOfWork)
+			}))) {
 				tempArrayData.push({
 					client: resultListData[j].client,
 					period: resultListData[j].period,
@@ -1626,7 +1632,7 @@ function filterUniqueValues(resultList) {
 				})
 			}
 		}
-		tempArray.push({name: resultList[i].name, data: tempArrayData})
+		tempArray.push({ name: resultList[i].name, data: tempArrayData })
 	}
 	return tempArray
 }
@@ -1641,9 +1647,11 @@ function filterUniqueValues2(resultArray) {
 	})
 	for (let i = 0 + 1; i <= resultArray.length - 1; i++) {
 		// if ### is not equal to ### in tempArrayData[all].###
-		if (!(tempArray.some(function(e) {return (e.project === resultArray[i].project
-			&& e.subject === resultArray[i].subject
-			&& e.user === resultArray[i].user)}))) {
+		if (!(tempArray.some(function (e) {
+			return (e.project === resultArray[i].project
+				&& e.subject === resultArray[i].subject
+				&& e.user === resultArray[i].user)
+		}))) {
 			tempArray.push({
 				project: resultArray[i].project,
 				projectName: resultArray[i].projectName,
@@ -1669,15 +1677,15 @@ function splitWorkPackageIDsArrays(resultArray, prop) {
 
 function filterClientTypes(resultList, projectList) {
 	const tempArrayData = []
-	tempArrayData.push({client: "client"})
+	tempArrayData.push({ client: "client" })
 	for (let j = 0; j <= projectList.length - 1; j++) {
 		if (projectList[j].name[0] === "}") {
-			tempArrayData.push({client: projectList[j].name})
+			tempArrayData.push({ client: projectList[j].name })
 		}
 	}
 	const tempArray = []
 	for (let i = 0; i <= resultList.length - 1; i++) {
-		tempArray.push({name: resultList[i].name, data: tempArrayData.slice()})
+		tempArray.push({ name: resultList[i].name, data: tempArrayData.slice() })
 	}
 	return tempArray
 }
@@ -1701,13 +1709,13 @@ function filterClientTypes2(resultList, prop) {
 			for (let k = 0; k <= resultListInnerData.length - 1; k++) {
 				// FIXME: Confirm use of `if (typeof e[prop] !== "undefined") {`
 				// if resultListInnerData[k][prop] is not found in tempArrayInnerData[all][prop]
-				if (!(tempArrayInnerData.some(function(e) {if (typeof e[prop] !== "undefined") {return e[prop] === resultListInnerData[k][prop]}}))) {
-					tempArrayInnerData.push({[prop]: resultListInnerData[k][prop]})
+				if (!(tempArrayInnerData.some(function (e) { if (typeof e[prop] !== "undefined") { return e[prop] === resultListInnerData[k][prop] } }))) {
+					tempArrayInnerData.push({ [prop]: resultListInnerData[k][prop] })
 				}
 			}
-			tempArrayData.push({name: resultListData[j].name, data: tempArrayInnerData.slice()})
+			tempArrayData.push({ name: resultListData[j].name, data: tempArrayInnerData.slice() })
 		}
-		tempArray.push({name: resultList[i].name, data: tempArrayData.slice()})
+		tempArray.push({ name: resultList[i].name, data: tempArrayData.slice() })
 	}
 	return tempArray
 }
@@ -1715,11 +1723,11 @@ function filterClientTypes2(resultList, prop) {
 function filterCategoryTypes(resultList, categoryList) {
 	const tempArrayData = []
 	for (let j = 0; j <= categoryList.length - 1; j++) {
-		tempArrayData.push({category: categoryList[j].name})
+		tempArrayData.push({ category: categoryList[j].name })
 	}
 	const tempArray = []
 	for (let i = 0; i <= resultList.length - 1; i++) {
-		tempArray.push({name: resultList[i].name, data: tempArrayData.slice()})
+		tempArray.push({ name: resultList[i].name, data: tempArrayData.slice() })
 	}
 	return tempArray
 }
@@ -1728,7 +1736,7 @@ function filterTableTypes(resultList, prop) {
 	const temp = []
 	for (let i = 0; i <= resultList.length - 1; i++) {
 		if (resultList[i].data.length !== 0) {
-			temp.push({[prop]: resultList[i].data[0][prop]})
+			temp.push({ [prop]: resultList[i].data[0][prop] })
 			break
 		}
 	}
@@ -1736,8 +1744,8 @@ function filterTableTypes(resultList, prop) {
 		for (let j = 0; j <= resultList[i].data.length - 1; j++) {
 			// FIXME: Confirm use of `if (typeof e[prop] !== "undefined") {`
 			// if resultList[i].data[j][prop] is not found in temp[all][prop]
-			if (!(temp.some(function(e) {if (typeof e[prop] !== "undefined") {return e[prop] === resultList[i].data[j][prop]}}))) {
-				temp.push({[prop]: resultList[i].data[j][prop]})
+			if (!(temp.some(function (e) { if (typeof e[prop] !== "undefined") { return e[prop] === resultList[i].data[j][prop] } }))) {
+				temp.push({ [prop]: resultList[i].data[j][prop] })
 			}
 		}
 	}
@@ -1747,8 +1755,8 @@ function filterTableTypes(resultList, prop) {
 
 function summarizeData(action, listA, listB, i, prop) {
 
-    const listDataA = listA[i].data
-    const listDataB = listB[i].data
+	const listDataA = listA[i].data
+	const listDataB = listB[i].data
 
 	// @ts-ignore
 	// eslint-disable-next-line no-inner-declarations
@@ -1757,19 +1765,19 @@ function summarizeData(action, listA, listB, i, prop) {
 	}
 
 	// @ts-ignore
-    // eslint-disable-next-line no-inner-declarations
-    function reduceFunctionB(index) {
-        return getSummedList(listDataB[index], prop)
-    }
+	// eslint-disable-next-line no-inner-declarations
+	function reduceFunctionB(index) {
+		return getSummedList(listDataB[index], prop)
+	}
 
-    // @ts-ignore
-    // eslint-disable-next-line no-inner-declarations
-    function reduceFunctionC(index) {
-        return getSummedList2(listDataB[index], prop)
-    }
+	// @ts-ignore
+	// eslint-disable-next-line no-inner-declarations
+	function reduceFunctionC(index) {
+		return getSummedList2(listDataB[index], prop)
+	}
 
-    // @ts-ignore
-    // eslint-disable-next-line no-inner-declarations
+	// @ts-ignore
+	// eslint-disable-next-line no-inner-declarations
 	function reduceObjectFunctionA(index) {
 		return {
 			client: listDataB[index].client,
@@ -1786,11 +1794,11 @@ function summarizeData(action, listA, listB, i, prop) {
 		}
 	}
 
-    // @ts-ignore
-    // eslint-disable-next-line no-inner-declarations
-    function reduceObjectFunctionB(index) {
-        return {[prop]: listDataB[index][prop], units: ""}
-    }
+	// @ts-ignore
+	// eslint-disable-next-line no-inner-declarations
+	function reduceObjectFunctionB(index) {
+		return { [prop]: listDataB[index][prop], units: "" }
+	}
 
 	if (action === actions.condenseTimeSheets) {
 		return summarizeDataInner(listDataA, listDataB, reduceFunctionA, reduceObjectFunctionA)
@@ -1823,7 +1831,7 @@ function tabulateData(action, resultList, i, prop, topLeft) {
 		typesListData.sort(compareMoveCurlyToBottom)
 	}
 
-	const innerTableData = {[topLeft]: resultList[i].name}
+	const innerTableData = { [topLeft]: resultList[i].name }
 	return tabulateDataInner(resultListData, typesListData, innerTableData, prop)
 }
 
@@ -1831,8 +1839,8 @@ function tabulateDataInner(resultListData, typesListData, innerTableData, prop) 
 	for (let j = 0; j <= typesListData.length - 1; j++) {
 		// FIXME: Confirm use of `if (typeof e[prop] !== "undefined") {`
 		// if typesListData[j][prop] is found in resultListData[all][prop]
-		if (resultListData.some(function(e) {if (typeof e[prop] !== "undefined") {return e[prop] === typesListData[j][prop]}})) {
-			const resultListIndex = resultListData.findIndex(function(e) {return e[prop] === typesListData[j][prop]})
+		if (resultListData.some(function (e) { if (typeof e[prop] !== "undefined") { return e[prop] === typesListData[j][prop] } })) {
+			const resultListIndex = resultListData.findIndex(function (e) { return e[prop] === typesListData[j][prop] })
 			innerTableData[typesListData[j][prop]] = resultListData[resultListIndex].units
 		} else {
 			innerTableData[typesListData[j][prop]] = 0
@@ -2283,10 +2291,10 @@ async function currentRequestAsync(fullURL, httpMethod, apiKey, body, prefixName
 
 	if (typeof reqResponse.data === "undefined"
 		&& typeof reqResponse.errorType !== "undefined") {
-		return {prefix: `${prefixName} ${prefixValue}: ${httpMethod}`, prelog: ["request started"], status: reqResponse.status, errorType: reqResponse.errorType, error: reqResponse.error}
+		return { prefix: `${prefixName} ${prefixValue}: ${httpMethod}`, prelog: ["request started"], status: reqResponse.status, errorType: reqResponse.errorType, error: reqResponse.error }
 	}
 
-	return {prefix: `${prefixName} ${prefixValue}: ${httpMethod}`, prelog: ["request started"], status: reqResponse.status, data: reqResponse.data}
+	return { prefix: `${prefixName} ${prefixValue}: ${httpMethod}`, prelog: ["request started"], status: reqResponse.status, data: reqResponse.data }
 }
 
 async function WRequestAsync(fullURL, httpMethod, apiKey, bodyData) {

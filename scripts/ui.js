@@ -1,13 +1,13 @@
 import { passwordToApiKey, passwordAndApiKeyMatch } from "./apiKeyListFile.js"
 import {
-	actionTypes,
-	csvTypes,
-	getDomElementValueById,
-	getDomElementCheckedStateById,
-	wpConvertUser,
-	apiKey,
-	checkPreReq,
-	preReqTypes,
+    actionTypes,
+    csvTypes,
+    getDomElementValueById,
+    getDomElementCheckedStateById,
+    wpConvertUser,
+    apiKey,
+    checkPreReq,
+    preReqTypes,
     runActions,
     runSpreadsheetDone
 } from "./main.js"
@@ -270,22 +270,22 @@ function makeWeeklySpreadsheet(projectList, periodList, categoryList) {
     const customDropDown3 = getCustomDropDown(categoryList)
 
     const myCols = [
-        {editor: customDropDown1},
-        {editor: customDropDown2},
-        {editor: customDropDown3},
-        {type: "text"},
-        {type: "text"},
-        {type: "text"},
-        {type: "text"},
-        {type: "text"},
-        {type: "text"},
-        {type: "text"},
-        {type: "text"}
+        { editor: customDropDown1 },
+        { editor: customDropDown2 },
+        { editor: customDropDown3 },
+        { type: "text" },
+        { type: "text" },
+        { type: "text" },
+        { type: "text" },
+        { type: "text" },
+        { type: "text" },
+        { type: "text" },
+        { type: "text" }
     ]
-    const myColHeaders = ["client","period","category","nature of work","monday","tuesday","wednesday","thursday","friday","saturday","sunday"]
+    const myColHeaders = ["client", "period", "category", "nature of work", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
     const spreadsheetData = [
-        ["","","","","","","","","","",""],
-        ["","","","","","","","","","",""]
+        ["", "", "", "", "", "", "", "", "", "", ""],
+        ["", "", "", "", "", "", "", "", "", "", ""]
     ]
     const myColWidths = [200, 120, 120, 200, 80, 80, 80, 80, 80, 80, 80]
 
@@ -299,17 +299,17 @@ function makeDailySpreadsheet(projectList, periodList, categoryList) {
     const customDropDown3 = getCustomDropDown(categoryList)
 
     const myCols = [
-        {editor: customDropDown1},
-        {editor: customDropDown2},
-        {editor: customDropDown3},
-        {type: "text"},
-        {type: "text"},
-        {type: "text"}
+        { editor: customDropDown1 },
+        { editor: customDropDown2 },
+        { editor: customDropDown3 },
+        { type: "text" },
+        { type: "text" },
+        { type: "text" }
     ]
-    const myColHeaders = ["client","period","category","nature of work","spent on (YYYY-MM-DD)","units"]
+    const myColHeaders = ["client", "period", "category", "nature of work", "spent on (YYYY-MM-DD)", "units"]
     const spreadsheetData = [
-        ["","","","","",""],
-        ["","","","","",""]
+        ["", "", "", "", "", ""],
+        ["", "", "", "", "", ""]
     ]
     const myColWidths = [200, 120, 120, 200, 180, 80]
 
@@ -318,28 +318,28 @@ function makeDailySpreadsheet(projectList, periodList, categoryList) {
 
 function makeSpreadsheet(spreadsheetData, myCols, myColHeaders, myColWidths, projectList, periodList, categoryList) {
 
-    const changed = function(obj, cell, val) {
+    const changed = function (obj, cell, val) {
         const cellName = $(cell).prop("id").split("-")
 
         if (cellName[0] === "0") {
             if (!(projectList.includes(val))) {
-                $("#spreadsheet1").jexcel("setStyle", "A"+(Number(cellName[1])+1), "background-color", "yellow")
+                $("#spreadsheet1").jexcel("setStyle", "A" + (Number(cellName[1]) + 1), "background-color", "yellow")
             } else {
-                $("#spreadsheet1").jexcel("setStyle", "A"+(Number(cellName[1])+1), "background-color", "revert")
+                $("#spreadsheet1").jexcel("setStyle", "A" + (Number(cellName[1]) + 1), "background-color", "revert")
             }
         }
         if (cellName[0] === "1") {
             if (!(periodList.includes(val))) {
-                $("#spreadsheet1").jexcel("setStyle", "B"+(Number(cellName[1])+1), "background-color", "yellow")
+                $("#spreadsheet1").jexcel("setStyle", "B" + (Number(cellName[1]) + 1), "background-color", "yellow")
             } else {
-                $("#spreadsheet1").jexcel("setStyle", "B"+(Number(cellName[1])+1), "background-color", "revert")
+                $("#spreadsheet1").jexcel("setStyle", "B" + (Number(cellName[1]) + 1), "background-color", "revert")
             }
         }
         if (cellName[0] === "2") {
             if (!(categoryList.includes(val))) {
-                $("#spreadsheet1").jexcel("setStyle", "C"+(Number(cellName[1])+1), "background-color", "yellow")
+                $("#spreadsheet1").jexcel("setStyle", "C" + (Number(cellName[1]) + 1), "background-color", "yellow")
             } else {
-                $("#spreadsheet1").jexcel("setStyle", "C"+(Number(cellName[1])+1), "background-color", "revert")
+                $("#spreadsheet1").jexcel("setStyle", "C" + (Number(cellName[1]) + 1), "background-color", "revert")
             }
         }
     }
@@ -360,7 +360,7 @@ function getCustomDropDown(list) {
     return {
         // Methods
         // eslint-disable-next-line no-unused-vars
-        closeEditor: function(cell, save) {
+        closeEditor: function (cell, save) {
             // Get value
             const txt = $(cell).find(".editor").val()
             // Set visual value
@@ -371,7 +371,7 @@ function getCustomDropDown(list) {
             // Save history
             return txt
         },
-        openEditor: function(cell) {
+        openEditor: function (cell) {
             // Get current content
             let currentValue = $(cell).text()
             // Create the editor
@@ -379,27 +379,27 @@ function getCustomDropDown(list) {
             $(cell).html(editor)
             $(editor).prop("class", "editor")
             $(editor).val(currentValue)
-            $(editor).on("blur", function() {
+            $(editor).on("blur", function () {
                 $("#" + $.fn.jexcel.current).jexcel("closeEditor", $(cell), true)
             })
             // Create the instance of the plugin
             $(editor)
-            //don't navigate away from the field on tab when selecting an item
-            .on("keydown", function(event) {
-                if (event.keyCode === $.ui.keyCode.TAB &&
-                    $(this).autocomplete("instance").menu.active) {
-                    event.preventDefault()
-                }
-            })
-            .autocomplete({
-                minLength: 0,
-                source: list
-            })
+                //don't navigate away from the field on tab when selecting an item
+                .on("keydown", function (event) {
+                    if (event.keyCode === $.ui.keyCode.TAB &&
+                        $(this).autocomplete("instance").menu.active) {
+                        event.preventDefault()
+                    }
+                })
+                .autocomplete({
+                    minLength: 0,
+                    source: list
+                })
         },
-        getValue: function(cell) {
+        getValue: function (cell) {
             return $(cell).text()
         },
-        setValue: function(cell, value) {
+        setValue: function (cell, value) {
             $(cell).html(value)
 
             return true
@@ -425,8 +425,8 @@ function getSpreedsheetData() {
     const temp = arrayToCsv(initCsvFile)
     let tempHeaders = `"${headers.join(`","`)}"`
     // FIXME: Do this properly: Get headers from validation collection
-    tempHeaders = tempHeaders.replaceAll("nature of work","natureOfWork")
-    tempHeaders = tempHeaders.replaceAll("spent on (YYYY-MM-DD)","spentOn")
+    tempHeaders = tempHeaders.replaceAll("nature of work", "natureOfWork")
+    tempHeaders = tempHeaders.replaceAll("spent on (YYYY-MM-DD)", "spentOn")
     return `${tempHeaders}\r\n${temp}`
     // const tempHeaders = arrayToCsv([headers])
     // return = `${tempHeaders}\r\n${temp}`
@@ -493,8 +493,8 @@ function writeToLogDom(logValue, logFirstColumn, type) {
     const logElement = document.createElement("span")
     logElement.setAttribute("class", type)
     logElement.innerHTML = `<span class="cell"><!----></span><span class="cell content"><!----></span>`
-    logElement.children[0].innerHTML = logFirstColumn.replaceAll("\n","<br>")
-    logElement.children[1].innerHTML = logValue.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll("\n","<br>")
+    logElement.children[0].innerHTML = logFirstColumn.replaceAll("\n", "<br>")
+    logElement.children[1].innerHTML = logValue.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br>")
     logTextBox.appendChild(logElement)
     logTextBox.parentElement.scrollTop = logTextBox.parentElement.scrollHeight
 }

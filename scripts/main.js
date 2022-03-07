@@ -37,7 +37,7 @@ import { actions, webErrorTypes, doActionAsync, webErrorsPresent } from "./OPReq
 const CLI = false
 
 dayjs.extend(window.dayjs_plugin_customParseFormat)
-const validDateFormats = ["DD-MM-YYYY","DD/MM/YYYY"]
+const validDateFormats = ["DD-MM-YYYY", "DD/MM/YYYY"]
 let wpConvertUser
 const adminUser1 = getAdminUser1IdNumber()
 const adminUser2 = getAdminUser2IdNumber()
@@ -101,7 +101,7 @@ const preReqTypes = {
 
 const billingStatusList = getBillingStatusList()
 
-$(function() {
+$(function () {
     if (!CLI) {
         addDomEventListeners()
         getLocalStorage()
@@ -161,12 +161,12 @@ async function runActions() {
 
     let justProjectNamesList
     let justCategoryNamesList
-    if (!(actionType === actionTypes.single)) {    
+    if (!(actionType === actionTypes.single)) {
         if (!(wpConvertUser == adminUser1
             || wpConvertUser == adminUser2)) {
-                if (!CLI) {
-                    setLocalStorage()
-                }
+            if (!CLI) {
+                setLocalStorage()
+            }
         }
 
         weekBegin = dayjs(weekBegin, validDateFormats).format("YYYY-MM-DD")
@@ -190,11 +190,11 @@ async function runActions() {
         if (csvType === csvTypes.create
             || csvType === csvTypes.import) {
 
-                if (!CLI) {
-                    showSpreadsheet()
+            if (!CLI) {
+                showSpreadsheet()
 
-                    makeWeeklySpreadsheet(justProjectNamesList, periodList, justCategoryNamesList)
-                }
+                makeWeeklySpreadsheet(justProjectNamesList, periodList, justCategoryNamesList)
+            }
         }
     }
     if (actionType === actionTypes.sequenceDaily) {
@@ -204,11 +204,11 @@ async function runActions() {
         if (csvType === csvTypes.create
             || csvType === csvTypes.import) {
 
-                if (!CLI) {
-                    showSpreadsheet()
+            if (!CLI) {
+                showSpreadsheet()
 
-                    makeDailySpreadsheet(justProjectNamesList, periodList, justCategoryNamesList)
-                }
+                makeDailySpreadsheet(justProjectNamesList, periodList, justCategoryNamesList)
+            }
 
         }
     }
@@ -237,50 +237,50 @@ async function runSingleAction() {
     const actionListArray = []
     const actionListOptionsArray = [
         // eslint-disable-next-line no-unused-vars
-        function(actionListArray) {return {action: actionSelectAction, logValue: `step: 1 action: ${actionSelectAction}`, myCsvFileObj: fileSelectFile, logDataBool}},
+        function (actionListArray) { return { action: actionSelectAction, logValue: `step: 1 action: ${actionSelectAction}`, myCsvFileObj: fileSelectFile, logDataBool } },
     ]
 
     for (let i = 0; i <= actionListOptionsArray.length - 1; i++) {
         actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray).action, actionListOptionsArray[i](actionListArray).logValue, actionListOptionsArray[i](actionListArray).myCsvFileObj, actionListOptionsArray[i](actionListArray).logDataBool)
         if (actionListArray[i].halt) {
-            return {halt: actionListArray[i].halt}
+            return { halt: actionListArray[i].halt }
         }
     }
     writeSeparatorToLog()
-    return {halt: actionListArray[0].halt}
+    return { halt: actionListArray[0].halt }
 }
 
 async function runFirstHalf() {
 
-	const actionListArray = []
-	const actionListOptionsArray = [
-		function() {return {}},
+    const actionListArray = []
+    const actionListOptionsArray = [
+        function () { return {} },
         // eslint-disable-next-line no-unused-vars
-		function(actionListArray) {return {action: actions.getProjects, logValue: "step: 1/8 action: getProjects", myCsvFileObj: "", logDataBool: false}}
-	]
+        function (actionListArray) { return { action: actions.getProjects, logValue: "step: 1/8 action: getProjects", myCsvFileObj: "", logDataBool: false } }
+    ]
 
-	// if (true) {
+    // if (true) {
     for (let i = 1; i <= actionListOptionsArray.length - 1; i++) {
         actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray).action, actionListOptionsArray[i](actionListArray).logValue, actionListOptionsArray[i](actionListArray).myCsvFileObj, actionListOptionsArray[i](actionListArray).logDataBool)
         if (actionListArray[i].halt) {
-            return {halt: actionListArray[i].halt}
+            return { halt: actionListArray[i].halt }
         }
 
         if (i === 1) {
             projectList = actionListArray[i].conversion.data[0].data
         }
     }
-	// } else {
-	// 	logFakeAction("step: 1/8 action: getProjects", false)
-	// 	projectList = getProjectList()
-	// }
+    // } else {
+    //     logFakeAction("step: 1/8 action: getProjects", false)
+    //     projectList = getProjectList()
+    // }
 
     categoryList = getCategoryList()
     userList = getUserList()
     userList = addGradeOrderToUserList(userList)
     // billingStatusList = getBillingStatusList()
     periodList = getPeriodList()
-    return {halt: actionListArray[1].halt}
+    return { halt: actionListArray[1].halt }
 }
 
 function getJustNames(inputArray, sort) {
@@ -290,7 +290,7 @@ function getJustNames(inputArray, sort) {
     }
     if (sort) {
         return temp.sort()
-    } else{
+    } else {
         return temp
     }
 }
@@ -389,18 +389,18 @@ async function runSecondHalf(initCsvFileString) {
     if (actionType === actionTypes.sequenceWeekly) {
         const actionListArray = []
         const actionListOptionsArray = [
-            function() {return {}},
-            function() {return {}},
-            function() {return {}},
+            function () { return {} },
+            function () { return {} },
+            function () { return {} },
             // eslint-disable-next-line no-unused-vars
-            function(actionListArray) {return {action: actions.convertNamesToIDs, logValue: "step: 3/8 action: name validation using convertNamesToIDs", myCsvFileObj: initCsvFileString, logDataBool: false}},
+            function (actionListArray) { return { action: actions.convertNamesToIDs, logValue: "step: 3/8 action: name validation using convertNamesToIDs", myCsvFileObj: initCsvFileString, logDataBool: false } },
             // eslint-disable-next-line no-unused-vars
-            function(actionListArray) {return {action: actions.convertWeekToDays, logValue: "step: 4/8 action: convertWeekToDays", myCsvFileObj: initCsvFileString, logDataBool: true}},
-            function(actionListArray) {return {action: actions.convertNamesToIDs, logValue: "step: 5/8 action: convertNamesToIDs", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true}},
+            function (actionListArray) { return { action: actions.convertWeekToDays, logValue: "step: 4/8 action: convertWeekToDays", myCsvFileObj: initCsvFileString, logDataBool: true } },
+            function (actionListArray) { return { action: actions.convertNamesToIDs, logValue: "step: 5/8 action: convertNamesToIDs", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true } },
             // eslint-disable-next-line no-unused-vars
-            function(actionListArray) {return {action: actions.getWorkPackages, logValue: "step: 6/8 action: getWorkPackages (please wait, this step takes a bit of time)", myCsvFileObj: "", logDataBool: false}},
-            function(actionListArray) {return {action: actions.convertToWorkPackageIDs, logValue: "step: 7/8 action: convertToWorkPackageIDs", myCsvFileObj: actionListArray[5].conversion.data[0].data, logDataBool: true}},
-            function(actionListArray) {return {action: actions.addTimeEntry, logValue: "step: 8/8 action: addTimeEntry", myCsvFileObj: actionListArray[7].conversion.data[0].data, logDataBool: false}}
+            function (actionListArray) { return { action: actions.getWorkPackages, logValue: "step: 6/8 action: getWorkPackages (please wait, this step takes a bit of time)", myCsvFileObj: "", logDataBool: false } },
+            function (actionListArray) { return { action: actions.convertToWorkPackageIDs, logValue: "step: 7/8 action: convertToWorkPackageIDs", myCsvFileObj: actionListArray[5].conversion.data[0].data, logDataBool: true } },
+            function (actionListArray) { return { action: actions.addTimeEntry, logValue: "step: 8/8 action: addTimeEntry", myCsvFileObj: actionListArray[7].conversion.data[0].data, logDataBool: false } }
         ]
 
         for (let i = 3; i <= actionListOptionsArray.length - 1; i++) {
@@ -422,15 +422,15 @@ async function runSecondHalf(initCsvFileString) {
 
         const actionListArray = []
         const actionListOptionsArray = [
-            function() {return {}},
-            function() {return {}},
-            function() {return {}},
+            function () { return {} },
+            function () { return {} },
+            function () { return {} },
             // eslint-disable-next-line no-unused-vars
-            function(actionListArray) {return {action: actions.convertNamesToIDs, logValue: "step: 3/6 action: convertNamesToIDs", myCsvFileObj: initCsvFileString, logDataBool: true}},
+            function (actionListArray) { return { action: actions.convertNamesToIDs, logValue: "step: 3/6 action: convertNamesToIDs", myCsvFileObj: initCsvFileString, logDataBool: true } },
             // eslint-disable-next-line no-unused-vars
-            function(actionListArray) {return {action: actions.getWorkPackages, logValue: "step: 4/6 action: getWorkPackages (please wait, this step takes a bit of time)", myCsvFileObj: "", logDataBool: false}},
-            function(actionListArray) {return {action: actions.convertToWorkPackageIDs, logValue: "step: 5/6 action: convertToWorkPackageIDs", myCsvFileObj: actionListArray[3].conversion.data[0].data, logDataBool: true}},
-            function(actionListArray) {return {action: actions.addTimeEntry, logValue: "step: 6/6 action: addTimeEntry", myCsvFileObj: actionListArray[5].conversion.data[0].data, logDataBool: false}}
+            function (actionListArray) { return { action: actions.getWorkPackages, logValue: "step: 4/6 action: getWorkPackages (please wait, this step takes a bit of time)", myCsvFileObj: "", logDataBool: false } },
+            function (actionListArray) { return { action: actions.convertToWorkPackageIDs, logValue: "step: 5/6 action: convertToWorkPackageIDs", myCsvFileObj: actionListArray[3].conversion.data[0].data, logDataBool: true } },
+            function (actionListArray) { return { action: actions.addTimeEntry, logValue: "step: 6/6 action: addTimeEntry", myCsvFileObj: actionListArray[5].conversion.data[0].data, logDataBool: false } }
         ]
 
         for (let i = 3; i <= actionListOptionsArray.length - 1; i++) {
@@ -458,27 +458,27 @@ async function runSecondHalf(initCsvFileString) {
         const actionListOptionsArray = []
 
         // eslint-disable-next-line no-unused-vars
-        actionListOptionsArray[2] = function(actionListArray) {return {action: actions.getAllWorkPackages, logValue: "step: 2/4 action: getWorkPackages (please wait, this step takes a bit of time)", myCsvFileObj: "", logDataBool: false}}
+        actionListOptionsArray[2] = function (actionListArray) { return { action: actions.getAllWorkPackages, logValue: "step: 2/4 action: getWorkPackages (please wait, this step takes a bit of time)", myCsvFileObj: "", logDataBool: false } }
         // eslint-disable-next-line no-unused-vars
-        actionListOptionsArray[3] = function(actionListArray) {return {action: actions.getTimeEntries, logValue: "step: 3/4 action: getTimeEntries", myCsvFileObj: "", logDataBool: false}}
+        actionListOptionsArray[3] = function (actionListArray) { return { action: actions.getTimeEntries, logValue: "step: 3/4 action: getTimeEntries", myCsvFileObj: "", logDataBool: false } }
         // eslint-disable-next-line no-unused-vars
-        actionListOptionsArray[4] = function(actionListArray) {return {action: actions.exportTimeEntries, logValue: "step: 4/4 action: exportTimeEntries", myCsvFileObj: "", logDataBool: true}}
+        actionListOptionsArray[4] = function (actionListArray) { return { action: actions.exportTimeEntries, logValue: "step: 4/4 action: exportTimeEntries", myCsvFileObj: "", logDataBool: true } }
 
         if (actionType === actionTypes.sequenceExportExtract) {
-            actionListOptionsArray[5] = function(actionListArray) {return {action: actions.extractTimeSheets, logValue: "step: 5/4 action: extractTimeSheets", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: false}}
-            actionListOptionsArray[6] = function(actionListArray) {return {action: actions.condenseTimeSheets, logValue: "step: 6/4 action: condenseTimeSheets", myCsvFileObj: actionListArray[5].conversion.data, logDataBool: true}}
+            actionListOptionsArray[5] = function (actionListArray) { return { action: actions.extractTimeSheets, logValue: "step: 5/4 action: extractTimeSheets", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: false } }
+            actionListOptionsArray[6] = function (actionListArray) { return { action: actions.condenseTimeSheets, logValue: "step: 6/4 action: condenseTimeSheets", myCsvFileObj: actionListArray[5].conversion.data, logDataBool: true } }
         }
         if (actionType === actionTypes.sequenceExportSummarizeUt) {
-            actionListOptionsArray[5] = function(actionListArray) {return {action: actions.summarizeUtTimeEntries, logValue: "step: 6/4 action: tabulateUtTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true}}
+            actionListOptionsArray[5] = function (actionListArray) { return { action: actions.summarizeUtTimeEntries, logValue: "step: 6/4 action: tabulateUtTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true } }
         }
         if (actionType === actionTypes.sequenceExportSummarizeCat) {
-            actionListOptionsArray[5] = function(actionListArray) {return {action: actions.summarizeCatTimeEntries, logValue: "step: 6/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true}}
+            actionListOptionsArray[5] = function (actionListArray) { return { action: actions.summarizeCatTimeEntries, logValue: "step: 6/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true } }
         }
         if (actionType === actionTypes.sequenceExportBreakdownCat) {
-            actionListOptionsArray[5] = function(actionListArray) {return {action: actions.breakdownClientByCatTimeEntries, logValue: "step: 6/4 action: tabulateBreakdownClientByCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true}}
+            actionListOptionsArray[5] = function (actionListArray) { return { action: actions.breakdownClientByCatTimeEntries, logValue: "step: 6/4 action: tabulateBreakdownClientByCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true } }
         }
         if (actionType === actionTypes.sequenceExportBreakdownClient) {
-            actionListOptionsArray[5] = function(actionListArray) {return {action: actions.breakdownCatByClientTimeEntries, logValue: "step: 6/4 action: tabulateBreakdownCatByClientTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true}}
+            actionListOptionsArray[5] = function (actionListArray) { return { action: actions.breakdownCatByClientTimeEntries, logValue: "step: 6/4 action: tabulateBreakdownCatByClientTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true } }
         }
 
         if (staticLists === false) {
@@ -652,7 +652,7 @@ function getActionOptions(action) {
         }
         return returnObj
     } else {
-		throw new RangeError(`Invalid action: "${action}"`)
+        throw new RangeError(`Invalid action: "${action}"`)
     }
 }
 
@@ -700,13 +700,13 @@ async function runOneAction(paramsObj) {
 async function checkGetFile(action, hasFile, myCsvFileObj) {
     if (hasFile) {
         if (action === actions.condenseTimeSheets) {
-            return {rows: myCsvFileObj, headerRow: []}
+            return { rows: myCsvFileObj, headerRow: [] }
         } else {
             const myCsvFile = await parseCSVFile(myCsvFileObj)
             return myCsvFile
         }
     } else {
-        return {rows: [], headerRow: []}
+        return { rows: [], headerRow: [] }
     }
 }
 
@@ -724,19 +724,19 @@ async function parseCSVFile(myCsvFileObj) {
     const headerRow = csvData.meta.fields
     const rows = csvData.data
 
-    return {rows: rows, headerRow: headerRow}
+    return { rows: rows, headerRow: headerRow }
 }
 
 async function getPapaPromise(content) {
     return new Promise(function (complete, error) {
-        Papa.parse(content, {complete, error, skipEmptyLines: "greedy", header: true})
+        Papa.parse(content, { complete, error, skipEmptyLines: "greedy", header: true })
     })
 }
 
 async function readFileReaderAsync(file) {
     return new Promise(function (resolve, reject) {
         let reader = new FileReader()
-        reader.onload = function() {
+        reader.onload = function () {
             resolve(reader.result)
         }
         reader.onerror = reject
@@ -810,7 +810,7 @@ function logWebResults(resultList) {
                 case webErrorTypes.httpWithJSON:
                     console.log(element.prefix, element.status)
                     console.error(element.error)
-                    writeToLog(`${element.prefix} ${element.status}\nerror: ${element.error.errorIdentifier.replaceAll("urn:openproject-org:api:v3:errors:","")} - ${element.error.message}`, "error", logType.error)
+                    writeToLog(`${element.prefix} ${element.status}\nerror: ${element.error.errorIdentifier.replaceAll("urn:openproject-org:api:v3:errors:", "")} - ${element.error.message}`, "error", logType.error)
                     break
                 case webErrorTypes.http:
                     console.log(element.prefix, element.status)
@@ -841,16 +841,16 @@ function logWebResults(resultList) {
     }
     // ReferenceError: logTextBox is not defined
     // resultList.forEach(function (element) {
-    // 	if (typeof element.error !== "undefined") {
-    // 		console.log(element.prefix, element.status)
-    // 		console.error(element.error)
+    //     if (typeof element.error !== "undefined") {
+    //         console.log(element.prefix, element.status)
+    //         console.error(element.error)
     //      writeToLog(`${element.prefix} ${element.status}`, "output", logType.normal)
     //      writeToLog(`${element.error}`, "error", logType.error)
-    // 	} else {
-    // 		console.log(element.prefix, element.status)
+    //     } else {
+    //         console.log(element.prefix, element.status)
     //      writeToLog(`${element.prefix} ${element.status}`, "output", logType.normal)
-    // 		////console.log(element.prefix, element.data.id)
-    // 	}
+    //         ////console.log(element.prefix, element.data.id)
+    //     }
     // })
 }
 
@@ -871,10 +871,10 @@ function logConversionErrors(resultArray) {
     }
     // ReferenceError: logTextBox is not defined
     // resultArray.errors.forEach(function (element) {
-    // 	if (element !== "") {
-    // 		console.error(element)
+    //     if (element !== "") {
+    //         console.error(element)
     //      writeToLog(`${element}`, "error", logType.error)
-    // 	}
+    //     }
     // })
 }
 
@@ -932,7 +932,7 @@ function logData(action, currentStep) {
 }
 
 function writeSeparatorToLog() {
-    writeToLog("------------------------------------------------------------------------------------------------------------------------","",logType.step)
+    writeToLog("------------------------------------------------------------------------------------------------------------------------", "", logType.step)
 }
 
 function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, numberOfWeeks, csvType, selectedFile) {
@@ -1033,7 +1033,7 @@ function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, numberO
             } else {
                 msg = "Run again, are you sure?"
             }
-    
+
             if (!(promptForConfirmation(msg))) {
                 return false
             }

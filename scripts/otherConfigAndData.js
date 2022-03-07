@@ -63,23 +63,23 @@ function addGradeOrderToUserList(inputArray) {
     const tempArray = []
     for (let i = 0; i <= inputArray.length - 1; i++) {
         if (inputArray[i].grade === "Assistant Manager") {
-            tempArray.push({...inputArray[i], gradeOrder: 1})
+            tempArray.push({ ...inputArray[i], gradeOrder: 1 })
         } else if (inputArray[i].grade === "Supervisor") {
-            tempArray.push({...inputArray[i], gradeOrder: 2})
+            tempArray.push({ ...inputArray[i], gradeOrder: 2 })
         } else if (inputArray[i].grade === "S2") {
-            tempArray.push({...inputArray[i], gradeOrder: 3})
+            tempArray.push({ ...inputArray[i], gradeOrder: 3 })
         } else if (inputArray[i].grade === "S1") {
-            tempArray.push({...inputArray[i], gradeOrder: 4})
+            tempArray.push({ ...inputArray[i], gradeOrder: 4 })
         } else if (inputArray[i].grade === "G2") {
-            tempArray.push({...inputArray[i], gradeOrder: 5})
+            tempArray.push({ ...inputArray[i], gradeOrder: 5 })
         } else if (inputArray[i].grade === "G1") {
-            tempArray.push({...inputArray[i], gradeOrder: 6})
+            tempArray.push({ ...inputArray[i], gradeOrder: 6 })
         } else if (inputArray[i].grade === "T2") {
-            tempArray.push({...inputArray[i], gradeOrder: 7})
+            tempArray.push({ ...inputArray[i], gradeOrder: 7 })
         } else if (inputArray[i].grade === "T1") {
-            tempArray.push({...inputArray[i], gradeOrder: 8})
+            tempArray.push({ ...inputArray[i], gradeOrder: 8 })
         } else {
-            tempArray.push({...inputArray[i], gradeOrder: 0})
+            tempArray.push({ ...inputArray[i], gradeOrder: 0 })
         }
     }
     return tempArray
