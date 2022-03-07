@@ -165,22 +165,22 @@ const custom = getCustom()
 async function doActionAsync(paramsObj) {
 	// params: action,apiKey,wpConvertUser,rows,headerRow,weekBegin,dateEndPeriod,projectList,categoryList,workPackageList,timeEntryList,userList
 
-	const action = checkIfPropertyExists(paramsObj, "action")
-	const apiKey = checkIfPropertyExists(paramsObj, "apiKey")
-	const wpConvertUser = checkIfPropertyExists(paramsObj, "wpConvertUser")
-	const rows = checkIfPropertyExists(paramsObj, "rows")
-	const headerRow = checkIfPropertyExists(paramsObj, "headerRow")
-	const weekBegin = checkIfPropertyExists(paramsObj, "weekBegin")
-	const dateEndPeriod = checkIfPropertyExists(paramsObj, "dateEndPeriod")
-	const numberOfWeeks = checkIfPropertyExists(paramsObj, "numberOfWeeks")
-	const filterToOneUserBool = checkIfPropertyExists(paramsObj, "filterToOneUserBool")
-	const billingStatusReportFilter = checkIfPropertyExists(paramsObj, "billingStatusReportFilter")
-	const projectList = checkIfPropertyExists(paramsObj, "projectList")
-	const categoryList = checkIfPropertyExists(paramsObj, "categoryList")
-	const workPackageList = checkIfPropertyExists(paramsObj, "workPackageList")
-	const timeEntryList = checkIfPropertyExists(paramsObj, "timeEntryList")
-	const userList = checkIfPropertyExists(paramsObj, "userList")
-	const billingStatusList = checkIfPropertyExists(paramsObj, "billingStatusList")
+	const action = returnPropertyIfExists(paramsObj, "action")
+	const apiKey = returnPropertyIfExists(paramsObj, "apiKey")
+	const wpConvertUser = returnPropertyIfExists(paramsObj, "wpConvertUser")
+	const rows = returnPropertyIfExists(paramsObj, "rows")
+	const headerRow = returnPropertyIfExists(paramsObj, "headerRow")
+	const weekBegin = returnPropertyIfExists(paramsObj, "weekBegin")
+	const dateEndPeriod = returnPropertyIfExists(paramsObj, "dateEndPeriod")
+	const numberOfWeeks = returnPropertyIfExists(paramsObj, "numberOfWeeks")
+	const filterToOneUserBool = returnPropertyIfExists(paramsObj, "filterToOneUserBool")
+	const billingStatusReportFilter = returnPropertyIfExists(paramsObj, "billingStatusReportFilter")
+	const projectList = returnPropertyIfExists(paramsObj, "projectList")
+	const categoryList = returnPropertyIfExists(paramsObj, "categoryList")
+	const workPackageList = returnPropertyIfExists(paramsObj, "workPackageList")
+	const timeEntryList = returnPropertyIfExists(paramsObj, "timeEntryList")
+	const userList = returnPropertyIfExists(paramsObj, "userList")
+	const billingStatusList = returnPropertyIfExists(paramsObj, "billingStatusList")
 
 	// const workPackageList = await getListFileAsync(action, workPackageListFilename)
 	// const projectList = await getListFileAsync(action, projectListFilename)
@@ -356,10 +356,18 @@ function setCount(action, rows, numOfPages, numberOfWeeks, timeEntryList) {
 	}
 }
 
-function checkIfPropertyExists(obj, prop) {
+function returnPropertyIfExists(obj, prop) {
 	if (Object.prototype.hasOwnProperty.call(obj, prop)) {
 		return obj[prop]
 	}
+	return undefined
+}
+
+function checkIfPropertyExists(obj, prop) {
+	if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+		return true
+	}
+	return false
 }
 
 function validateCSV(action, rows, headerRow) {
@@ -833,20 +841,20 @@ async function retrievePageCountAsync(action, apiKey, wpConvertUser) {
 
 function convertCsvAction(paramsObj) {
 	// params: action, row, rowIndex, wpConvertUser, weekBegin, dateEndPeriod, resultList, projectList, categoryList, workPackageList, timeEntryList, userList
-	const action = checkIfPropertyExists(paramsObj, "action")
-	const row = checkIfPropertyExists(paramsObj, "row")
-	const rowIndex = checkIfPropertyExists(paramsObj, "rowIndex")
-	const wpConvertUser = checkIfPropertyExists(paramsObj, "wpConvertUser")
-	const weekBegin = checkIfPropertyExists(paramsObj, "weekBegin")
-	const dateEndPeriod = checkIfPropertyExists(paramsObj, "dateEndPeriod")
-	const filterToOneUserBool = checkIfPropertyExists(paramsObj, "filterToOneUserBool")
-	const billingStatusReportFilter = checkIfPropertyExists(paramsObj, "billingStatusReportFilter")
-	const resultList = checkIfPropertyExists(paramsObj, "resultList")
-	const projectList = checkIfPropertyExists(paramsObj, "projectList")
-	const categoryList = checkIfPropertyExists(paramsObj, "categoryList")
-	const workPackageList = checkIfPropertyExists(paramsObj, "workPackageList")
-	const timeEntryList = checkIfPropertyExists(paramsObj, "timeEntryList")
-	const userList = checkIfPropertyExists(paramsObj, "userList")
+	const action = returnPropertyIfExists(paramsObj, "action")
+	const row = returnPropertyIfExists(paramsObj, "row")
+	const rowIndex = returnPropertyIfExists(paramsObj, "rowIndex")
+	const wpConvertUser = returnPropertyIfExists(paramsObj, "wpConvertUser")
+	const weekBegin = returnPropertyIfExists(paramsObj, "weekBegin")
+	const dateEndPeriod = returnPropertyIfExists(paramsObj, "dateEndPeriod")
+	const filterToOneUserBool = returnPropertyIfExists(paramsObj, "filterToOneUserBool")
+	const billingStatusReportFilter = returnPropertyIfExists(paramsObj, "billingStatusReportFilter")
+	const resultList = returnPropertyIfExists(paramsObj, "resultList")
+	const projectList = returnPropertyIfExists(paramsObj, "projectList")
+	const categoryList = returnPropertyIfExists(paramsObj, "categoryList")
+	const workPackageList = returnPropertyIfExists(paramsObj, "workPackageList")
+	const timeEntryList = returnPropertyIfExists(paramsObj, "timeEntryList")
+	const userList = returnPropertyIfExists(paramsObj, "userList")
 
 	const outputArray = []
 	let error
