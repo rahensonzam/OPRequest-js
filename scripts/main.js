@@ -312,42 +312,76 @@ async function runSpreadsheetDone() {
     showLoading()
 
     let initCsvFileString
+    const hasInitCsvFileString = setHasInitCsvFileString()
+
+    if (hasInitCsvFileString) {
+        initCsvFileString = await setInitCsvFileString()
+    } else {
+        initCsvFileString = ""
+    }
+
+    const doRunSecondHalf = setDoRunSecondHalf()
+
+    if (doRunSecondHalf) {
+        await runSecondHalf(initCsvFileString)
+    }
+
+    hideLoading()
+    secondHalfRunning = false
+}
+
+function setHasInitCsvFileString() {
     if (actionType === actionTypes.sequenceWeekly
         || actionType === actionTypes.sequenceDaily) {
-
-        if (csvType === csvTypes.import2) {
-            writeToLog(`${getDomElementFileListFilenameById(fileSelect)} CSV imported`, "log", logType.normal)
-
-            initCsvFileString = getDomElementFileListFileById(fileSelect)
-
-            //writeToLog(initCsvFileString.toString, "output", logType.normal)
-            //console.log(initCsvFileString)
-        } else {
-            writeToLog("CSV created", "log", logType.normal)
-
-            initCsvFileString = getSpreedsheetData()
-
-            console.log(initCsvFileString)
-            writeToLog(initCsvFileString, "output", logType.normal)
-        }
-
-        writeToLog("step: 2/8 action: csvInput completed successfully", "step", logType.finished)
-        console.log("step: 2/8 action: csvInput completed successfully")
+        return true
     }
     if (actionType === actionTypes.sequenceExportExtract
         || actionType === actionTypes.sequenceExportSummarizeUt
         || actionType === actionTypes.sequenceExportSummarizeCat
         || actionType === actionTypes.sequenceExportBreakdownCat
         || actionType === actionTypes.sequenceExportBreakdownClient) {
-        initCsvFileString = ""
+        return false
     }
-    //FIXME: Hack, needs rearranging
-    if (!(actionType === actionTypes.single)) {
-        await runSecondHalf(initCsvFileString)
+}
+
+function setDoRunSecondHalf() {
+    if (actionType === actionTypes.sequenceWeekly
+        || actionType === actionTypes.sequenceDaily
+        || actionType === actionTypes.sequenceExportExtract
+        || actionType === actionTypes.sequenceExportSummarizeUt
+        || actionType === actionTypes.sequenceExportSummarizeCat
+        || actionType === actionTypes.sequenceExportBreakdownCat
+        || actionType === actionTypes.sequenceExportBreakdownClient) {
+        return true
+    }
+    if (actionType === actionTypes.single) {
+        return false
+    }
+}
+
+async function setInitCsvFileString() {
+    let initCsvFileString
+
+    if (csvType === csvTypes.import2) {
+        writeToLog(`${getDomElementFileListFilenameById(fileSelect)} CSV imported`, "log", logType.normal)
+
+        initCsvFileString = getDomElementFileListFileById(fileSelect)
+
+        //writeToLog(initCsvFileString.toString, "output", logType.normal)
+        //console.log(initCsvFileString)
+    } else {
+        writeToLog("CSV created", "log", logType.normal)
+
+        initCsvFileString = getSpreedsheetData()
+
+        console.log(initCsvFileString)
+        writeToLog(initCsvFileString, "output", logType.normal)
     }
 
-    hideLoading()
-    secondHalfRunning = false
+    writeToLog("step: 2/8 action: csvInput completed successfully", "step", logType.finished)
+    console.log("step: 2/8 action: csvInput completed successfully")
+
+    return initCsvFileString
 }
 
 async function runSecondHalf(initCsvFileString) {
