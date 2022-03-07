@@ -18,6 +18,7 @@ function addDomEventListeners() {
     getDomElementById("single").addEventListener("click", showHideUI)
     getDomElementById("sequenceWeekly").addEventListener("click", showHideUI)
     getDomElementById("sequenceDaily").addEventListener("click", showHideUI)
+    getDomElementById("sequenceFeeNote").addEventListener("click", showHideUI)
     getDomElementById("sequenceExportExtract").addEventListener("click", showHideUI)
     getDomElementById("sequenceExportSummarizeUt").addEventListener("click", showHideUI)
     getDomElementById("sequenceExportSummarizeCat").addEventListener("click", showHideUI)
@@ -53,7 +54,8 @@ function showHideUI() {
         showHideUtil("actionSelectLogLabel", "none")
     }
 
-    if (actionType === actionTypes.sequenceDaily) {
+    if (actionType === actionTypes.sequenceDaily
+        || actionType === actionTypes.sequenceFeeNote) {
         //hideWeek
         showHideUtil("weekBeginLabel", "none")
         showHideUtil("weekBeginBox", "none")

@@ -82,6 +82,7 @@ const logType = {
 const actionTypes = {
     sequenceWeekly: "sequenceWeekly",
     sequenceDaily: "sequenceDaily",
+    sequenceFeeNote: "sequenceFeeNote",
     sequenceExportExtract: "sequenceExportExtract",
     sequenceExportSummarizeUt: "sequenceExportSummarizeUt",
     sequenceExportSummarizeCat: "sequenceExportSummarizeCat",
@@ -154,7 +155,8 @@ async function runActions() {
     firstHalfSucessful = false
 
     if (actionType === actionTypes.sequenceWeekly
-        || actionType === actionTypes.sequenceDaily) {
+        || actionType === actionTypes.sequenceDaily
+        || actionType === actionTypes.sequenceFeeNote) {
         if (csvType === csvTypes.create) {
             firstHalfUsingSpreadsheet = true
         }
@@ -171,7 +173,9 @@ async function runActions() {
                 setLocalStorage()
             }
         }
-
+    }
+    if (actionType !== actionTypes.single
+        && actionType !== actionTypes.sequenceFeeNote) {
         weekBegin = dayjs(weekBegin, validDateFormats).format("YYYY-MM-DD")
         dateEndPeriod = dayjs(dateEndPeriod, validDateFormats).format("YYYY-MM-DD")
 
@@ -1059,7 +1063,8 @@ function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, numberO
             }
         }
         if (actionType === actionTypes.sequenceWeekly
-            || actionType === actionTypes.sequenceDaily) {
+            || actionType === actionTypes.sequenceDaily
+            || actionType === actionTypes.sequenceFeeNote) {
             if (csvType === csvTypes.import
                 || csvType === csvTypes.import2) {
                 if (typeof selectedFile === "undefined") {
@@ -1078,7 +1083,8 @@ function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, numberO
             return false
         }
         if (actionType !== actionTypes.sequenceWeekly
-            && actionType !== actionTypes.sequenceDaily) {
+            && actionType !== actionTypes.sequenceDaily
+            && actionType !== actionTypes.sequenceFeeNote) {
             if (firstHalfSucessful === false) {
                 writeToLog(`error: Sucessfully run "Go 1" first`, "error", logType.error)
                 return false
