@@ -44,7 +44,8 @@ const actions = {
 	convertToWorkPackageIDs: "convertToWorkPackageIDs",
 	convertNamesToIDs: "convertNamesToIDs",
 	convertMembershipNamesToIDs: "convertMembershipNamesToIDs",
-	convertWeekToDays: "convertWeekToDays"
+	convertWeekToDays: "convertWeekToDays",
+	convertDaysToWeek: "convertDaysToWeek"
 }
 
 // const activeAction = actions.addTimeEntry
@@ -199,6 +200,7 @@ async function doActionAsync(paramsObj) {
 		}
 	}
 	if (action === actions.convertWeekToDays
+		|| action === actions.convertDaysToWeek
 		|| action === actions.convertNamesToIDs) {
 		if (isValid.errors[0].message !== "") {
 			return { conversion: isValid }
@@ -249,6 +251,8 @@ async function doActionAsync(paramsObj) {
 			convertedCSVResults.push(convertCsvAction({ action, row, rowIndex, projectList }))
 		} else if (action === actions.convertWeekToDays) {
 			convertedCSVResults.push(convertCsvAction({ action, row, weekBegin }))
+		} else if (action === actions.convertDaysToWeek) {
+			convertedCSVResults.push(convertCsvAction({ action, row, weekBegin }))
 		} else if (action === actions.exportTimeEntries) {
 			convertedCSVResults.push(convertCsvAction({ action, rowIndex, projectList, categoryList, workPackageList, timeEntryList, userList }))
 		} else if (action === actions.extractTimeSheets) {
@@ -285,6 +289,7 @@ async function doActionAsync(paramsObj) {
 	}
 
 	if (action === actions.convertWeekToDays
+		|| action === actions.convertDaysToWeek
 		|| action === actions.convertNamesToIDs
 		|| action === actions.convertMembershipNamesToIDs
 		|| action === actions.convertToWorkPackageIDs
@@ -396,6 +401,8 @@ function validateCSV(action, rows, headerRow) {
 		console.log(`${action} CSV Validation not yet implemented`)
 	} else if (action === actions.convertWeekToDays) {
 		return innerValidateCSVConversion(["client", "period", "category", "natureOfWork", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"], headerRow)
+	} else if (action === actions.convertDaysToWeek) {
+		return innerValidateCSVConversion(["client", "period", "category", "spentOn", "units"], headerRow)
 	} else if (action === actions.exportTimeEntries) {
 		console.log(`${action} CSV Validation not yet implemented`)
 	} else if (action === actions.extractTimeSheets) {
@@ -517,7 +524,11 @@ function innerValidateCSVConversion(expected, headerRow) {
 // }
 
 function convertResultsToCsv(action, resultArray) {
-	const temp = expandResults(resultArray)
+	let temp = expandResults(resultArray)
+	if (action === actions.convertDaysToWeek) {
+		// FIXME: addEmptyDays modifies the orignal array
+		temp = addEmptyDays2(temp)
+	}
 	let temp6 = []
 	if (action === actions.summarizeCatTimeEntries) {
 		const temp3 = extractProp(temp, "data")
@@ -651,6 +662,20 @@ function addEmptyDays(resultArray) {
 				}
 			}
 		}
+	}
+	return resultArray
+}
+
+function addEmptyDays2(resultArray) {
+	// FIXME: addEmptyDays modifies the orignal array
+	for (let i = 0; i <= resultArray.length - 1; i++) {
+		// for (let j = 0; j <= resultArray[i].data.length - 1; j++) {
+			for (let k = 0; k <= daysOfWeek.length - 1; k++) {
+				if (typeof resultArray[i].data[daysOfWeek[k]] === "undefined") {
+					resultArray[i].data[daysOfWeek[k]] = ""
+				}
+			}
+		// }
 	}
 	return resultArray
 }
@@ -1102,7 +1127,8 @@ function convertCsvAction(paramsObj) {
 }
 
 function setConversionCount(action, retrievedListLength, filteredSortedListLength) {
-	if (action === actions.convertToWorkPackageIDs
+	if (action === actions.convertDaysToWeek
+		|| action === actions.convertToWorkPackageIDs
 		|| action === actions.convertNamesToIDs
 		|| action === actions.convertMembershipNamesToIDs
 		|| action === actions.exportTimeEntries) {
@@ -1220,6 +1246,7 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, filterToOne
 		error.message = ""
 		return { errors: error }
 	} else if (action === actions.convertWeekToDays
+		|| action === actions.convertDaysToWeek
 		|| action === actions.exportTimeEntries
 		|| action === actions.condenseTimeSheets
 		|| action === actions.tabulateUtTimeEntries
@@ -1280,6 +1307,23 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 				spentOn: currentDate,
 				units: row[daysOfWeek[i]]
 			}]
+		}
+		return []
+	} else if (action === actions.convertDaysToWeek) {
+		// day:  client,period,category,natureOfWork,spentOn,units
+		// week: client,period,category,natureOfWork,mo,tu,wd,th,fr,sa,su
+		let currentDate2 = currentDate
+		for (let index = 0; index <= daysOfWeek.length - 1; index++) {
+			if (row.spentOn === currentDate2) {
+				return [{
+					client: row.client,
+					period: row.period,
+					category: row.category,
+					natureOfWork: row.natureOfWork,
+					[daysOfWeek[index]]: row.units
+				}]
+			}
+			currentDate2 = dayjs(currentDate2).add(1, "day").format('YYYY-MM-DD')
 		}
 		return []
 	} else if (action === actions.extractTimeSheets) {

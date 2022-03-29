@@ -647,6 +647,7 @@ function getActionOptions(action) {
         || action === actions.convertNamesToIDs
         || action === actions.convertMembershipNamesToIDs
         || action === actions.convertWeekToDays
+        || action === actions.convertDaysToWeek
         || action === actions.exportTimeEntries
         || action === actions.extractTimeSheets
         || action === actions.condenseTimeSheets
@@ -954,6 +955,7 @@ function logData(action, currentStep) {
         || action === actions.convertNamesToIDs
         || action === actions.convertMembershipNamesToIDs
         || action === actions.convertWeekToDays
+        || action === actions.convertDaysToWeek
         || action === actions.exportTimeEntries) {
         writeToLog(`${currentStep.conversion.data[0].data}`, "output", logType.normal)
         console.log(currentStep.conversion.data[0].data)
