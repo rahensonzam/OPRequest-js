@@ -7,43 +7,43 @@ function getAdminUser2IdNumber() {
 }
 
 function getBillingStatusList() {
-    return JSON.parse(`[{"id": "1", "name": "Unbilled"},
-    {"id": "2", "name": "Billed"},
-    {"id": "3", "name": "Written off"}]`)
+    return JSON.parse(`[{ "id": "1", "name": "Unbilled" },
+    { "id": "2", "name": "Billed" },
+    { "id": "3", "name": "Written off" }]`)
 }
 
 // function getProjectList() {
-//     return JSON.parse(`[{"id": "1", "identifier": "client-a", "name": "Client A"},
-//     // {"id": "2", "identifier": "client-b", "name": "Client B"}]`)
+//     return JSON.parse(`[{ "id": "1", "identifier": "client-a", "name": "Client A" },
+//     // { "id": "2", "identifier": "client-b", "name": "Client B" }]`)
 // }
 
 function getCategoryList() {
-    return JSON.parse(`[{"id": "14", "name": "Audit"},
-    {"id": "18", "name": "Accountancy"},
-    {"id": "19", "name": "Secretarial"},
-    {"id": "20", "name": "Property Administration"},
-    {"id": "27", "name": "Tax"},
-    {"id": "15", "name": "Income Tax"},
-    {"id": "16", "name": "VAT"},
-    {"id": "17", "name": "Reverse Charge"},
-    {"id": "21", "name": "PAYE"},
-    {"id": "22", "name": "NAPSA"},
-    {"id": "28", "name": "NHIMA"},
-    {"id": "29", "name": "WCF"},
-    {"id": "23", "name": "TOT"},
-    {"id": "24", "name": "WHT"},
-    {"id": "30", "name": "TLEVY"},
-    {"id": "31", "name": "PTT"},
-    {"id": "32", "name": "TP"},
-    {"id": "25", "name": "Special Assignment"},
-    {"id": "26", "name": "Non-billable"}]`)
+    return JSON.parse(`[{ "id": "14", "name": "Audit" },
+    { "id": "18", "name": "Accountancy" },
+    { "id": "19", "name": "Secretarial" },
+    { "id": "20", "name": "Property Administration" },
+    { "id": "27", "name": "Tax" },
+    { "id": "15", "name": "Income Tax" },
+    { "id": "16", "name": "VAT" },
+    { "id": "17", "name": "Reverse Charge" },
+    { "id": "21", "name": "PAYE" },
+    { "id": "22", "name": "NAPSA" },
+    { "id": "28", "name": "NHIMA" },
+    { "id": "29", "name": "WCF" },
+    { "id": "23", "name": "TOT" },
+    { "id": "24", "name": "WHT" },
+    { "id": "30", "name": "TLEVY" },
+    { "id": "31", "name": "PTT" },
+    { "id": "32", "name": "TP" },
+    { "id": "25", "name": "Special Assignment" },
+    { "id": "26", "name": "Non-billable" }]`)
 }
 
 function getUserList() {
-    return JSON.parse(`[{"id": "6", "name": "Alice", "grade": "T2", "order": "1"},
-    {"id": "7", "name": "Bob", "grade": "G2", "order": "3"},
-    {"id": "4", "name": "admin", "grade": "", "order": "0"},
-    {"id": "8", "name": "Carrol", "grade": "Supervisor", "order": "2"}]`)
+    return JSON.parse(`[{ "id": "6", "name": "Alice", "grade": "T2", "order": "1" },
+    { "id": "7", "name": "Bob", "grade": "G2", "order": "3" },
+    { "id": "4", "name": "admin", "grade": "", "order": "0" },
+    { "id": "8", "name": "Carrol", "grade": "Supervisor", "order": "2" }]`)
 }
 
 function getGradeOrder() {
