@@ -221,7 +221,7 @@ async function doActionAsync(paramsObj) {
 		if (webErrorsPresent(result)) {
 			return { web: result, conversion: {} }
 		}
-		numOfPages = Math.ceil(Number(result[0].data["total"]) / Number(result[0].data["pageSize"]))
+		numOfPages = Math.ceil(Number(result[0].data.total) / Number(result[0].data.pageSize))
 	}
 
 	const count = setCount(action, rows, numOfPages, numberOfWeeks, timeEntryList)
@@ -892,9 +892,9 @@ function convertCsvAction(paramsObj) {
 		const period = row.period
 
 		for (const workPackageRow of workPackageList) {
-			const project = workPackageRow["project"]
-			const subject = workPackageRow["subject"]
-			const assignee = workPackageRow["assignee"]
+			const project = workPackageRow.project
+			const subject = workPackageRow.subject
+			const assignee = workPackageRow.assignee
 			if ((project == client)
 				&& (subject == period)
 				&& (assignee == wpConvertUser)) {
@@ -987,7 +987,7 @@ function convertCsvAction(paramsObj) {
 		|| action === actions.getWorkPackages
 		|| action === actions.getAllWorkPackages
 		|| action === actions.getTimeEntries) {
-		retrievedListLength = resultList[rowIndex].data["_embedded"]["elements"].length - 1
+		retrievedListLength = resultList[rowIndex].data["_embedded"].elements.length - 1
 	}
 
 	const outputExt = []
@@ -1375,58 +1375,58 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 		|| action === actions.getWorkPackages
 		|| action === actions.getAllWorkPackages
 		|| action === actions.getTimeEntries) {
-		const retrivedProjectList = resultList[rowIndex].data["_embedded"]["elements"]
+		const retrivedProjectList = resultList[rowIndex].data["_embedded"].elements
 		if (action === actions.getProjects) {
 			return [{
-				id: retrivedProjectList[i]["id"],
-				identifier: retrivedProjectList[i]["identifier"],
-				name: retrivedProjectList[i]["name"]
+				id: retrivedProjectList[i].id,
+				identifier: retrivedProjectList[i].identifier,
+				name: retrivedProjectList[i].name
 			}]
 		} else if (action === actions.getWorkPackages
 			|| action === actions.getAllWorkPackages) {
 			return [{
-				id: retrivedProjectList[i]["id"],
-				subject: retrivedProjectList[i]["subject"],
+				id: retrivedProjectList[i].id,
+				subject: retrivedProjectList[i].subject,
 				project: extractProject(retrivedProjectList[i]),
 				assignee: extractAssignee(retrivedProjectList[i]),
-				status: retrivedProjectList[i]["_links"]["status"]["title"]
+				status: retrivedProjectList[i]["_links"].status.title
 			}]
 		} else if (action === actions.getTimeEntries) {
 			return [{
-				id: retrivedProjectList[i]["id"],
-				spentOn: retrivedProjectList[i]["spentOn"],
-				hours: convertUnitsBack(retrivedProjectList[i]["hours"]),
-				comment: retrivedProjectList[i]["comment"]["raw"],
+				id: retrivedProjectList[i].id,
+				spentOn: retrivedProjectList[i].spentOn,
+				hours: convertUnitsBack(retrivedProjectList[i].hours),
+				comment: retrivedProjectList[i].comment.raw,
 				workPackage: extractWorkPackage(retrivedProjectList[i]),
 				user: extractUser(retrivedProjectList[i]),
 				activity: extractActivity(retrivedProjectList[i]),
-				billingStatus: retrivedProjectList[i]["_links"][custom.billingStatus]["title"],
+				billingStatus: retrivedProjectList[i]["_links"][custom.billingStatus].title,
 				feeNoteNumber: retrivedProjectList[i][custom.feeNoteNumber]
 			}]
 		}
 	} else if (action === actions.exportTimeEntries) {
-		const workPackageID = timeEntryList[rowIndex]["workPackage"]
+		const workPackageID = timeEntryList[rowIndex].workPackage
 		const workPackageIndex = findArrayIndexFromID(workPackageList, workPackageID)
-		const projectID = workPackageList[workPackageIndex]["project"]
+		const projectID = workPackageList[workPackageIndex].project
 		const projectIndex = findArrayIndexFromID(projectList, projectID)
-		const categoryID = timeEntryList[rowIndex]["activity"]
+		const categoryID = timeEntryList[rowIndex].activity
 		const categoryIndex = findArrayIndexFromID(categoryList, categoryID)
-		const userID = timeEntryList[rowIndex]["user"]
+		const userID = timeEntryList[rowIndex].user
 		const userIndex = findArrayIndexFromID(userList, userID)
 		return [{
-			id: timeEntryList[rowIndex]["id"],
+			id: timeEntryList[rowIndex].id,
 			workPackage: workPackageID,
-			spentOn: timeEntryList[rowIndex]["spentOn"],
-			user: userList[userIndex]["name"],
-			grade: userList[userIndex]["grade"],
-			client: projectList[projectIndex]["name"],
-			period: workPackageList[workPackageIndex]["subject"],
-			category: categoryList[categoryIndex]["name"],
-			status: workPackageList[workPackageIndex]["status"],
-			natureOfWork: removeNatureNull(timeEntryList[rowIndex]["comment"]),
-			units: removeUnitsNull(timeEntryList[rowIndex]["hours"]),
-			billingStatus: timeEntryList[rowIndex]["billingStatus"],
-			feeNoteNumber: removeFeeNoteNull(timeEntryList[rowIndex]["feeNoteNumber"])
+			spentOn: timeEntryList[rowIndex].spentOn,
+			user: userList[userIndex].name,
+			grade: userList[userIndex].grade,
+			client: projectList[projectIndex].name,
+			period: workPackageList[workPackageIndex].subject,
+			category: categoryList[categoryIndex].name,
+			status: workPackageList[workPackageIndex].status,
+			natureOfWork: removeNatureNull(timeEntryList[rowIndex].comment),
+			units: removeUnitsNull(timeEntryList[rowIndex].hours),
+			billingStatus: timeEntryList[rowIndex].billingStatus,
+			feeNoteNumber: removeFeeNoteNull(timeEntryList[rowIndex].feeNoteNumber)
 			// cost: ,
 		}]
 	} else {
@@ -2074,10 +2074,10 @@ function extractActivity(element) {
 }
 
 function extractElement(element, subElement, subURL) {
-	if (element["_links"][subElement]["href"] !== null) {
-		return Number(element["_links"][subElement]["href"].replace(`${apiURL}${subURL}`, ""))
+	if (element["_links"][subElement].href !== null) {
+		return Number(element["_links"][subElement].href.replace(`${apiURL}${subURL}`, ""))
 	} else {
-		return element["_links"][subElement]["href"]
+		return element["_links"][subElement].href
 	}
 }
 
@@ -2110,32 +2110,32 @@ function setBody(action, row, lockVersion, rowIndex, wpConvertUser, billingStatu
 
 	if (action === actions.updateWorkPackage) {
 		const tempWP = {}
-		tempWP["lockVersion"] = lockVersion
+		tempWP.lockVersion = lockVersion
 		if (checkIfPropertyExists(row, "subject")) {
-			tempWP["subject"] = row.subject
+			tempWP.subject = row.subject
 		}
 		if (checkIfPropertyExists(row, "user")) {
 			if (row.user === "nobody") {
 				tempWP["_links"] = tempWP["_links"] ?? {}
-				tempWP["_links"]["assignee"] = {
+				tempWP["_links"].assignee = {
 					"href": null
 				}
 			} else {
 				tempWP["_links"] = tempWP["_links"] ?? {}
-				tempWP["_links"]["assignee"] = {
+				tempWP["_links"].assignee = {
 					"href": `${apiURL}/users/${row.user}`
 				}
 			}
 		}
 		if (checkIfPropertyExists(row, "project")) {
 			tempWP["_links"] = tempWP["_links"] ?? {}
-			tempWP["_links"]["project"] = {
+			tempWP["_links"].project = {
 				"href": `${apiURL}/projects/${row.project}`
 			}
 		}
 		if (checkIfPropertyExists(row, "status")) {
 			tempWP["_links"] = tempWP["_links"] ?? {}
-			tempWP["_links"]["status"] = {
+			tempWP["_links"].status = {
 				"href": `${apiURL}/statuses/${row.status}`
 			}
 		}
@@ -2143,26 +2143,26 @@ function setBody(action, row, lockVersion, rowIndex, wpConvertUser, billingStatu
 	} else if (action === actions.updateTimeEntry) {
 		const tempTimeEntry = {}
 		if (checkIfPropertyExists(row, "spentOn")) {
-			tempTimeEntry["spentOn"] = row.spentOn
+			tempTimeEntry.spentOn = row.spentOn
 		}
 		if (checkIfPropertyExists(row, "units")) {
 			const convertedUnits = convertUnits(row.units)
-			tempTimeEntry["hours"] = convertedUnits
+			tempTimeEntry.hours = convertedUnits
 		}
 		if (checkIfPropertyExists(row, "comment")) {
-			tempTimeEntry["comment"] = {
+			tempTimeEntry.comment = {
 				"raw": row.comment
 			}
 		}
 		if (checkIfPropertyExists(row, "workPackageID")) {
 			tempTimeEntry["_links"] = tempTimeEntry["_links"] ?? {}
-			tempTimeEntry["_links"]["workPackage"] = {
+			tempTimeEntry["_links"].workPackage = {
 				"href": `${apiURL}/work_packages/${row.workPackageID}`
 			}
 		}
 		if (checkIfPropertyExists(row, "activity")) {
 			tempTimeEntry["_links"] = tempTimeEntry["_links"] ?? {}
-			tempTimeEntry["_links"]["activity"] = {
+			tempTimeEntry["_links"].activity = {
 				"href": `${apiURL}/time_entries/activities/${row.activity}`
 			}
 		}
@@ -2192,22 +2192,22 @@ function setBody(action, row, lockVersion, rowIndex, wpConvertUser, billingStatu
 		}
 	} else if (action === actions.addWorkPackage) {
 		const tempWP = {}
-		tempWP["subject"] = row.subject
+		tempWP.subject = row.subject
 		if (checkIfPropertyExists(row, "user")) {
 			if (row.user === "nobody") {
 				tempWP["_links"] = tempWP["_links"] ?? {}
-				tempWP["_links"]["assignee"] = {
+				tempWP["_links"].assignee = {
 					"href": null
 				}
 			} else {
 				tempWP["_links"] = tempWP["_links"] ?? {}
-				tempWP["_links"]["assignee"] = {
+				tempWP["_links"].assignee = {
 					"href": `${apiURL}/users/${row.user}`
 				}
 			}
 		}
 		tempWP["_links"] = tempWP["_links"] ?? {}
-		tempWP["_links"]["project"] = {
+		tempWP["_links"].project = {
 			"href": `${apiURL}/projects/${row.project}`
 		}
 		if (checkIfPropertyExists(row, "feeNoteDate")) {
@@ -2327,7 +2327,7 @@ async function doCurrentActionAsync(action, row, billingStatusList, httpMethod, 
 			return getReqResponse
 		}
 
-		const lockVersion = getReqResponse.data["lockVersion"]
+		const lockVersion = getReqResponse.data.lockVersion
 
 		getReqResponse.prelog.push(`lockVersion ${lockVersion}`)
 
