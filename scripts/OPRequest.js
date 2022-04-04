@@ -221,8 +221,7 @@ async function doActionAsync(paramsObj) {
 		if (webErrorsPresent(result)) {
 			return { web: result, conversion: {} }
 		}
-		// FIXME: pageSize is hardcoded as 100
-		numOfPages = Math.ceil(Number(result[0].data["total"]) / 100)
+		numOfPages = Math.ceil(Number(result[0].data["total"]) / Number(result[0].data["pageSize"]))
 	}
 
 	const count = setCount(action, rows, numOfPages, numberOfWeeks, timeEntryList)
@@ -2250,7 +2249,10 @@ function setBody(action, row, lockVersion, rowIndex, wpConvertUser, billingStatu
 			}
 		}
 	} else if (action === actions.getProjects) {
+		// FIXME: pageSize is hardcoded as 100
 		return {
+			offset: rowIndex,
+			pageSize: 100,
 			filters: "[]"
 		}
 	} else if (action === actions.getWorkPackages) {
