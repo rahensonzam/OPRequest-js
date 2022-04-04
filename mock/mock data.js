@@ -5,6 +5,8 @@ module.exports = {
         "_type": "Collection",
         "total": 3,
         "count": 3,
+        "pageSize": 100,
+        "offset": 1,
         "_embedded": {
             "elements": [
                 {"_type":"Project","id":1,"identifier":"apple","name":"Apple","_links":{"self":{"href":"/api/v3/projects/1","title":"Apple"},}},
