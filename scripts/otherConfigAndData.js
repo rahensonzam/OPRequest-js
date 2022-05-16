@@ -12,6 +12,24 @@ function getBillingStatusList() {
     { "id": "3", "name": "Written off" }]`)
 }
 
+function getBillingStatusEnum() {
+    return {
+        Unbilled: "Unbilled",
+        Billed: "Billed",
+        WrittenOff: "Written off"
+    }
+}
+
+function getBillingStatusReportFilterEnum() {
+    return {
+        All: "All",
+        BilledAndWrittenOff: "BilledAndWrittenOff",
+        Unbilled: "Unbilled",
+        Billed: "Billed",
+        WrittenOff: "WrittenOff"
+    }
+}
+
 // function getProjectList() {
 //     return JSON.parse(`[{ "id": "1", "identifier": "client-a", "name": "Client A" },
 //     // { "id": "2", "identifier": "client-b", "name": "Client B" }]`)

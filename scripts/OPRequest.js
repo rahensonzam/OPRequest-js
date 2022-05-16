@@ -4,7 +4,7 @@
 // const got = require('got')
 // const papa = require('papaparse')
 // const fs = require('fs').promises
-import { getCustom, getGradeOrder } from "./otherConfigAndData.js"
+import { getCustom, getGradeOrder, getBillingStatusEnum, getBillingStatusReportFilterEnum } from "./otherConfigAndData.js"
 
 const hostURL = "http://127.0.0.1:9999"
 const apiURL = "/api/v3"
@@ -67,20 +67,9 @@ const webErrorTypes = {
 	unknown: "unknown"
 }
 
-// FIXME: billingStatus values should be defined in one place
-const billingStatusEnum = {
-	Unbilled: "Unbilled",
-	Billed: "Billed",
-	WrittenOff: "Written off"
-}
+const billingStatusEnum = getBillingStatusEnum()
 
-const billingStatusReportFilterEnum = {
-	All: "All",
-	BilledAndWrittenOff: "BilledAndWrittenOff",
-	Unbilled: "Unbilled",
-	Billed: "Billed",
-	WrittenOff: "WrittenOff"
-}
+const billingStatusReportFilterEnum = getBillingStatusReportFilterEnum()
 
 const custom = getCustom()
 
