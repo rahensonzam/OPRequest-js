@@ -6,6 +6,11 @@ function getAdminUser2IdNumber() {
     return 5
 }
 
+function getFixedBeginDate() {
+    // return "2021-05-03"
+    return "2021-03-01"
+}
+
 function getBillingStatusList() {
     return JSON.parse(`[{ "id": "1", "name": "Unbilled" },
     { "id": "2", "name": "Billed" },
@@ -159,7 +164,10 @@ function getCustom() {
 export {
     getAdminUser1IdNumber,
     getAdminUser2IdNumber,
+    getFixedBeginDate,
     getBillingStatusList,
+    getBillingStatusEnum,
+    getBillingStatusReportFilterEnum,
     // getProjectList,
     getCategoryList,
     getUserList,

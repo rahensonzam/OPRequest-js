@@ -22,6 +22,7 @@ function addDomEventListeners() {
     getDomElementById("sequenceExportExtract").addEventListener("click", showHideUI)
     getDomElementById("sequenceExportSummarizeUt").addEventListener("click", showHideUI)
     getDomElementById("sequenceExportSummarizeCat").addEventListener("click", showHideUI)
+    getDomElementById("sequenceExportLoggedMinusBilledCat").addEventListener("click", showHideUI)
     getDomElementById("sequenceExportBreakdownCat").addEventListener("click", showHideUI)
     getDomElementById("sequenceExportBreakdownClient").addEventListener("click", showHideUI)
     getDomElementById("staticListsCheckbox").addEventListener("change", showHideUI)
@@ -84,6 +85,7 @@ function showHideUI() {
 
     if (actionType === actionTypes.sequenceExportSummarizeUt
         || actionType === actionTypes.sequenceExportSummarizeCat
+        || actionType === actionTypes.sequenceExportLoggedMinusBilledCat
         || actionType === actionTypes.sequenceExportBreakdownCat
         || actionType === actionTypes.sequenceExportBreakdownClient
         || actionType === actionTypes.single) {
@@ -99,6 +101,7 @@ function showHideUI() {
     if (actionType === actionTypes.sequenceExportExtract
         || actionType === actionTypes.sequenceExportSummarizeUt
         || actionType === actionTypes.sequenceExportSummarizeCat
+        || actionType === actionTypes.sequenceExportLoggedMinusBilledCat
         || actionType === actionTypes.sequenceExportBreakdownCat
         || actionType === actionTypes.sequenceExportBreakdownClient) {
         //hideCsvChooser
@@ -125,6 +128,7 @@ function showHideUI() {
     if (actionType === actionTypes.sequenceExportExtract
         || actionType === actionTypes.sequenceExportSummarizeUt
         || actionType === actionTypes.sequenceExportSummarizeCat
+        || actionType === actionTypes.sequenceExportLoggedMinusBilledCat
         || actionType === actionTypes.sequenceExportBreakdownCat
         || actionType === actionTypes.sequenceExportBreakdownClient
         || actionType === actionTypes.single) {
@@ -138,6 +142,7 @@ function showHideUI() {
     }
 
     if (actionType === actionTypes.sequenceExportSummarizeCat
+        || actionType === actionTypes.sequenceExportLoggedMinusBilledCat
         || actionType === actionTypes.sequenceExportBreakdownCat
         || actionType === actionTypes.sequenceExportBreakdownClient
         || actionType === actionTypes.single) {
@@ -155,6 +160,7 @@ function showHideUI() {
             if (actionType === actionTypes.sequenceExportExtract
                 || actionType === actionTypes.sequenceExportSummarizeUt
                 || actionType === actionTypes.sequenceExportSummarizeCat
+                || actionType === actionTypes.sequenceExportLoggedMinusBilledCat
                 || actionType === actionTypes.sequenceExportBreakdownCat
                 || actionType === actionTypes.sequenceExportBreakdownClient) {
                 showStaticFile()

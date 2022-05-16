@@ -5,7 +5,10 @@
 import {
     getAdminUser1IdNumber,
     getAdminUser2IdNumber,
+    getFixedBeginDate,
     getBillingStatusList,
+    getBillingStatusEnum,
+    getBillingStatusReportFilterEnum,
     // getProjectList,
     getCategoryList,
     getUserList,
@@ -48,6 +51,8 @@ let exportedApiKey
 let actionType
 let csvType
 // let billingStatusList
+const billingStatusEnum = getBillingStatusEnum()
+const billingStatusReportFilterEnum = getBillingStatusReportFilterEnum()
 const paramsObj = {}
 // let mySpreadsheet
 // let firstHalfAlready = false
@@ -72,6 +77,7 @@ const actionTypes = {
     sequenceExportExtract: "sequenceExportExtract",
     sequenceExportSummarizeUt: "sequenceExportSummarizeUt",
     sequenceExportSummarizeCat: "sequenceExportSummarizeCat",
+    sequenceExportLoggedMinusBilledCat: "sequenceExportLoggedMinusBilledCat",
     sequenceExportBreakdownCat: "sequenceExportBreakdownCat",
     sequenceExportBreakdownClient: "sequenceExportBreakdownClient",
     single: "single"
@@ -120,6 +126,7 @@ async function runActions() {
     paramsObj.weekBegin = getDomElementValueById("weekBeginBox")
     paramsObj.dateEndPeriod = getDomElementValueById("dateEndPeriodBox")
     paramsObj.numberOfWeeks = Number(getDomElementValueById("numberOfWeeksBox"))
+    paramsObj.fixedBeginDate = getFixedBeginDate()
     paramsObj.fileSelect = getDomElementObjById("fileSelect")
     paramsObj.staticLists = getDomElementCheckedStateById("staticListsCheckbox")
     paramsObj.filterToOneUserBool = getDomElementCheckedStateById("filterToOneUserCheckbox")
@@ -349,6 +356,7 @@ function setHasInitCsvFileString() {
     if (actionType === actionTypes.sequenceExportExtract
         || actionType === actionTypes.sequenceExportSummarizeUt
         || actionType === actionTypes.sequenceExportSummarizeCat
+        || actionType === actionTypes.sequenceExportLoggedMinusBilledCat
         || actionType === actionTypes.sequenceExportBreakdownCat
         || actionType === actionTypes.sequenceExportBreakdownClient) {
         return false
@@ -362,6 +370,7 @@ function setDoRunSecondHalf() {
         || actionType === actionTypes.sequenceExportExtract
         || actionType === actionTypes.sequenceExportSummarizeUt
         || actionType === actionTypes.sequenceExportSummarizeCat
+        || actionType === actionTypes.sequenceExportLoggedMinusBilledCat
         || actionType === actionTypes.sequenceExportBreakdownCat
         || actionType === actionTypes.sequenceExportBreakdownClient) {
         return true
@@ -380,7 +389,7 @@ async function setInitCsvFileString(paramsObj) {
         initCsvFileString = getDomElementFileListFileById(paramsObj.fileSelect)
 
         if (actionType === actionTypes.sequenceFeeNote) {
-            initCsvFileString = await addColumnsToFeeNoteCsv(initCsvFileString)
+            initCsvFileString = await editCsv(initCsvFileString, addColumnsToFeeNoteCsv)
         }
         //writeToLog(initCsvFileString.toString, "output", logType.normal)
         //console.log(initCsvFileString)
@@ -390,7 +399,7 @@ async function setInitCsvFileString(paramsObj) {
         initCsvFileString = getSpreedsheetData()
 
         if (actionType === actionTypes.sequenceFeeNote) {
-            initCsvFileString = await addColumnsToFeeNoteCsv(initCsvFileString)
+            initCsvFileString = await editCsv(initCsvFileString, addColumnsToFeeNoteCsv)
         }
 
         console.log(initCsvFileString)
@@ -403,15 +412,197 @@ async function setInitCsvFileString(paramsObj) {
     return initCsvFileString
 }
 
-async function addColumnsToFeeNoteCsv(inputCsvString) {
+async function editCsv(inputCsvString, innerFunc) {
     const myCsvObj = await parseCSVFile(inputCsvString)
     const myCsvArray = myCsvObj.rows
-    const tempArray = []
-    for (let i = 0; i <= myCsvArray.length - 1; i++) {
-        tempArray.push({ ...myCsvArray[i], project: getFeeNotesProjectID(), user: "nobody" })
-    }
+    const tempArray = innerFunc(myCsvArray)
     const outputCsv = Papa.unparse(tempArray, { quotes: true })
     return outputCsv
+}
+
+async function addColumnsToFeeNoteCsv(inputArray) {
+    const outputArray = []
+    for (let i = 0; i <= inputArray.length - 1; i++) {
+        outputArray.push({ ...inputArray[i], project: getFeeNotesProjectID(), user: "nobody" })
+    }
+    return outputArray
+}
+
+async function editCsv2A(inputCsvStringB, inputCsvStringC) {
+    const inputCsvObjB = await parseCSVFile(inputCsvStringB)
+    const inputCsvArrayB = inputCsvObjB.rows
+    const inputCsvObjC = await parseCSVFile(inputCsvStringC)
+    const inputCsvArrayC = inputCsvObjC.rows
+    const inputCsvArrayA = changeLoggedMinusBilledCsvToZeros(inputCsvArrayB)
+
+    const aPlusBArray = addOpeningPlusLoggedCsv(inputCsvArrayA, inputCsvArrayB)
+    const outputArrayD = subtractLoggedMinusBilledCsv(aPlusBArray, inputCsvArrayC)
+
+    return [inputCsvArrayA, inputCsvArrayB, inputCsvArrayC, outputArrayD]
+}
+
+function editCsv2B(inputCsvArrayA, inputCsvArrayB, inputCsvArrayC, inputCsvArrayD) {
+
+    const tempArray0 = getLeftColumnLoggedBilledCsv(inputCsvArrayB)
+    const tempArrayA = removeLeftColumnLoggedBilledCsv(inputCsvArrayA)
+    const tempArrayB = removeLeftColumnLoggedBilledCsv(inputCsvArrayB)
+    const tempArrayC = removeLeftColumnLoggedBilledCsv(inputCsvArrayC)
+    const tempArrayD = removeLeftColumnLoggedBilledCsv(inputCsvArrayD)
+
+    const outputCsv = concatColumnsLoggedBilledCsv(tempArray0, tempArrayA, tempArrayB, tempArrayC, tempArrayD)
+
+    return outputCsv
+}
+
+async function editCsv3A(inputCsvArrayA, inputCsvStringB, inputCsvStringC) {
+    const inputCsvObjB = await parseCSVFile(inputCsvStringB)
+    const inputCsvArrayB = inputCsvObjB.rows
+    const inputCsvObjC = await parseCSVFile(inputCsvStringC)
+    const inputCsvArrayC = inputCsvObjC.rows
+    // const inputCsvArrayA = returnD1LoggedBilledCsv(inputCsvArrayA)
+
+    const aPlusBArray = addOpeningPlusLoggedCsv(inputCsvArrayA, inputCsvArrayB)
+    const outputArrayD = subtractLoggedMinusBilledCsv(aPlusBArray, inputCsvArrayC)
+
+    return [inputCsvArrayA, inputCsvArrayB, inputCsvArrayC, outputArrayD]
+}
+
+function changeLoggedMinusBilledCsvToZeros(inputArray) {
+    const outputArray = []
+
+    // resultArray = [
+	//   {
+	//     category/grade: "Audit", Supervisor: "79", Assistant: "1", Trainee: "154"
+	//   },
+	//   {
+	//     category/grade: "Tax", Supervisor: "70", Assistant: "2", Trainee: "131"
+	//   },
+	// ]
+
+	// "category/grade","Supervisor","Assistant","Trainee"
+	// "Audit","79","1","154"
+	// "Tax","70","2","131"
+
+
+    for (let i = 0; i <= inputArray.length - 1; i++) {
+        outputArray[i] = {...inputArray[i]}
+    }
+
+	const inputArrayProps = Object.keys(inputArray[0])
+
+    for (let i = 0; i <= outputArray.length - 1; i++) {
+		//skip topLeft
+        for (let j = 0 + 1; j <= inputArrayProps.length - 1; j++) {
+            outputArray[i][inputArrayProps[j]] = ""
+        }
+    }
+    return outputArray
+}
+
+function addOpeningPlusLoggedCsv(inputArray1, inputArray2) {
+    return addSubtractLoggedBilledCsv(inputArray1, inputArray2, true)
+}
+
+function subtractLoggedMinusBilledCsv(inputArray1, inputArray2) {
+    return addSubtractLoggedBilledCsv(inputArray1, inputArray2, false)
+}
+
+function addSubtractLoggedBilledCsv(inputArray1, inputArray2, operatorBool) {
+    const tempArray1 = []
+    const tempArray2 = []
+    const outputArray = []
+
+    // resultArray = [
+	//   {
+	//     category/grade: "Audit", Supervisor: "79", Assistant: "1", Trainee: "154"
+	//   },
+	//   {
+	//     category/grade: "Tax", Supervisor: "70", Assistant: "2", Trainee: "131"
+	//   },
+	// ]
+
+	// "category/grade","Supervisor","Assistant","Trainee"
+	// "Audit","79","1","154"
+	// "Tax","70","2","131"
+
+	const inputArrayProps = Object.keys(inputArray1[0])
+
+    for (let i = 0; i <= inputArray1.length - 1; i++) {
+        tempArray1[i] = {...inputArray1[i]}
+    }
+
+    for (let i = 0; i <= inputArray2.length - 1; i++) {
+        tempArray2[i] = {...inputArray2[i]}
+    }
+
+	const topLeft = inputArrayProps[0]
+	for (let i = 0; i <= inputArray1.length - 1; i++) {
+		outputArray[i] = {[topLeft]: inputArray1[i][topLeft]}
+	}
+
+
+    for (let i = 0; i <= tempArray1.length - 1; i++) {
+		//skip topLeft
+        for (let j = 0 + 1; j <= inputArrayProps.length - 1; j++) {
+            let result = 0
+            if (operatorBool) {
+                result = Number(tempArray1[i][inputArrayProps[j]]) + Number(tempArray2[i][inputArrayProps[j]])
+            } else {
+                result = Number(tempArray1[i][inputArrayProps[j]]) - Number(tempArray2[i][inputArrayProps[j]])
+            }
+            if (result === 0) {
+                outputArray[i][inputArrayProps[j]] = ""
+            } else {
+                outputArray[i][inputArrayProps[j]] = String(result)
+            }
+        }
+    }
+    return outputArray
+}
+
+function getLeftColumnLoggedBilledCsv(inputArray) {
+	const inputArrayProps = Object.keys(inputArray[0])
+	const topLeft = inputArrayProps[0]
+	const resultArray = []
+	for (let i = 0; i <= inputArray.length - 1; i++) {
+		resultArray[i] = {[topLeft]: inputArray[i][topLeft]}
+	}
+    return resultArray
+}
+
+function removeLeftColumnLoggedBilledCsv(inputArray) {
+	const inputArrayProps = Object.keys(inputArray[0])
+	const resultArray = []
+	for (let i = 0; i <= inputArray.length - 1; i++) {
+        resultArray[i] = {}
+		//skip topLeft
+        for (let j = 0 + 1; j <= inputArrayProps.length - 1; j++) {
+            resultArray[i][inputArrayProps[j]] = inputArray[i][inputArrayProps[j]]
+        }
+	}
+    return resultArray
+}
+
+function concatColumnsLoggedBilledCsv(inputArray0, inputArrayA, inputArrayB, inputArrayC, inputArrayD) {
+	const tempResult = []
+
+    const tempCsv0 = Papa.unparse(inputArray0, { quotes: true })
+    const tempCsvA = Papa.unparse(inputArrayA, { quotes: true })
+    const tempCsvB = Papa.unparse(inputArrayB, { quotes: true })
+    const tempCsvC = Papa.unparse(inputArrayC, { quotes: true })
+    const tempCsvD = Papa.unparse(inputArrayD, { quotes: true })
+
+    const temp0 = tempCsv0.split("\r\n")
+    const tempA = tempCsvA.split("\r\n")
+    const tempB = tempCsvB.split("\r\n")
+    const tempC = tempCsvC.split("\r\n")
+    const tempD = tempCsvD.split("\r\n")
+
+	for (let i = 0; i <= temp0.length - 1; i++) {
+        tempResult[i] = `${temp0[i]},${tempA[i]},${tempB[i]},${tempC[i]},${tempD[i]}`
+    }
+    const resultCsv = tempResult.join("\r\n")
+    return resultCsv
 }
 
 async function runSecondHalf(initCsvFileString, inputParamsObj) {
@@ -503,11 +694,16 @@ async function runSecondHalf(initCsvFileString, inputParamsObj) {
     if (actionType === actionTypes.sequenceExportExtract
         || actionType === actionTypes.sequenceExportSummarizeUt
         || actionType === actionTypes.sequenceExportSummarizeCat
+        || actionType === actionTypes.sequenceExportLoggedMinusBilledCat
         || actionType === actionTypes.sequenceExportBreakdownCat
         || actionType === actionTypes.sequenceExportBreakdownClient) {
 
         const actionListArray = []
         const actionListOptionsArray = []
+
+        const weekBeginObj = dayjs(inputParamsObj.weekBegin)
+        const fixedBeginDateObj = dayjs(inputParamsObj.fixedBeginDate)
+        const weekBeginAfterFixedBeginDate = dayjs(weekBeginObj).isAfter(fixedBeginDateObj, "day")
 
         // eslint-disable-next-line no-unused-vars
         actionListOptionsArray[2] = function (actionListArray) { return { paramsObj: {action: actions.getAllWorkPackages, logValue: "step: 2/4 action: getWorkPackages (please wait, this step takes a bit of time)", myCsvFileObj: "", logDataBool: false }, inputParamsObj } }
@@ -525,6 +721,45 @@ async function runSecondHalf(initCsvFileString, inputParamsObj) {
         }
         if (actionType === actionTypes.sequenceExportSummarizeCat) {
             actionListOptionsArray[5] = function (actionListArray) { return { paramsObj: {action: actions.summarizeCatTimeEntries, logValue: "step: 6/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true }, inputParamsObj } }
+        }
+        if (actionType === actionTypes.sequenceExportLoggedMinusBilledCat) {
+            if (weekBeginAfterFixedBeginDate === false) {
+                actionListOptionsArray[5] = function (actionListArray) { 
+                    const editedInputParamsObj = {...inputParamsObj}
+                    editedInputParamsObj.billingStatusReportFilter = billingStatusReportFilterEnum.All
+                    return { paramsObj: {action: actions.summarizeCatTimeEntries, logValue: "step: 6/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true }, inputParamsObj: editedInputParamsObj } 
+                }
+                actionListOptionsArray[6] = function (actionListArray) { 
+                    const editedInputParamsObj = {...inputParamsObj}
+                    editedInputParamsObj.billingStatusReportFilter = billingStatusReportFilterEnum.BilledAndWrittenOff
+                    return { paramsObj: {action: actions.summarizeCatTimeEntries, logValue: "step: 8/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true }, inputParamsObj: editedInputParamsObj } 
+                }
+            } else {
+                actionListOptionsArray[5] = function (actionListArray) { 
+                    const editedInputParamsObj = {...inputParamsObj}
+                    editedInputParamsObj.weekBegin = inputParamsObj.fixedBeginDate
+                    editedInputParamsObj.dateEndPeriod = dayjs(weekBeginObj).subtract(1, "day").format("YYYY-MM-DD")
+                    editedInputParamsObj.billingStatusReportFilter = billingStatusReportFilterEnum.All
+                    return { paramsObj: {action: actions.summarizeCatTimeEntries, logValue: "step: 66/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true }, inputParamsObj: editedInputParamsObj } 
+                }
+                actionListOptionsArray[6] = function (actionListArray) { 
+                    const editedInputParamsObj = {...inputParamsObj}
+                    editedInputParamsObj.weekBegin = inputParamsObj.fixedBeginDate
+                    editedInputParamsObj.dateEndPeriod = dayjs(weekBeginObj).subtract(1, "day").format("YYYY-MM-DD")
+                    editedInputParamsObj.billingStatusReportFilter = billingStatusReportFilterEnum.BilledAndWrittenOff
+                    return { paramsObj: {action: actions.summarizeCatTimeEntries, logValue: "step: 88/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true }, inputParamsObj: editedInputParamsObj } 
+                }
+                actionListOptionsArray[7] = function (actionListArray) { 
+                    const editedInputParamsObj = {...inputParamsObj}
+                    editedInputParamsObj.billingStatusReportFilter = billingStatusReportFilterEnum.Unbilled
+                    return { paramsObj: {action: actions.summarizeCatTimeEntries, logValue: "step: 10/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true }, inputParamsObj: editedInputParamsObj } 
+                }
+                actionListOptionsArray[8] = function (actionListArray) { 
+                    const editedInputParamsObj = {...inputParamsObj}
+                    editedInputParamsObj.billingStatusReportFilter = billingStatusReportFilterEnum.BilledAndWrittenOff
+                    return { paramsObj: {action: actions.summarizeCatTimeEntries, logValue: "step: 12/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true }, inputParamsObj: editedInputParamsObj } 
+                }
+            }
         }
         if (actionType === actionTypes.sequenceExportBreakdownCat) {
             actionListOptionsArray[5] = function (actionListArray) { return { paramsObj: {action: actions.breakdownClientByCatTimeEntries, logValue: "step: 6/4 action: tabulateBreakdownClientByCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true }, inputParamsObj } }
@@ -566,6 +801,9 @@ async function runSecondHalf(initCsvFileString, inputParamsObj) {
                 if (actionType === actionTypes.sequenceExportSummarizeCat) {
                     logFakeAction("step: 5/4 action: summarizeCatTimeEntries", true)
                 }
+                if (actionType === actionTypes.sequenceExportLoggedMinusBilledCat) {
+                    logFakeAction("step: 5/4 action: summarizeCatTimeEntries", true)
+                }
                 if (actionType === actionTypes.sequenceExportBreakdownCat) {
                     logFakeAction("step: 5/4 action: breakdownClientByCatTimeEntries", true)
                 }
@@ -574,10 +812,55 @@ async function runSecondHalf(initCsvFileString, inputParamsObj) {
                 }
             }
 
+            if (actionType === actionTypes.sequenceExportLoggedMinusBilledCat) {
+                // step '8' is in position 6 with fake step 7 before it
+                if (i === 6) {
+                    logFakeAction("step: 7/4 action: summarizeCatTimeEntries", true)
+                }
+                // step '10' is in position 7 with fake step 9 before it
+                if (i === 7) {
+                    logFakeAction("step: 9/4 action: summarizeCatTimeEntries", true)
+                }
+                // step '12' is in position 8 with fake step 11 before it
+                if (i === 8) {
+                    logFakeAction("step: 11/4 action: summarizeCatTimeEntries", true)
+                }
+            }
+
             actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray).paramsObj, actionListOptionsArray[i](actionListArray).inputParamsObj)
             if (actionListArray[i].halt) {
                 return
             }
+
+            if (actionType === actionTypes.sequenceExportLoggedMinusBilledCat) {
+                if (i === 6) {
+                    if (weekBeginAfterFixedBeginDate === false) {
+
+                        const tempResultA = await editCsv2A(actionListArray[5].conversion.data[0].data, actionListArray[6].conversion.data[0].data)
+                        const tempResultB = editCsv2B(...tempResultA)
+                        actionListArray[6].conversion.data[0].data = tempResultB
+                        logData(actions.summarizeCatTimeEntries, actionListArray[6])
+                        // A     :   B  :  C   :     D
+                        // zeros : data : data : A + B - C
+                        // 
+                    }
+                }
+
+                if (weekBeginAfterFixedBeginDate === true) {
+                    if (i === 8) {
+                        const tempResult1A = await editCsv2A(actionListArray[5].conversion.data[0].data, actionListArray[6].conversion.data[0].data)
+                        const tempResult2A = await editCsv3A(tempResult1A[3], actionListArray[7].conversion.data[0].data, actionListArray[8].conversion.data[0].data)
+                        const tempResultB = editCsv2B(...tempResult2A)
+                        actionListArray[8].conversion.data[0].data = tempResultB
+                        logData(actions.summarizeCatTimeEntries, actionListArray[8])
+                        // A1     :   B1  :  C1   :     D1
+                        // A2     :   B2  :  C2   :     D2
+                        // D1     :  data :  data : A + B - C
+                        // 
+                    }
+                }
+            }
+
         }
 
         writeToLog("Sequence completed successfully", "step", logType.finished)
@@ -1020,6 +1303,7 @@ function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, numberO
             || actionType === actionTypes.sequenceExportExtract
             || actionType === actionTypes.sequenceExportSummarizeUt
             || actionType === actionTypes.sequenceExportSummarizeCat
+            || actionType === actionTypes.sequenceExportLoggedMinusBilledCat
             || actionType === actionTypes.sequenceExportBreakdownCat
             || actionType === actionTypes.sequenceExportBreakdownClient) {
             if (!(dayjs(weekBegin, validDateFormats).isValid())) {
@@ -1037,6 +1321,7 @@ function checkPreReq(preReqType, user, apiKey, weekBegin, dateEndPeriod, numberO
             // }
             if (actionType === actionTypes.sequenceExportSummarizeUt
                 || actionType === actionTypes.sequenceExportSummarizeCat
+                || actionType === actionTypes.sequenceExportLoggedMinusBilledCat
                 || actionType === actionTypes.sequenceExportBreakdownCat
                 || actionType === actionTypes.sequenceExportBreakdownClient) {
                 if (!(dayjs(dateEndPeriod, validDateFormats).isValid())) {
