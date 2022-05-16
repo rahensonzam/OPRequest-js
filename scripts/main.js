@@ -41,28 +41,14 @@ const CLI = false
 
 dayjs.extend(window.dayjs_plugin_customParseFormat)
 const validDateFormats = ["DD-MM-YYYY", "DD/MM/YYYY"]
-let wpConvertUser
+let exportedWPConvertUser
 const adminUser1 = getAdminUser1IdNumber()
 const adminUser2 = getAdminUser2IdNumber()
-let apiKey
-let weekBegin
-let dateEndPeriod
-let numberOfWeeks
-let filterToOneUserBool
+let exportedApiKey
 let actionType
 let csvType
-let fileSelect
-let staticLists
-let billingStatusReportFilter
-let workPackageListFileSelect
-let timeEntryListFileSelect
-let projectList
-let periodList
-let categoryList
-let workPackageList
-let timeEntryList
-let userList
 // let billingStatusList
+const paramsObj = {}
 // let mySpreadsheet
 // let firstHalfAlready = false
 let firstHalfUsingSpreadsheet = false
@@ -129,23 +115,26 @@ async function runActions() {
     if (!CLI) {
         checkApiKeyYellow()
     }
-    wpConvertUser = getDomElementValueById("user")
-    apiKey = getDomElementValueById("apiKeyBox")
-    weekBegin = getDomElementValueById("weekBeginBox")
-    dateEndPeriod = getDomElementValueById("dateEndPeriodBox")
-    numberOfWeeks = Number(getDomElementValueById("numberOfWeeksBox"))
-    fileSelect = getDomElementObjById("fileSelect")
-    staticLists = getDomElementCheckedStateById("staticListsCheckbox")
-    filterToOneUserBool = getDomElementCheckedStateById("filterToOneUserCheckbox")
-    billingStatusReportFilter = getDomElementValueById("billingStatusReportFilterSelect")
-    workPackageListFileSelect = getDomElementObjById("workPackageListFileSelect")
-    timeEntryListFileSelect = getDomElementObjById("timeEntryListFileSelect")
-    let fileSelectFile = getDomElementFileListFileById(fileSelect)
+    paramsObj.wpConvertUser = getDomElementValueById("user")
+    paramsObj.apiKey = getDomElementValueById("apiKeyBox")
+    paramsObj.weekBegin = getDomElementValueById("weekBeginBox")
+    paramsObj.dateEndPeriod = getDomElementValueById("dateEndPeriodBox")
+    paramsObj.numberOfWeeks = Number(getDomElementValueById("numberOfWeeksBox"))
+    paramsObj.fileSelect = getDomElementObjById("fileSelect")
+    paramsObj.staticLists = getDomElementCheckedStateById("staticListsCheckbox")
+    paramsObj.filterToOneUserBool = getDomElementCheckedStateById("filterToOneUserCheckbox")
+    paramsObj.billingStatusReportFilter = getDomElementValueById("billingStatusReportFilterSelect")
+    paramsObj.workPackageListFileSelect = getDomElementObjById("workPackageListFileSelect")
+    paramsObj.timeEntryListFileSelect = getDomElementObjById("timeEntryListFileSelect")
+    paramsObj.billingStatusList = billingStatusList
+    exportedApiKey = paramsObj.apiKey
+    exportedWPConvertUser = paramsObj.wpConvertUser
+    let fileSelectFile = getDomElementFileListFileById(paramsObj.fileSelect)
 
     actionType = getRadioOptionValue("actionType")
     csvType = getRadioOptionValue("csvType")
 
-    const preReq = checkPreReq(preReqTypes.sequence, wpConvertUser, apiKey, weekBegin, dateEndPeriod, numberOfWeeks, csvType, fileSelectFile)
+    const preReq = checkPreReq(preReqTypes.sequence, paramsObj.wpConvertUser, paramsObj.apiKey, paramsObj.weekBegin, paramsObj.dateEndPeriod, paramsObj.numberOfWeeks, csvType, fileSelectFile)
     if (!preReq) {
         return
     }
@@ -167,8 +156,8 @@ async function runActions() {
     let justProjectNamesList
     let justCategoryNamesList
     if (!(actionType === actionTypes.single)) {
-        if (!(wpConvertUser == adminUser1
-            || wpConvertUser == adminUser2)) {
+        if (!(paramsObj.wpConvertUser == adminUser1
+            || paramsObj.wpConvertUser == adminUser2)) {
             if (!CLI) {
                 setLocalStorage()
             }
@@ -176,18 +165,18 @@ async function runActions() {
     }
     if (actionType !== actionTypes.single
         && actionType !== actionTypes.sequenceFeeNote) {
-        weekBegin = dayjs(weekBegin, validDateFormats).format("YYYY-MM-DD")
-        dateEndPeriod = dayjs(dateEndPeriod, validDateFormats).format("YYYY-MM-DD")
+        paramsObj.weekBegin = dayjs(paramsObj.weekBegin, validDateFormats).format("YYYY-MM-DD")
+        paramsObj.dateEndPeriod = dayjs(paramsObj.dateEndPeriod, validDateFormats).format("YYYY-MM-DD")
 
-        const stepFirstHalf = await runFirstHalf()
+        const stepFirstHalf = await runFirstHalf(paramsObj)
         if (stepFirstHalf.halt) {
             hideLoading()
             firstHalfRunning = false
             return
         }
 
-        justProjectNamesList = getJustNames(projectList, true)
-        justCategoryNamesList = getJustNames(categoryList, false)
+        justProjectNamesList = getJustNames(paramsObj.projectList, true)
+        justCategoryNamesList = getJustNames(paramsObj.categoryList, false)
     }
 
     if (actionType === actionTypes.sequenceWeekly) {
@@ -200,7 +189,7 @@ async function runActions() {
             if (!CLI) {
                 showSpreadsheet()
 
-                makeWeeklySpreadsheet(justProjectNamesList, periodList, justCategoryNamesList)
+                makeWeeklySpreadsheet(justProjectNamesList, paramsObj.periodList, justCategoryNamesList)
             }
         }
     }
@@ -214,7 +203,7 @@ async function runActions() {
             if (!CLI) {
                 showSpreadsheet()
 
-                makeDailySpreadsheet(justProjectNamesList, periodList, justCategoryNamesList)
+                makeDailySpreadsheet(justProjectNamesList, paramsObj.periodList, justCategoryNamesList)
             }
 
         }
@@ -234,7 +223,7 @@ async function runActions() {
         }
     }
     if (actionType === actionTypes.single) {
-        const currentStep = await runSingleAction()
+        const currentStep = await runSingleAction(paramsObj)
         if (currentStep.halt) {
             firstHalfRunning = false
             return
@@ -251,10 +240,10 @@ async function runActions() {
 
 }
 
-async function runSingleAction() {
+async function runSingleAction(inputParamsObj) {
     const actionSelectAction = getDomElementValueById("actionSelect")
     const logDataBool = getDomElementCheckedStateById("actionSelectLogCheckbox")
-    let fileSelectFile = getDomElementFileListFileById(fileSelect)
+    let fileSelectFile = getDomElementFileListFileById(inputParamsObj.fileSelect)
     const actionListArray = []
     const actionListOptionsArray = [
         // eslint-disable-next-line no-unused-vars
@@ -262,7 +251,7 @@ async function runSingleAction() {
     ]
 
     for (let i = 0; i <= actionListOptionsArray.length - 1; i++) {
-        actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray).action, actionListOptionsArray[i](actionListArray).logValue, actionListOptionsArray[i](actionListArray).myCsvFileObj, actionListOptionsArray[i](actionListArray).logDataBool)
+        actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray), inputParamsObj)
         if (actionListArray[i].halt) {
             return { halt: actionListArray[i].halt }
         }
@@ -271,7 +260,7 @@ async function runSingleAction() {
     return { halt: actionListArray[0].halt }
 }
 
-async function runFirstHalf() {
+async function runFirstHalf(inputParamsObj) {
 
     const actionListArray = []
     const actionListOptionsArray = [
@@ -282,25 +271,25 @@ async function runFirstHalf() {
 
     // if (true) {
     for (let i = 1; i <= actionListOptionsArray.length - 1; i++) {
-        actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray).action, actionListOptionsArray[i](actionListArray).logValue, actionListOptionsArray[i](actionListArray).myCsvFileObj, actionListOptionsArray[i](actionListArray).logDataBool)
+        actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray), inputParamsObj)
         if (actionListArray[i].halt) {
             return { halt: actionListArray[i].halt }
         }
 
         if (i === 1) {
-            projectList = actionListArray[i].conversion.data[0].data
+            inputParamsObj.projectList = actionListArray[i].conversion.data[0].data
         }
     }
     // } else {
     //     logFakeAction("step: 1/8 action: getProjects", false)
-    //     projectList = getProjectList()
+    //     inputParamsObj.projectList = getProjectList()
     // }
 
-    categoryList = getCategoryList()
-    userList = getUserList()
-    userList = addGradeOrderToUserList(userList)
-    // billingStatusList = getBillingStatusList()
-    periodList = getPeriodList()
+    inputParamsObj.categoryList = getCategoryList()
+    inputParamsObj.userList = getUserList()
+    inputParamsObj.userList = addGradeOrderToUserList(inputParamsObj.userList)
+    // inputParamsObj.billingStatusList = getBillingStatusList()
+    inputParamsObj.periodList = getPeriodList()
     return { halt: actionListArray[1].halt }
 }
 
@@ -336,7 +325,7 @@ async function runSpreadsheetDone() {
     const hasInitCsvFileString = setHasInitCsvFileString()
 
     if (hasInitCsvFileString) {
-        initCsvFileString = await setInitCsvFileString()
+        initCsvFileString = await setInitCsvFileString(paramsObj)
     } else {
         initCsvFileString = ""
     }
@@ -344,7 +333,7 @@ async function runSpreadsheetDone() {
     const doRunSecondHalf = setDoRunSecondHalf()
 
     if (doRunSecondHalf) {
-        await runSecondHalf(initCsvFileString)
+        await runSecondHalf(initCsvFileString, paramsObj)
     }
 
     hideLoading()
@@ -382,13 +371,13 @@ function setDoRunSecondHalf() {
     }
 }
 
-async function setInitCsvFileString() {
+async function setInitCsvFileString(paramsObj) {
     let initCsvFileString
 
     if (csvType === csvTypes.import2) {
-        writeToLog(`${getDomElementFileListFilenameById(fileSelect)} CSV imported`, "log", logType.normal)
+        writeToLog(`${getDomElementFileListFilenameById(paramsObj.fileSelect)} CSV imported`, "log", logType.normal)
 
-        initCsvFileString = getDomElementFileListFileById(fileSelect)
+        initCsvFileString = getDomElementFileListFileById(paramsObj.fileSelect)
 
         if (actionType === actionTypes.sequenceFeeNote) {
             initCsvFileString = await addColumnsToFeeNoteCsv(initCsvFileString)
@@ -425,7 +414,7 @@ async function addColumnsToFeeNoteCsv(inputCsvString) {
     return outputCsv
 }
 
-async function runSecondHalf(initCsvFileString) {
+async function runSecondHalf(initCsvFileString, inputParamsObj) {
 
     if (actionType === actionTypes.sequenceWeekly) {
         const actionListArray = []
@@ -445,13 +434,13 @@ async function runSecondHalf(initCsvFileString) {
         ]
 
         for (let i = 3; i <= actionListOptionsArray.length - 1; i++) {
-            actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray).action, actionListOptionsArray[i](actionListArray).logValue, actionListOptionsArray[i](actionListArray).myCsvFileObj, actionListOptionsArray[i](actionListArray).logDataBool)
+            actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray), inputParamsObj)
             if (actionListArray[i].halt) {
                 return
             }
 
             if (i === 6) {
-                workPackageList = actionListArray[i].conversion.data[0].data
+                inputParamsObj.workPackageList = actionListArray[i].conversion.data[0].data
             }
         }
 
@@ -475,13 +464,13 @@ async function runSecondHalf(initCsvFileString) {
         ]
 
         for (let i = 3; i <= actionListOptionsArray.length - 1; i++) {
-            actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray).action, actionListOptionsArray[i](actionListArray).logValue, actionListOptionsArray[i](actionListArray).myCsvFileObj, actionListOptionsArray[i](actionListArray).logDataBool)
+            actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray), inputParamsObj)
             if (actionListArray[i].halt) {
                 return
             }
 
             if (i === 4) {
-                workPackageList = actionListArray[i].conversion.data[0].data
+                inputParamsObj.workPackageList = actionListArray[i].conversion.data[0].data
             }
         }
 
@@ -501,7 +490,7 @@ async function runSecondHalf(initCsvFileString) {
         ]
 
         for (let i = 3; i <= actionListOptionsArray.length - 1; i++) {
-            actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray).action, actionListOptionsArray[i](actionListArray).logValue, actionListOptionsArray[i](actionListArray).myCsvFileObj, actionListOptionsArray[i](actionListArray).logDataBool)
+            actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray), inputParamsObj)
             if (actionListArray[i].halt) {
                 return
             }
@@ -521,58 +510,56 @@ async function runSecondHalf(initCsvFileString) {
         const actionListOptionsArray = []
 
         // eslint-disable-next-line no-unused-vars
-        actionListOptionsArray[2] = function (actionListArray) { return { action: actions.getAllWorkPackages, logValue: "step: 2/4 action: getWorkPackages (please wait, this step takes a bit of time)", myCsvFileObj: "", logDataBool: false } }
+        actionListOptionsArray[2] = function (actionListArray) { return { paramsObj: {action: actions.getAllWorkPackages, logValue: "step: 2/4 action: getWorkPackages (please wait, this step takes a bit of time)", myCsvFileObj: "", logDataBool: false }, inputParamsObj } }
         // eslint-disable-next-line no-unused-vars
-        actionListOptionsArray[3] = function (actionListArray) { return { action: actions.getTimeEntries, logValue: "step: 3/4 action: getTimeEntries", myCsvFileObj: "", logDataBool: false } }
+        actionListOptionsArray[3] = function (actionListArray) { return { paramsObj: {action: actions.getTimeEntries, logValue: "step: 3/4 action: getTimeEntries", myCsvFileObj: "", logDataBool: false }, inputParamsObj } }
         // eslint-disable-next-line no-unused-vars
-        actionListOptionsArray[4] = function (actionListArray) { return { action: actions.exportTimeEntries, logValue: "step: 4/4 action: exportTimeEntries", myCsvFileObj: "", logDataBool: true } }
+        actionListOptionsArray[4] = function (actionListArray) { return { paramsObj: {action: actions.exportTimeEntries, logValue: "step: 4/4 action: exportTimeEntries", myCsvFileObj: "", logDataBool: true }, inputParamsObj } }
 
         if (actionType === actionTypes.sequenceExportExtract) {
-            actionListOptionsArray[5] = function (actionListArray) { return { action: actions.extractTimeSheets, logValue: "step: 5/4 action: extractTimeSheets", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: false } }
-            actionListOptionsArray[6] = function (actionListArray) { return { action: actions.condenseTimeSheets, logValue: "step: 6/4 action: condenseTimeSheets", myCsvFileObj: actionListArray[5].conversion.data, logDataBool: true } }
+            actionListOptionsArray[5] = function (actionListArray) { return { paramsObj: {action: actions.extractTimeSheets, logValue: "step: 5/4 action: extractTimeSheets", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: false }, inputParamsObj } }
+            actionListOptionsArray[6] = function (actionListArray) { return { paramsObj: {action: actions.condenseTimeSheets, logValue: "step: 6/4 action: condenseTimeSheets", myCsvFileObj: actionListArray[5].conversion.data, logDataBool: true }, inputParamsObj } }
         }
         if (actionType === actionTypes.sequenceExportSummarizeUt) {
-            actionListOptionsArray[5] = function (actionListArray) { return { action: actions.summarizeUtTimeEntries, logValue: "step: 6/4 action: tabulateUtTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true } }
+            actionListOptionsArray[5] = function (actionListArray) { return { paramsObj: {action: actions.summarizeUtTimeEntries, logValue: "step: 6/4 action: tabulateUtTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true }, inputParamsObj } }
         }
         if (actionType === actionTypes.sequenceExportSummarizeCat) {
-            actionListOptionsArray[5] = function (actionListArray) { return { action: actions.summarizeCatTimeEntries, logValue: "step: 6/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true } }
+            actionListOptionsArray[5] = function (actionListArray) { return { paramsObj: {action: actions.summarizeCatTimeEntries, logValue: "step: 6/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true }, inputParamsObj } }
         }
         if (actionType === actionTypes.sequenceExportBreakdownCat) {
-            actionListOptionsArray[5] = function (actionListArray) { return { action: actions.breakdownClientByCatTimeEntries, logValue: "step: 6/4 action: tabulateBreakdownClientByCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true } }
+            actionListOptionsArray[5] = function (actionListArray) { return { paramsObj: {action: actions.breakdownClientByCatTimeEntries, logValue: "step: 6/4 action: tabulateBreakdownClientByCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true }, inputParamsObj } }
         }
         if (actionType === actionTypes.sequenceExportBreakdownClient) {
-            actionListOptionsArray[5] = function (actionListArray) { return { action: actions.breakdownCatByClientTimeEntries, logValue: "step: 6/4 action: tabulateBreakdownCatByClientTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true } }
+            actionListOptionsArray[5] = function (actionListArray) { return { paramsObj: {action: actions.breakdownCatByClientTimeEntries, logValue: "step: 6/4 action: tabulateBreakdownCatByClientTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true }, inputParamsObj } }
         }
 
-        if (staticLists === false) {
+        if (inputParamsObj.staticLists === false) {
             for (let i = 2; i <= 3; i++) {
-                actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray).action, actionListOptionsArray[i](actionListArray).logValue, actionListOptionsArray[i](actionListArray).myCsvFileObj, actionListOptionsArray[i](actionListArray).logDataBool)
+                actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray).paramsObj, inputParamsObj)
                 if (actionListArray[i].halt) {
                     return
                 }
 
                 if (i === 2) {
-                    workPackageList = actionListArray[i].conversion.data[0].data
+                    inputParamsObj.workPackageList = actionListArray[i].conversion.data[0].data
                 }
                 if (i === 3) {
-                    timeEntryList = actionListArray[i].conversion.data[0].data
+                    inputParamsObj.timeEntryList = actionListArray[i].conversion.data[0].data
                 }
             }
         } else {
             logFakeAction("step: 2/4 action: getWorkPackages", true)
-            let workPackageListFileSelectFile = getDomElementFileListFileById(workPackageListFileSelect)
-            workPackageList = JSON.parse(await readFileReaderAsync(workPackageListFileSelectFile))
+            let workPackageListFileSelectFile = getDomElementFileListFileById(inputParamsObj.workPackageListFileSelect)
+            inputParamsObj.workPackageList = JSON.parse(await readFileReaderAsync(workPackageListFileSelectFile))
 
             logFakeAction("step: 3/4 action: getTimeEntries", true)
-            let timeEntryListFileSelectFile = getDomElementFileListFileById(timeEntryListFileSelect)
-            timeEntryList = JSON.parse(await readFileReaderAsync(timeEntryListFileSelectFile))
+            let timeEntryListFileSelectFile = getDomElementFileListFileById(inputParamsObj.timeEntryListFileSelect)
+            inputParamsObj.timeEntryList = JSON.parse(await readFileReaderAsync(timeEntryListFileSelectFile))
         }
 
         for (let i = 4; i <= actionListOptionsArray.length - 1; i++) {
+            // step '6' is in position 5 with fake step 5 before it
             if (i === 5) {
-                // if (actionType === actionTypes.sequenceExportExtract) {
-                //     logFakeAction("step: 5/4 action: extractTimeSheets", true)
-                // }
                 if (actionType === actionTypes.sequenceExportSummarizeUt) {
                     logFakeAction("step: 5/4 action: summarizeUtTimeEntries", true)
                 }
@@ -587,7 +574,7 @@ async function runSecondHalf(initCsvFileString) {
                 }
             }
 
-            actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray).action, actionListOptionsArray[i](actionListArray).logValue, actionListOptionsArray[i](actionListArray).myCsvFileObj, actionListOptionsArray[i](actionListArray).logDataBool)
+            actionListArray[i] = await runCurrentAction(actionListOptionsArray[i](actionListArray).paramsObj, actionListOptionsArray[i](actionListArray).inputParamsObj)
             if (actionListArray[i].halt) {
                 return
             }
@@ -612,23 +599,27 @@ function logFakeAction(logValue, logMiddle) {
     writeToLog(`${logValue} completed successfully`, "step", logType.finished)
 }
 
-async function runCurrentAction(action, logValue, myCsvFileObj, logDataBool) {
-    const actionOptions = getActionOptions(action)
-    const runOneActionParamsObj = actionOptions
-    runOneActionParamsObj.action = action
-    runOneActionParamsObj.logValue = logValue
-    runOneActionParamsObj.myCsvFileObj = myCsvFileObj
-    runOneActionParamsObj.logDataBool = logDataBool
-    runOneActionParamsObj.billingStatusList = billingStatusList
+async function runCurrentAction(paramsObj, inputParamsObj) {
+    // params: action, logValue, myCsvFileObj, logDataBool
+    const actionOptions = getActionOptions(paramsObj.action, inputParamsObj)
+
+    const runOneActionParamsObj = {...paramsObj, ...actionOptions}
 
     // runOneAction params: action, logValue, myCsvFileObj, hasWeb, hasConversion, hasFile, logDataBool, apiKey, wpConvertUser, projectList, categoryList, workPackageList, timeEntryList, userList, billingStatusList
     const currentStep = await runOneAction(runOneActionParamsObj)
     return currentStep
 }
 
-function getActionOptions(action) {
+function getActionOptions(action, inputParamsObj) {
     // return params: hasWeb, hasConversion, hasFile, apiKey, wpConvertUser, projectList, categoryList, workPackageList, timeEntryList, userList, billingStatusList
     const returnObj = {}
+
+    returnObj.weekBegin = inputParamsObj.weekBegin
+    returnObj.dateEndPeriod = inputParamsObj.dateEndPeriod
+    returnObj.numberOfWeeks = inputParamsObj.numberOfWeeks
+    returnObj.filterToOneUserBool = inputParamsObj.filterToOneUserBool
+    returnObj.billingStatusList = inputParamsObj.billingStatusList
+
     if (action === actions.updateWorkPackage
         || action === actions.updateTimeEntry
         || action === actions.addMembership
@@ -638,7 +629,7 @@ function getActionOptions(action) {
         returnObj.hasWeb = true
         returnObj.hasConversion = false
         returnObj.hasFile = true
-        returnObj.apiKey = apiKey
+        returnObj.apiKey = inputParamsObj.apiKey
         // if (action === actions.updateTimeEntry) {
         //     returnObj.billingStatusList = billingStatusList
         // }
@@ -663,12 +654,12 @@ function getActionOptions(action) {
         }
         if (action === actions.convertToWorkPackageIDs
             || action === actions.extractTimeSheets) {
-            returnObj.wpConvertUser = wpConvertUser
+            returnObj.wpConvertUser = inputParamsObj.wpConvertUser
         }
         if (action === actions.summarizeCatTimeEntries
             || action === actions.breakdownClientByCatTimeEntries
             || action === actions.breakdownCatByClientTimeEntries) {
-            returnObj.billingStatusReportFilter = billingStatusReportFilter
+            returnObj.billingStatusReportFilter = inputParamsObj.billingStatusReportFilter
         }
         if (action === actions.convertToWorkPackageIDs
             || action === actions.convertNamesToIDs
@@ -678,21 +669,21 @@ function getActionOptions(action) {
             || action === actions.summarizeCatTimeEntries
             || action === actions.breakdownClientByCatTimeEntries
             || action === actions.breakdownCatByClientTimeEntries) {
-            returnObj.projectList = projectList
+            returnObj.projectList = inputParamsObj.projectList
         }
         if (action === actions.convertNamesToIDs
             || action === actions.exportTimeEntries
             || action === actions.summarizeCatTimeEntries
             || action === actions.breakdownClientByCatTimeEntries
             || action === actions.breakdownCatByClientTimeEntries) {
-            returnObj.categoryList = categoryList
+            returnObj.categoryList = inputParamsObj.categoryList
         }
         if (action === actions.convertToWorkPackageIDs
             || action === actions.exportTimeEntries) {
-            returnObj.workPackageList = workPackageList
+            returnObj.workPackageList = inputParamsObj.workPackageList
         }
         if (actions.exportTimeEntries) {
-            returnObj.timeEntryList = timeEntryList
+            returnObj.timeEntryList = inputParamsObj.timeEntryList
         }
         if (action === actions.exportTimeEntries
             || action === actions.extractTimeSheets
@@ -700,7 +691,7 @@ function getActionOptions(action) {
             || action === actions.summarizeCatTimeEntries
             || action === actions.breakdownClientByCatTimeEntries
             || action === actions.breakdownCatByClientTimeEntries) {
-            returnObj.userList = userList
+            returnObj.userList = inputParamsObj.userList
         }
         return returnObj
     } else if (action === actions.getProjects
@@ -710,9 +701,9 @@ function getActionOptions(action) {
         returnObj.hasWeb = true
         returnObj.hasConversion = true
         returnObj.hasFile = false
-        returnObj.apiKey = apiKey
+        returnObj.apiKey = inputParamsObj.apiKey
         if (action === actions.getWorkPackages) {
-            returnObj.wpConvertUser = wpConvertUser
+            returnObj.wpConvertUser = inputParamsObj.wpConvertUser
         }
         return returnObj
     } else {
@@ -726,13 +717,9 @@ async function runOneAction(paramsObj) {
     console.log(paramsObj.logValue)
     const myCsvFile = await checkGetFile(paramsObj.action, paramsObj.hasFile, paramsObj.myCsvFileObj)
     // doActionAsync params: action,apiKey,wpConvertUser,rows,headerRow,weekBegin,dateEndPeriod,projectList,categoryList,workPackageList,timeEntryList,userList,billingStatusList
-    const doActionAsyncParamsObj = paramsObj
+    const doActionAsyncParamsObj = {...paramsObj}
     doActionAsyncParamsObj.rows = myCsvFile.rows
     doActionAsyncParamsObj.headerRow = myCsvFile.headerRow
-    doActionAsyncParamsObj.weekBegin = weekBegin
-    doActionAsyncParamsObj.dateEndPeriod = dateEndPeriod
-    doActionAsyncParamsObj.numberOfWeeks = numberOfWeeks
-    doActionAsyncParamsObj.filterToOneUserBool = filterToOneUserBool
 
     const currentStep = await doActionAsync(doActionAsyncParamsObj)
     if (paramsObj.hasWeb) {
@@ -1129,4 +1116,4 @@ function writeToLog(logValue, logFirstColumn, type) {
     }
 }
 
-export { actionTypes, csvTypes, getDomElementValueById, getDomElementCheckedStateById, wpConvertUser, apiKey, checkPreReq, preReqTypes, runActions, runSpreadsheetDone }
+export { actionTypes, csvTypes, getDomElementValueById, getDomElementCheckedStateById, exportedWPConvertUser as wpConvertUser, exportedApiKey as apiKey, checkPreReq, preReqTypes, runActions, runSpreadsheetDone }
