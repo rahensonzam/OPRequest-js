@@ -976,7 +976,7 @@ function convertCsvAction(paramsObj) {
 		|| action === actions.getWorkPackages
 		|| action === actions.getAllWorkPackages
 		|| action === actions.getTimeEntries) {
-		retrievedListLength = resultList[rowIndex].data["_embedded"].elements.length - 1
+		retrievedListLength = extractRetrivedListLength(resultList[rowIndex].data)
 	}
 
 	const outputExt = []
@@ -1364,7 +1364,7 @@ function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, w
 		|| action === actions.getWorkPackages
 		|| action === actions.getAllWorkPackages
 		|| action === actions.getTimeEntries) {
-		const retrivedProjectList = resultList[rowIndex].data["_embedded"].elements
+		const retrivedProjectList = extractRetrivedListElements(resultList[rowIndex].data)
 		if (action === actions.getProjects) {
 			return [{
 				id: retrivedProjectList[i].id,
@@ -2068,6 +2068,16 @@ function extractElement(element, subElement, subURL) {
 	} else {
 		return element["_links"][subElement].href
 	}
+}
+
+function extractRetrivedListElements(inputObj) {
+	// Abstract actual API location/path
+	return inputObj["_embedded"].elements
+}
+
+function extractRetrivedListLength(inputObj) {
+	// Abstract actual API location/path
+	return inputObj["_embedded"].elements.length - 1
 }
 
 function setFullUrl(action, row) {
