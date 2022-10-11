@@ -218,19 +218,19 @@ async function doActionAsync(paramsObj) {
 	for (let rowIndex = count.start; rowIndex <= count.end; rowIndex++) {
 		const row = rows[rowIndex]
 		if (action === actions.updateWorkPackage) {
-			taskList.push(doCurrentActionAsync(action, row, billingStatusList, "PATCH", true, apiKey, "workPackageID", row.workPackageID))
+			taskList.push(doCurrentActionAsync(action, row, "", "", billingStatusList, "PATCH", true, apiKey, "workPackageID", row.workPackageID))
 		} else if (action === actions.updateTimeEntry) {
-			taskList.push(doCurrentActionAsync(action, row, billingStatusList, "PATCH", false, apiKey, "timeEntryID", row.timeEntryID))
+			taskList.push(doCurrentActionAsync(action, row, "", "", billingStatusList, "PATCH", false, apiKey, "timeEntryID", row.timeEntryID))
 			// } else if (action === actions.deleteTimeEntry) {
-			// 	taskList.push(doCurrentActionAsync(action, row, billingStatusList, "DELETE", false, apiKey, "timeEntryID", row.timeEntryID))
+			// 	taskList.push(doCurrentActionAsync(action, row, "", "", billingStatusList, "DELETE", false, apiKey, "timeEntryID", row.timeEntryID))
 		} else if (action === actions.addMembership) {
-			taskList.push(doCurrentActionAsync(action, row, billingStatusList, "POST", false, apiKey, "project", row.project))
+			taskList.push(doCurrentActionAsync(action, row, "", "", billingStatusList, "POST", false, apiKey, "project", row.project))
 		} else if (action === actions.addWorkPackage) {
-			taskList.push(doCurrentActionAsync(action, row, billingStatusList, "POST", false, apiKey, "project", row.project))
+			taskList.push(doCurrentActionAsync(action, row, "", "", billingStatusList, "POST", false, apiKey, "project", row.project))
 		} else if (action === actions.addProject) {
-			taskList.push(doCurrentActionAsync(action, row, billingStatusList, "POST", false, apiKey, "name", row.name))
+			taskList.push(doCurrentActionAsync(action, row, "", "", billingStatusList, "POST", false, apiKey, "name", row.name))
 		} else if (action === actions.addTimeEntry) {
-			taskList.push(doCurrentActionAsync(action, row, billingStatusList, "POST", false, apiKey, "workPackageID", row.workPackageID))
+			taskList.push(doCurrentActionAsync(action, row, "", "", billingStatusList, "POST", false, apiKey, "workPackageID", row.workPackageID))
 		} else if (action === actions.convertToWorkPackageIDs) {
 			convertedCSVResults.push(convertCsvAction({ action, row, rowIndex, wpConvertUser, projectList, workPackageList }))
 		} else if (action === actions.convertNamesToIDs) {
@@ -264,13 +264,13 @@ async function doActionAsync(paramsObj) {
 		} else if (action === actions.breakdownCatByClientTimeEntries) {
 			convertedCSVResults.push(convertCsvAction({ action, weekBegin, dateEndPeriod, resultList: rows, billingStatusReportFilter, projectList, categoryList, userList }))
 		} else if (action === actions.getProjects) {
-			taskList.push(getCurrentListPartAAsync(action, rowIndex, "", "GET", apiKey, "pageNum", rowIndex))
+			taskList.push(doCurrentActionAsync(action, "", rowIndex, "", "", "GET", false, apiKey, "pageNum", rowIndex))
 		} else if (action === actions.getWorkPackages) {
-			taskList.push(getCurrentListPartAAsync(action, rowIndex, wpConvertUser, "GET", apiKey, "pageNum", rowIndex))
+			taskList.push(doCurrentActionAsync(action, "", rowIndex, wpConvertUser, "", "GET", false, apiKey, "pageNum", rowIndex))
 		} else if (action === actions.getAllWorkPackages) {
-			taskList.push(getCurrentListPartAAsync(action, rowIndex, "", "GET", apiKey, "pageNum", rowIndex))
+			taskList.push(doCurrentActionAsync(action, "", rowIndex, "", "", "GET", false, apiKey, "pageNum", rowIndex))
 		} else if (action === actions.getTimeEntries) {
-			taskList.push(getCurrentListPartAAsync(action, rowIndex, "", "GET", apiKey, "pageNum", rowIndex))
+			taskList.push(doCurrentActionAsync(action, "", rowIndex, "", "", "GET", false, apiKey, "pageNum", rowIndex))
 		} else {
 			throw new RangeError(`Invalid action: "${action}"`)
 		}
@@ -846,7 +846,7 @@ function webErrorsPresent(resultList) {
 async function retrievePageCountAsync(action, apiKey, wpConvertUser) {
 	const task = []
 
-	task.push(getCurrentListPartAAsync(action, 1, wpConvertUser, "GET", apiKey, "pageNum", 1))
+	task.push(doCurrentActionAsync(action, "", 1, wpConvertUser, "", "GET", false, apiKey, "pageNum", 1))
 	const result = await Promise.all(task)
 
 	return result
@@ -2297,18 +2297,9 @@ function convertUnitsBack(convertedUnits) {
 	return (num1 * 24) + num2
 }
 
-async function getCurrentListPartAAsync(action, rowIndex, wpConvertUser, httpMethod, apiKey, prefixName, prefixValue) {
-	const fullURL = setFullUrl(action, "")
-	const body = setBody(action, "", "", rowIndex, wpConvertUser, "")
-
-	const reqResponse = await currentRequestAsync(fullURL, httpMethod, apiKey, body, prefixName, prefixValue)
-	return reqResponse
-}
-
-async function doCurrentActionAsync(action, row, billingStatusList, httpMethod, withGet, apiKey, prefixName, prefixValue) {
-	const fullURL = setFullUrl(action, row)
-
+async function doCurrentActionAsync(action, row, rowIndex, wpConvertUser, billingStatusList, httpMethod, withGet, apiKey, prefixName, prefixValue) {
 	if (withGet === true) {
+		const fullURL = setFullUrl(action, row)
 
 		const getReqResponse = await currentRequestAsync(fullURL, "GET", apiKey, "", prefixName, prefixValue)
 
@@ -2324,11 +2315,14 @@ async function doCurrentActionAsync(action, row, billingStatusList, httpMethod, 
 
 		const reqResponse = await currentRequestAsync(fullURL, httpMethod, apiKey, body, prefixName, prefixValue)
 
+		//array.unshift adds elements to the beginning of an array
 		reqResponse.prelog.unshift(...getReqResponse.prelog)
 
 		return reqResponse
 	} else {
-		const body = setBody(action, row, "", "", "", billingStatusList)
+		const fullURL = setFullUrl(action, row)
+
+		const body = setBody(action, row, "", rowIndex, wpConvertUser, billingStatusList)
 
 		const reqResponse = await currentRequestAsync(fullURL, httpMethod, apiKey, body, prefixName, prefixValue)
 		return reqResponse
