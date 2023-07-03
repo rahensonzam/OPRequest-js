@@ -1,0 +1,64 @@
+
+***1*** - Done
+No yellow when User and API Key match
+Yellow when User and API Key don't match
+
+***2***
+under add work packages
+do not add another of existing work packages
+	pre-req: runFirstHalf before run one action
+
+***3***
+Fix: output log shows
+POST
+POST
+instead of
+GET
+POST
+
+***4*** - Done
+under convert to workPackageIDs
+as well as names CSV it should display IDs CSV
+
+***5***
+Action system for dynamic action sequences
+	array for initial options for each action - Done
+	array for steps/results of actions - Done
+	UI feature to add to action list
+
+***6***
+under extractTimesheets
+have a filter for one user
+run for multiple weeks - Done
+
+***7***
+under convertAction
+change clientTypesList etc to get structure/properties from first object instead of reconstructing object from scratch
+
+***8***
+under convertAction
+integrate nested actions with double nested actions
+
+***9***
+fix checkIfPropertyExists property
+
+***10***
+integrate getCurrentListPartAAsync into doCurrentActionAsync,
+in other words integrate 'GET only' action
+
+***11***
+under convertWeekToDays
+run batches for multiple weeks
+
+***12*** - Done
+allow Go1 to repeat like Go2, when not using spreadsheet
+
+***13*** - Done
+under extractTimesheets
+add totals to timesheets on right and bottom
+
+***14***
+fix location of includeEmptyGradesBool
+
+***15***
+make billingStatusReportFilter a parameter passed to runCurrentAction()

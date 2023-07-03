@@ -1,0 +1,213 @@
+"getProjects" convert from convertCSVAction
+[ // pages
+	{
+		data: [ // outputArray
+			{data: {…}} // outputArrayDataRow
+			{data: {…}}
+			{data: {…}}
+			{data: {…}}
+			{data: {…}}
+			{data: {…}}
+		],
+		errors: {message: ""}
+	},
+	{
+		data: [
+			{data: {…}}
+			{data: {…}}
+			{data: {…}}
+			{data: {…}}
+			{data: {…}}
+			{data: {…}}
+		],
+		errors: {message: ""}
+	}
+]
+
+"getProjects" convert from convertResults
+{
+	data: [
+		{
+			data: [
+				{…}
+				{…}
+				{…}
+				{…}
+				{…}
+				{…}
+			]
+		}
+	],
+	errors: [
+		{message: ""},
+		{message: ""}
+	]
+}
+
+
+"convertToWorkPackageIDs" convert error from convertCSVAction
+[
+	{
+		data: [
+			{data: {}}
+		],
+		errors: {
+			message: "error: index 2, number of matching workPackageIDs for this user: 0",
+			data: {…}
+		}
+	},
+	{
+		data: [
+			{data: {}}
+		],
+		errors: {
+			message: "error: index 3, number of matching workPackageIDs for this user: 0",
+			data: {…}
+		}
+	}
+]
+
+"convertToWorkPackageIDs" convert error from convertResults
+{
+	data: [
+		{data: ""} // outputCsv
+	],
+	errors: [
+		{
+			message: "error: index 2, number of matching workPackageIDs for this user: 0",
+			data: {…},
+			csv: "…"
+		},
+		{
+			message: "error: index 3, number of matching workPackageIDs for this user: 0",
+			data: {…},
+			csv: "…" // same for all
+		},
+	]
+}
+
+"condenseTimeSheets" convert from convertCSVAction
+[
+	{
+		data: [
+			{
+				name: "Alice",
+				data: [
+					{…},
+					{…},
+					{…},
+					{…},
+					{…},
+				],
+			},
+			{
+				name: "Bob",
+				data: [
+					{…},
+					{…},
+					{…},
+					{…},
+					{…},
+				],
+			},
+		],
+		errors: {message: ""}
+	},
+]
+
+(old) "condenseTimeSheets" convert from convertResults
+{
+	data: [
+		{
+			name: "Alice",
+			data: "" // outputCsv
+		},
+		{
+			name: "Bob",
+			data: "" // outputCsv
+		}
+	],
+	errors: [
+		{message: ""},
+		{message: ""}
+	]
+}
+
+(new) "condenseTimeSheets" convert from convertResults
+{
+	data: [
+		{
+			name: "04-10-2021",
+			data: [
+				{
+					name: "Alice",
+					data: "" // outputCsv
+				},
+				{
+					name: "Bob",
+					data: "" // outputCsv
+				}
+			]
+		},
+		{
+			name: "11-10-2021",
+			data: [
+				{
+					name: "Alice",
+					data: "" // outputCsv
+				},
+				{
+					name: "Bob",
+					data: "" // outputCsv
+				}
+			]
+		},
+	],
+	errors: [
+		{message: ""},
+		{message: ""}
+	]
+}
+
+"tabulateBreakdownCatByClientTimeEntries" convert from convertCSVAction
+[
+	{
+		data: [
+			{
+				name: "Apple",
+				data: [
+					{data: {…}},
+					{data: {…}},
+					{data: {…}}
+				]
+			},
+			{
+				name: "Banana",
+				data: [
+					{data: {…}},
+					{data: {…}},
+					{data: {…}}
+				]
+			}
+		],
+		errors: {message: ""}
+	}
+]
+
+"tabulateBreakdownCatByClientTimeEntries" convert from convertResults
+{
+	data: [
+		{
+			name: "Apple",
+			data: ""
+		},
+		{
+			name: "Banana",
+			data: ""
+		}
+	],
+	errors: [
+		{message: ""}
+	]
+}
+

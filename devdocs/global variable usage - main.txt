@@ -1,0 +1,72 @@
+showHideUI() {
+	actionType
+	csvType
+}	
+
+runActions() {
+	wpConvertUser
+    apiKey
+    weekBegin
+    dateEndPeriod
+    fileSelect 
+    staticLists
+    billingStatusReportFilter
+    workPackageListFileSelect
+    timeEntryListFileSelect
+
+    actionType
+    csvType
+	
+	adminUser1
+	adminUser2
+	
+	projectList
+	periodList
+	categoryList
+}
+
+runSingleAction() {
+	fileSelect
+}
+
+runFirstHalf() {
+	projectList
+	periodList
+	categoryList
+	userList
+}
+
+runSpreadsheetDone() {
+    actionType
+    csvType
+	fileSelect
+}
+
+runSecondHalf() {
+	actionType
+	workPackageList
+	timeEntryList
+	staticLists
+	workPackageListFileSelect
+	timeEntryListFileSelect
+}
+
+getActionOptions() {
+    apiKey
+	wpConvertUser
+    billingStatusReportFilter
+	projectList
+	categoryList
+	workPackageList
+	timeEntryList
+	userList
+}
+
+runOneAction() {
+    weekBegin
+    dateEndPeriod
+}
+
+checkPreReq() {
+	actionType
+}
