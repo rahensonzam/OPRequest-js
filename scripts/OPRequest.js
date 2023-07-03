@@ -622,7 +622,7 @@ function convertResults(resultArray) {
 	const temp = expandResults(resultArray)
 	const temp3 = extractProp(temp, "data")
 	const temp2 = extractErrors(resultArray)
-	return { data: [{ data: temp3 }], errors: temp2 }
+	return [{ data: [{ data: temp3 }], errors: temp2 }]
 }
 
 // function logConversionErrors(resultArray) {

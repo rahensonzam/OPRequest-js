@@ -284,7 +284,7 @@ async function runFirstHalf(inputParamsObj) {
         }
 
         if (i === 1) {
-            inputParamsObj.projectList = actionListArray[i].conversion.data[0].data
+            inputParamsObj.projectList = actionListArray[i].conversion[0].data[0].data
         }
     }
     // } else {
@@ -1122,8 +1122,8 @@ function getDomElementValueById(eleName) {
 
 function conversionErrorsPresent(resultArray) {
     //FIXME: Use array.every
-    for (let i = 0; i <= resultArray.errors.length - 1; i++) {
-        if (resultArray.errors[i].message !== "") {
+    for (let i = 0; i <= resultArray[0].errors.length - 1; i++) {
+        if (resultArray[0].errors[i].message !== "") {
             return true
         }
     }
@@ -1189,22 +1189,22 @@ function logWebResults(resultList) {
 }
 
 function logConversionErrors(resultArray) {
-    for (let i = 0; i <= resultArray.errors.length - 1; i++) {
-        if (resultArray.errors[i].message !== "") {
-            console.error(resultArray.errors[i].message)
-            writeToLog(`${resultArray.errors[i].message}`, "error", logType.error)
+    for (let i = 0; i <= resultArray[0].errors.length - 1; i++) {
+        if (resultArray[0].errors[i].message !== "") {
+            console.error(resultArray[0].errors[i].message)
+            writeToLog(`${resultArray[0].errors[i].message}`, "error", logType.error)
         }
     }
-    if (typeof resultArray.errors[0].csv1 !== "undefined") {
-        console.error(resultArray.errors[0].csv1)
-        writeToLog(`${resultArray.errors[0].csv1}`, "error", logType.error)
+    if (typeof resultArray[0].errors[0].csv1 !== "undefined") {
+        console.error(resultArray[0].errors[0].csv1)
+        writeToLog(`${resultArray[0].errors[0].csv1}`, "error", logType.error)
     }
-    if (typeof resultArray.errors[0].csv2 !== "undefined") {
-        console.error(resultArray.errors[0].csv2)
-        writeToLog(`${resultArray.errors[0].csv2}`, "error", logType.error)
+    if (typeof resultArray[0].errors[0].csv2 !== "undefined") {
+        console.error(resultArray[0].errors[0].csv2)
+        writeToLog(`${resultArray[0].errors[0].csv2}`, "error", logType.error)
     }
     // ReferenceError: logTextBox is not defined
-    // resultArray.errors.forEach(function (element) {
+    // resultArray[0].errors.forEach(function (element) {
     //     if (element !== "") {
     //         console.error(element)
     //      writeToLog(`${element}`, "error", logType.error)
@@ -1213,8 +1213,12 @@ function logConversionErrors(resultArray) {
 }
 
 function logData(action, currentStep) {
-    if (action === actions.getProjects
-        || action === actions.getWorkPackages
+    if (action === actions.getProjects) {
+        writeToLog(`${JSON.stringify(currentStep.conversion[0].data[0].data)}`, "output", logType.normal)
+        console.log(currentStep.conversion[0].data[0].data)
+        return
+    }
+    if (action === actions.getWorkPackages
         || action === actions.getAllWorkPackages
         || action === actions.getTimeEntries) {
         writeToLog(`${JSON.stringify(currentStep.conversion.data[0].data)}`, "output", logType.normal)

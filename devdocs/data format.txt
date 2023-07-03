@@ -25,25 +25,26 @@
 ]
 
 "getProjects" convert from convertResults
-{
-	data: [
-		{
-			data: [
-				{…}
-				{…}
-				{…}
-				{…}
-				{…}
-				{…}
-			]
-		}
-	],
-	errors: [
-		{message: ""},
-		{message: ""}
-	]
-}
-
+[
+	{
+		data: [
+			{
+				data: [
+					{…}
+					{…}
+					{…}
+					{…}
+					{…}
+					{…}
+				]
+			}
+		],
+		errors: [
+			{message: ""},
+			{message: ""}
+		]
+	}
+]
 
 "convertToWorkPackageIDs" convert error from convertCSVAction
 [
