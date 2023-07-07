@@ -617,11 +617,11 @@ async function runSecondHalf(initCsvFileString, inputParamsObj) {
             function (actionListArray) { return { action: actions.convertNamesToIDs, logValue: "step: 3/8 action: name validation using convertNamesToIDs", myCsvFileObj: initCsvFileString, logDataBool: false } },
             // eslint-disable-next-line no-unused-vars
             function (actionListArray) { return { action: actions.convertWeekToDays, logValue: "step: 4/8 action: convertWeekToDays", myCsvFileObj: initCsvFileString, logDataBool: true } },
-            function (actionListArray) { return { action: actions.convertNamesToIDs, logValue: "step: 5/8 action: convertNamesToIDs", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true } },
+            function (actionListArray) { return { action: actions.convertNamesToIDs, logValue: "step: 5/8 action: convertNamesToIDs", myCsvFileObj: actionListArray[4].conversion[0].data[0].data, logDataBool: true } },
             // eslint-disable-next-line no-unused-vars
             function (actionListArray) { return { action: actions.getWorkPackages, logValue: "step: 6/8 action: getWorkPackages (please wait, this step takes a bit of time)", myCsvFileObj: "", logDataBool: false } },
-            function (actionListArray) { return { action: actions.convertToWorkPackageIDs, logValue: "step: 7/8 action: convertToWorkPackageIDs", myCsvFileObj: actionListArray[5].conversion.data[0].data, logDataBool: true } },
-            function (actionListArray) { return { action: actions.addTimeEntry, logValue: "step: 8/8 action: addTimeEntry", myCsvFileObj: actionListArray[7].conversion.data[0].data, logDataBool: false } }
+            function (actionListArray) { return { action: actions.convertToWorkPackageIDs, logValue: "step: 7/8 action: convertToWorkPackageIDs", myCsvFileObj: actionListArray[5].conversion[0].data[0].data, logDataBool: true } },
+            function (actionListArray) { return { action: actions.addTimeEntry, logValue: "step: 8/8 action: addTimeEntry", myCsvFileObj: actionListArray[7].conversion[0].data[0].data, logDataBool: false } }
         ]
 
         for (let i = 3; i <= actionListOptionsArray.length - 1; i++) {
@@ -631,7 +631,7 @@ async function runSecondHalf(initCsvFileString, inputParamsObj) {
             }
 
             if (i === 6) {
-                inputParamsObj.workPackageList = actionListArray[i].conversion.data[0].data
+                inputParamsObj.workPackageList = actionListArray[i].conversion[0].data[0].data
             }
         }
 
@@ -650,8 +650,8 @@ async function runSecondHalf(initCsvFileString, inputParamsObj) {
             function (actionListArray) { return { action: actions.convertNamesToIDs, logValue: "step: 3/6 action: convertNamesToIDs", myCsvFileObj: initCsvFileString, logDataBool: true } },
             // eslint-disable-next-line no-unused-vars
             function (actionListArray) { return { action: actions.getWorkPackages, logValue: "step: 4/6 action: getWorkPackages (please wait, this step takes a bit of time)", myCsvFileObj: "", logDataBool: false } },
-            function (actionListArray) { return { action: actions.convertToWorkPackageIDs, logValue: "step: 5/6 action: convertToWorkPackageIDs", myCsvFileObj: actionListArray[3].conversion.data[0].data, logDataBool: true } },
-            function (actionListArray) { return { action: actions.addTimeEntry, logValue: "step: 6/6 action: addTimeEntry", myCsvFileObj: actionListArray[5].conversion.data[0].data, logDataBool: false } }
+            function (actionListArray) { return { action: actions.convertToWorkPackageIDs, logValue: "step: 5/6 action: convertToWorkPackageIDs", myCsvFileObj: actionListArray[3].conversion[0].data[0].data, logDataBool: true } },
+            function (actionListArray) { return { action: actions.addTimeEntry, logValue: "step: 6/6 action: addTimeEntry", myCsvFileObj: actionListArray[5].conversion[0].data[0].data, logDataBool: false } }
         ]
 
         for (let i = 3; i <= actionListOptionsArray.length - 1; i++) {
@@ -661,7 +661,7 @@ async function runSecondHalf(initCsvFileString, inputParamsObj) {
             }
 
             if (i === 4) {
-                inputParamsObj.workPackageList = actionListArray[i].conversion.data[0].data
+                inputParamsObj.workPackageList = actionListArray[i].conversion[0].data[0].data
             }
         }
 
@@ -713,26 +713,26 @@ async function runSecondHalf(initCsvFileString, inputParamsObj) {
         actionListOptionsArray[4] = function (actionListArray) { return { paramsObj: {action: actions.exportTimeEntries, logValue: "step: 4/4 action: exportTimeEntries", myCsvFileObj: "", logDataBool: true }, inputParamsObj } }
 
         if (actionType === actionTypes.sequenceExportExtract) {
-            actionListOptionsArray[5] = function (actionListArray) { return { paramsObj: {action: actions.extractTimeSheets, logValue: "step: 5/4 action: extractTimeSheets", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: false }, inputParamsObj } }
-            actionListOptionsArray[6] = function (actionListArray) { return { paramsObj: {action: actions.condenseTimeSheets, logValue: "step: 6/4 action: condenseTimeSheets", myCsvFileObj: actionListArray[5].conversion.data, logDataBool: true }, inputParamsObj } }
+            actionListOptionsArray[5] = function (actionListArray) { return { paramsObj: {action: actions.extractTimeSheets, logValue: "step: 5/4 action: extractTimeSheets", myCsvFileObj: actionListArray[4].conversion[0].data[0].data, logDataBool: false }, inputParamsObj } }
+            actionListOptionsArray[6] = function (actionListArray) { return { paramsObj: {action: actions.condenseTimeSheets, logValue: "step: 6/4 action: condenseTimeSheets", myCsvFileObj: actionListArray[5].conversion[0].data, logDataBool: true }, inputParamsObj } }
         }
         if (actionType === actionTypes.sequenceExportSummarizeUt) {
-            actionListOptionsArray[5] = function (actionListArray) { return { paramsObj: {action: actions.summarizeUtTimeEntries, logValue: "step: 6/4 action: tabulateUtTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true }, inputParamsObj } }
+            actionListOptionsArray[5] = function (actionListArray) { return { paramsObj: {action: actions.summarizeUtTimeEntries, logValue: "step: 6/4 action: tabulateUtTimeEntries", myCsvFileObj: actionListArray[4].conversion[0].data[0].data, logDataBool: true }, inputParamsObj } }
         }
         if (actionType === actionTypes.sequenceExportSummarizeCat) {
-            actionListOptionsArray[5] = function (actionListArray) { return { paramsObj: {action: actions.summarizeCatTimeEntries, logValue: "step: 6/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true }, inputParamsObj } }
+            actionListOptionsArray[5] = function (actionListArray) { return { paramsObj: {action: actions.summarizeCatTimeEntries, logValue: "step: 6/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion[0].data[0].data, logDataBool: true }, inputParamsObj } }
         }
         if (actionType === actionTypes.sequenceExportLoggedMinusBilledCat) {
             if (weekBeginAfterFixedBeginDate === false) {
                 actionListOptionsArray[5] = function (actionListArray) { 
                     const editedInputParamsObj = {...inputParamsObj}
                     editedInputParamsObj.billingStatusReportFilter = billingStatusReportFilterEnum.All
-                    return { paramsObj: {action: actions.summarizeCatTimeEntries, logValue: "step: 6/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true }, inputParamsObj: editedInputParamsObj } 
+                    return { paramsObj: {action: actions.summarizeCatTimeEntries, logValue: "step: 6/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion[0].data[0].data, logDataBool: true }, inputParamsObj: editedInputParamsObj } 
                 }
                 actionListOptionsArray[6] = function (actionListArray) { 
                     const editedInputParamsObj = {...inputParamsObj}
                     editedInputParamsObj.billingStatusReportFilter = billingStatusReportFilterEnum.BilledAndWrittenOff
-                    return { paramsObj: {action: actions.summarizeCatTimeEntries, logValue: "step: 8/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true }, inputParamsObj: editedInputParamsObj } 
+                    return { paramsObj: {action: actions.summarizeCatTimeEntries, logValue: "step: 8/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion[0].data[0].data, logDataBool: true }, inputParamsObj: editedInputParamsObj } 
                 }
             } else {
                 actionListOptionsArray[5] = function (actionListArray) { 
@@ -740,32 +740,32 @@ async function runSecondHalf(initCsvFileString, inputParamsObj) {
                     editedInputParamsObj.weekBegin = inputParamsObj.fixedBeginDate
                     editedInputParamsObj.dateEndPeriod = dayjs(weekBeginObj).subtract(1, "day").format("YYYY-MM-DD")
                     editedInputParamsObj.billingStatusReportFilter = billingStatusReportFilterEnum.All
-                    return { paramsObj: {action: actions.summarizeCatTimeEntries, logValue: "step: 66/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true }, inputParamsObj: editedInputParamsObj } 
+                    return { paramsObj: {action: actions.summarizeCatTimeEntries, logValue: "step: 66/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion[0].data[0].data, logDataBool: true }, inputParamsObj: editedInputParamsObj } 
                 }
                 actionListOptionsArray[6] = function (actionListArray) { 
                     const editedInputParamsObj = {...inputParamsObj}
                     editedInputParamsObj.weekBegin = inputParamsObj.fixedBeginDate
                     editedInputParamsObj.dateEndPeriod = dayjs(weekBeginObj).subtract(1, "day").format("YYYY-MM-DD")
                     editedInputParamsObj.billingStatusReportFilter = billingStatusReportFilterEnum.BilledAndWrittenOff
-                    return { paramsObj: {action: actions.summarizeCatTimeEntries, logValue: "step: 88/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true }, inputParamsObj: editedInputParamsObj } 
+                    return { paramsObj: {action: actions.summarizeCatTimeEntries, logValue: "step: 88/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion[0].data[0].data, logDataBool: true }, inputParamsObj: editedInputParamsObj } 
                 }
                 actionListOptionsArray[7] = function (actionListArray) { 
                     const editedInputParamsObj = {...inputParamsObj}
                     editedInputParamsObj.billingStatusReportFilter = billingStatusReportFilterEnum.Unbilled
-                    return { paramsObj: {action: actions.summarizeCatTimeEntries, logValue: "step: 10/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true }, inputParamsObj: editedInputParamsObj } 
+                    return { paramsObj: {action: actions.summarizeCatTimeEntries, logValue: "step: 10/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion[0].data[0].data, logDataBool: true }, inputParamsObj: editedInputParamsObj } 
                 }
                 actionListOptionsArray[8] = function (actionListArray) { 
                     const editedInputParamsObj = {...inputParamsObj}
                     editedInputParamsObj.billingStatusReportFilter = billingStatusReportFilterEnum.BilledAndWrittenOff
-                    return { paramsObj: {action: actions.summarizeCatTimeEntries, logValue: "step: 12/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true }, inputParamsObj: editedInputParamsObj } 
+                    return { paramsObj: {action: actions.summarizeCatTimeEntries, logValue: "step: 12/4 action: tabulateCatTimeEntries", myCsvFileObj: actionListArray[4].conversion[0].data[0].data, logDataBool: true }, inputParamsObj: editedInputParamsObj } 
                 }
             }
         }
         if (actionType === actionTypes.sequenceExportBreakdownCat) {
-            actionListOptionsArray[5] = function (actionListArray) { return { paramsObj: {action: actions.breakdownClientByCatTimeEntries, logValue: "step: 6/4 action: tabulateBreakdownClientByCatTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true }, inputParamsObj } }
+            actionListOptionsArray[5] = function (actionListArray) { return { paramsObj: {action: actions.breakdownClientByCatTimeEntries, logValue: "step: 6/4 action: tabulateBreakdownClientByCatTimeEntries", myCsvFileObj: actionListArray[4].conversion[0].data[0].data, logDataBool: true }, inputParamsObj } }
         }
         if (actionType === actionTypes.sequenceExportBreakdownClient) {
-            actionListOptionsArray[5] = function (actionListArray) { return { paramsObj: {action: actions.breakdownCatByClientTimeEntries, logValue: "step: 6/4 action: tabulateBreakdownCatByClientTimeEntries", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: true }, inputParamsObj } }
+            actionListOptionsArray[5] = function (actionListArray) { return { paramsObj: {action: actions.breakdownCatByClientTimeEntries, logValue: "step: 6/4 action: tabulateBreakdownCatByClientTimeEntries", myCsvFileObj: actionListArray[4].conversion[0].data[0].data, logDataBool: true }, inputParamsObj } }
         }
 
         if (inputParamsObj.staticLists === false) {
@@ -776,10 +776,10 @@ async function runSecondHalf(initCsvFileString, inputParamsObj) {
                 }
 
                 if (i === 2) {
-                    inputParamsObj.workPackageList = actionListArray[i].conversion.data[0].data
+                    inputParamsObj.workPackageList = actionListArray[i].conversion[0].data[0].data
                 }
                 if (i === 3) {
-                    inputParamsObj.timeEntryList = actionListArray[i].conversion.data[0].data
+                    inputParamsObj.timeEntryList = actionListArray[i].conversion[0].data[0].data
                 }
             }
         } else {
@@ -836,9 +836,9 @@ async function runSecondHalf(initCsvFileString, inputParamsObj) {
                 if (i === 6) {
                     if (weekBeginAfterFixedBeginDate === false) {
 
-                        const tempResultA = await editCsv2A(actionListArray[5].conversion.data[0].data, actionListArray[6].conversion.data[0].data)
+                        const tempResultA = await editCsv2A(actionListArray[5].conversion[0].data[0].data, actionListArray[6].conversion[0].data[0].data)
                         const tempResultB = editCsv2B(...tempResultA)
-                        actionListArray[6].conversion.data[0].data = tempResultB
+                        actionListArray[6].conversion[0].data[0].data = tempResultB
                         logData(actions.summarizeCatTimeEntries, actionListArray[6])
                         // A     :   B  :  C   :     D
                         // zeros : data : data : A + B - C
@@ -848,10 +848,10 @@ async function runSecondHalf(initCsvFileString, inputParamsObj) {
 
                 if (weekBeginAfterFixedBeginDate === true) {
                     if (i === 8) {
-                        const tempResult1A = await editCsv2A(actionListArray[5].conversion.data[0].data, actionListArray[6].conversion.data[0].data)
-                        const tempResult2A = await editCsv3A(tempResult1A[3], actionListArray[7].conversion.data[0].data, actionListArray[8].conversion.data[0].data)
+                        const tempResult1A = await editCsv2A(actionListArray[5].conversion[0].data[0].data, actionListArray[6].conversion[0].data[0].data)
+                        const tempResult2A = await editCsv3A(tempResult1A[3], actionListArray[7].conversion[0].data[0].data, actionListArray[8].conversion[0].data[0].data)
                         const tempResultB = editCsv2B(...tempResult2A)
-                        actionListArray[8].conversion.data[0].data = tempResultB
+                        actionListArray[8].conversion[0].data[0].data = tempResultB
                         logData(actions.summarizeCatTimeEntries, actionListArray[8])
                         // A1     :   B1  :  C1   :     D1
                         // A2     :   B2  :  C2   :     D2
@@ -1221,8 +1221,8 @@ function logData(action, currentStep) {
     if (action === actions.getWorkPackages
         || action === actions.getAllWorkPackages
         || action === actions.getTimeEntries) {
-        writeToLog(`${JSON.stringify(currentStep.conversion.data[0].data)}`, "output", logType.normal)
-        console.log(currentStep.conversion.data[0].data)
+        writeToLog(`${JSON.stringify(currentStep.conversion[0].data[0].data)}`, "output", logType.normal)
+        console.log(currentStep.conversion[0].data[0].data)
         return
     }
     if (action === actions.convertToWorkPackageIDs
@@ -1231,8 +1231,8 @@ function logData(action, currentStep) {
         || action === actions.convertWeekToDays
         || action === actions.convertDaysToWeek
         || action === actions.exportTimeEntries) {
-        writeToLog(`${currentStep.conversion.data[0].data}`, "output", logType.normal)
-        console.log(currentStep.conversion.data[0].data)
+        writeToLog(`${currentStep.conversion[0].data[0].data}`, "output", logType.normal)
+        console.log(currentStep.conversion[0].data[0].data)
         return
     }
     if (action === actions.extractTimeSheets
@@ -1241,24 +1241,24 @@ function logData(action, currentStep) {
         || action === actions.summarizeCatTimeEntries
         || action === actions.breakdownClientByCatTimeEntries
         || action === actions.breakdownCatByClientTimeEntries) {
-        for (let i = 0; i <= currentStep.conversion.data.length - 1; i++) {
+        for (let i = 0; i <= currentStep.conversion[0].data.length - 1; i++) {
             if (action === actions.extractTimeSheets) {
-                writeToLog(`${currentStep.conversion.data[i].name}`, "output", logType.normal)
-                console.log(`${currentStep.conversion.data[i].name}`)
-                for (let j = 0; j <= currentStep.conversion.data[i].data.length - 1; j++) {
-                    writeToLog(`${currentStep.conversion.data[i].data[j].name}\n${currentStep.conversion.data[i].data[j].csv}`, "output", logType.normal)
-                    console.log(`${currentStep.conversion.data[i].data[j].name}\n${currentStep.conversion.data[i].data[j].csv}`)
+                writeToLog(`${currentStep.conversion[0].data[i].name}`, "output", logType.normal)
+                console.log(`${currentStep.conversion[0].data[i].name}`)
+                for (let j = 0; j <= currentStep.conversion[0].data[i].data.length - 1; j++) {
+                    writeToLog(`${currentStep.conversion[0].data[i].data[j].name}\n${currentStep.conversion[0].data[i].data[j].csv}`, "output", logType.normal)
+                    console.log(`${currentStep.conversion[0].data[i].data[j].name}\n${currentStep.conversion[0].data[i].data[j].csv}`)
                 }
             } else if (action === actions.condenseTimeSheets) {
-                writeToLog(`${currentStep.conversion.data[i].name}`, "output", logType.normal)
-                console.log(`${currentStep.conversion.data[i].name}`)
-                for (let j = 0; j <= currentStep.conversion.data[i].data.length - 1; j++) {
-                    writeToLog(`${currentStep.conversion.data[i].data[j].name}\n${currentStep.conversion.data[i].data[j].data}`, "output", logType.normal)
-                    console.log(`${currentStep.conversion.data[i].data[j].name}\n${currentStep.conversion.data[i].data[j].data}`)
+                writeToLog(`${currentStep.conversion[0].data[i].name}`, "output", logType.normal)
+                console.log(`${currentStep.conversion[0].data[i].name}`)
+                for (let j = 0; j <= currentStep.conversion[0].data[i].data.length - 1; j++) {
+                    writeToLog(`${currentStep.conversion[0].data[i].data[j].name}\n${currentStep.conversion[0].data[i].data[j].data}`, "output", logType.normal)
+                    console.log(`${currentStep.conversion[0].data[i].data[j].name}\n${currentStep.conversion[0].data[i].data[j].data}`)
                 }
             } else {
-                writeToLog(`${currentStep.conversion.data[i].data}`, "output", logType.normal)
-                console.log(currentStep.conversion.data[i].data)
+                writeToLog(`${currentStep.conversion[0].data[i].data}`, "output", logType.normal)
+                console.log(currentStep.conversion[0].data[i].data)
             }
         }
         return
