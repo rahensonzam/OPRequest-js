@@ -5,11 +5,23 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "pwa-chrome",
+            "type": "chrome",
             "request": "launch",
             "name": "Chrome",
             "url": "http://127.0.0.1:5500/bulk-upload/index.html",
             "webRoot": "${workspaceFolder}"
+        },
+        {
+            "type": "firefox",
+            "request": "launch",
+            "name": "Firefox",
+            "reAttach": true,
+            "url": "http://127.0.0.1:5500/bulk-upload/index.html",
+            "pathMappings": [{
+                "url": "http://127.0.0.1:5500",
+                "path": "${workspaceFolder}"
+            }],
+            "tmpDir": "~/.mozilla/firefox/tmp/"
         },
         {
             "type": "node",
