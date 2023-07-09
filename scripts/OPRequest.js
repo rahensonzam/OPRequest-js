@@ -191,7 +191,7 @@ async function doActionAsync(paramsObj) {
 	if (action === actions.convertWeekToDays
 		|| action === actions.convertDaysToWeek
 		|| action === actions.convertNamesToIDs) {
-		if (isValid[0].errors[0].message !== "") {
+		if (isValid.errors[0].message !== "") {
 			return { conversion: isValid }
 		}
 	}
@@ -246,12 +246,12 @@ async function doActionAsync(paramsObj) {
 		} else if (action === actions.extractTimeSheets) {
 			const currentDate = getCurrentDateFromWeekBegin(weekBegin, rowIndex)
 			const extractObj = convertCsvAction({ action, weekBegin: currentDate, resultList: rows, userList, wpConvertUser, filterToOneUserBool })
-			extractObj[0].name = dayjs(currentDate).format("DD-MM-YYYY")
+			extractObj.name = dayjs(currentDate).format("DD-MM-YYYY")
 			convertedCSVResults.push(extractObj)
 		} else if (action === actions.condenseTimeSheets) {
 			const currentDate = getCurrentDateFromWeekBegin(weekBegin, rowIndex)
 			const extractObj = convertCsvAction({ action, resultList: rows[rowIndex].data })
-			extractObj[0].name = dayjs(currentDate).format("DD-MM-YYYY")
+			extractObj.name = dayjs(currentDate).format("DD-MM-YYYY")
 			convertedCSVResults.push(extractObj)
 		} else if (action === actions.summarizeUtTimeEntries) {
 			convertedCSVResults.push(convertCsvAction({ action, weekBegin, dateEndPeriod, resultList: rows, projectList, userList }))
@@ -414,7 +414,7 @@ function validateCSV(action, rows, headerRow) {
 	} else {
 		throw new RangeError(`Invalid action: "${action}"`)
 	}
-	return [{}]
+	return {}
 	// convertToWorkPackageIDs: {
 	// 	client: 0,
 	// 	period: 1,
@@ -473,14 +473,14 @@ function innerValidateCSVConversion(expected, headerRow) {
 
 	for (let index = 0; index <= expected.length - 1; index++) {
 		if (!(headerRow.includes(expected[index]))) {
-			return [{
+			return {
 				errors: [{
 					message: `Invalid CSV input\n"${expected[index]}" missing from CSV header\nExpected "${expected}" but got "${headerRow}"`
 				}]
-			}]
+			}
 		}
 	}
-	return [{ errors: [{ message: "" }] }]
+	return { errors: [{ message: "" }] }
 }
 
 // async function getListFileAsync(action, listFilename) {
@@ -540,7 +540,7 @@ function convertResultsToCsv(action, resultArray) {
 			}
 		}
 	}
-	return [{ data: [{ data: outputCsv }], errors: temp2 }]
+	return { data: [{ data: outputCsv }], errors: temp2 }
 }
 
 function convertResultsToCsv2(action, resultArray) {
@@ -579,7 +579,7 @@ function convertResultsToCsv2(action, resultArray) {
 		}
 	}
 	const temp2 = extractErrors(resultArray)
-	return [{ data: outputData, errors: temp2 }]
+	return { data: outputData, errors: temp2 }
 }
 
 function convertResultsToCsv3(action, resultArray) {
@@ -964,11 +964,11 @@ function convertCsvAction(paramsObj) {
 
 	// check data for errors
 	const conversionErrorResult = conversionErrorSelect(action, row, rowIndex, wpConvertUser, filterToOneUserBool, projectList, categoryList, workPackageIDs, filteredSortedList)
-	if (conversionErrorResult[0].errors.message !== "") {
+	if (conversionErrorResult.errors.message !== "") {
 		return conversionErrorResult
-		// [{ data: outputArray, errors: error }]
+		// {data: outputArray, errors: error}
 	} else {
-		error = conversionErrorResult[0].errors
+		error = conversionErrorResult.errors
 	}
 
 	let retrievedListLength
@@ -1109,9 +1109,9 @@ function convertCsvAction(paramsObj) {
 		}
 	}
 
-	// console.log("convert", [{ data: outputArray, errors: error }])
+	// console.log("convert", { data: outputArray, errors: error })
 
-	return [{ data: outputArray, errors: error }]
+	return { data: outputArray, errors: error }
 }
 
 function setConversionCount(action, retrievedListLength, filteredSortedListLength) {
@@ -1168,10 +1168,10 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, filterToOne
 				error.data.subject = period
 				error.data.user = wpConvertUser
 			}
-			return [{ data: [{ data: {} }], errors: error }]
+			return { data: [{ data: {} }], errors: error }
 		}
 		error.message = ""
-		return [{ errors: error }]
+		return { errors: error }
 	} else if (action === actions.convertNamesToIDs) {
 		const projectName = row.client
 		const projectIndex = findArrayIndexFromName(projectList, projectName)
@@ -1196,10 +1196,10 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, filterToOne
 					units: row.units
 				}
 			})
-			return [{ data: outputArray, errors: error }]
+			return { data: outputArray, errors: error }
 		}
 		error.message = ""
-		return [{ errors: error }]
+		return { errors: error }
 	} else if (action === actions.convertMembershipNamesToIDs) {
 		const projectName = row.client
 		const projectIndex = findArrayIndexFromName(projectList, projectName)
@@ -1212,10 +1212,10 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, filterToOne
 					role: row.role
 				}
 			})
-			return [{ data: outputArray, errors: error }]
+			return { data: outputArray, errors: error }
 		}
 		error.message = ""
-		return [{ errors: error }]
+		return { errors: error }
 	} else if (action === actions.extractTimeSheets
 		|| action === actions.summarizeUtTimeEntries
 		|| action === actions.summarizeCatTimeEntries
@@ -1224,15 +1224,15 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, filterToOne
 		if (action === actions.extractTimeSheets) {
 			if (filterToOneUserBool) {
 				error.message = ""
-				return [{ errors: error }]
+				return { errors: error }
 			}
 		}
 		if (filteredSortedList.length === 0) {
 			error.message = "error: No rows found for the selected weeks"
-			return [{ errors: error }]
+			return { errors: error }
 		}
 		error.message = ""
-		return [{ errors: error }]
+		return { errors: error }
 	} else if (action === actions.convertWeekToDays
 		|| action === actions.convertDaysToWeek
 		|| action === actions.exportTimeEntries
@@ -1243,7 +1243,7 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, filterToOne
 		|| action === actions.getAllWorkPackages
 		|| action === actions.getTimeEntries) {
 		error.message = ""
-		return [{ errors: error }]
+		return { errors: error }
 	} else {
 		throw new RangeError(`Invalid action: "${action}"`)
 	}
