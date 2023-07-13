@@ -1213,16 +1213,12 @@ function logConversionErrors(resultArray) {
 }
 
 function logData(action, currentStep) {
-    if (action === actions.getProjects) {
-        writeToLog(`${JSON.stringify(currentStep.conversion[0].data[0].data)}`, "output", logType.normal)
-        console.log(currentStep.conversion[0].data[0].data)
-        return
-    }
-    if (action === actions.getWorkPackages
+    if (action === actions.getProjects
+        || action === actions.getWorkPackages
         || action === actions.getAllWorkPackages
         || action === actions.getTimeEntries) {
-        writeToLog(`${JSON.stringify(currentStep.conversion.data[0].data)}`, "output", logType.normal)
-        console.log(currentStep.conversion.data[0].data)
+        writeToLog(`${JSON.stringify(currentStep.conversion[0].data[0].data)}`, "output", logType.normal)
+        console.log(currentStep.conversion[0].data[0].data)
         return
     }
     if (action === actions.convertToWorkPackageIDs

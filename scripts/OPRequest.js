@@ -964,11 +964,11 @@ function convertCsvAction(paramsObj) {
 
 	// check data for errors
 	const conversionErrorResult = conversionErrorSelect(action, row, rowIndex, wpConvertUser, filterToOneUserBool, projectList, categoryList, workPackageIDs, filteredSortedList)
-	if (conversionErrorResult.errors.message !== "") {
+	if (conversionErrorResult[0].errors.message !== "") {
 		return conversionErrorResult
 		// {data: outputArray, errors: error}
 	} else {
-		error = conversionErrorResult.errors
+		error = conversionErrorResult[0].errors
 	}
 
 	let retrievedListLength
@@ -1243,7 +1243,7 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, filterToOne
 		|| action === actions.getAllWorkPackages
 		|| action === actions.getTimeEntries) {
 		error.message = ""
-		return { errors: error }
+		return [{ errors: error }]
 	} else {
 		throw new RangeError(`Invalid action: "${action}"`)
 	}
