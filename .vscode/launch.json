@@ -12,6 +12,13 @@
             "webRoot": "${workspaceFolder}"
         },
         {
+            "type": "msedge",
+            "request": "launch",
+            "name": "Edge",
+            "url": "http://127.0.0.1:5500/bulk-upload/index.html",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
             "type": "firefox",
             "request": "launch",
             "name": "Firefox",
