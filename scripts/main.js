@@ -713,7 +713,7 @@ async function runSecondHalf(initCsvFileString, inputParamsObj) {
         actionListOptionsArray[4] = function (actionListArray) { return { paramsObj: {action: actions.exportTimeEntries, logValue: "step: 4/4 action: exportTimeEntries", myCsvFileObj: "", logDataBool: true }, inputParamsObj } }
 
         if (actionType === actionTypes.sequenceExportExtract) {
-            actionListOptionsArray[5] = function (actionListArray) { return { paramsObj: {action: actions.extractTimeSheets, logValue: "step: 5/4 action: extractTimeSheets", myCsvFileObj: actionListArray[4].conversion.data[0].data, logDataBool: false }, inputParamsObj } }
+            actionListOptionsArray[5] = function (actionListArray) { return { paramsObj: {action: actions.extractTimeSheets, logValue: "step: 5/4 action: extractTimeSheets", myCsvFileObj: actionListArray[4].conversion[0].data[0].data, logDataBool: false }, inputParamsObj } }
             actionListOptionsArray[6] = function (actionListArray) { return { paramsObj: {action: actions.condenseTimeSheets, logValue: "step: 6/4 action: condenseTimeSheets", myCsvFileObj: actionListArray[5].conversion.data, logDataBool: true }, inputParamsObj } }
         }
         if (actionType === actionTypes.sequenceExportSummarizeUt) {

@@ -540,7 +540,8 @@ function convertResultsToCsv(action, resultArray) {
 			}
 		}
 	}
-	return { data: [{ data: outputCsv }], errors: temp2 }
+	// does NOT get pushed to array, add surrounding []
+	return [{ data: [{ data: outputCsv }], errors: temp2 }]
 }
 
 function convertResultsToCsv2(action, resultArray) {
@@ -1111,6 +1112,7 @@ function convertCsvAction(paramsObj) {
 
 	// console.log("convert", { data: outputArray, errors: error })
 
+	//gets pushed into array, do NOT add surrounding []
 	return { data: outputArray, errors: error }
 }
 
