@@ -245,16 +245,14 @@ async function doActionAsync(paramsObj) {
 			convertedCSVResults.push(convertCsvAction({ action, rowIndex, projectList, categoryList, workPackageList, timeEntryList, userList }))
 		} else if (action === actions.extractTimeSheets) {
 			const currentDate = getCurrentDateFromWeekBegin(weekBegin, rowIndex)
-			// does NOT get pushed to array, add surrounding []
-			const extractObj = convertCsvAction({ action, weekBegin: currentDate, resultList: rows, userList, wpConvertUser, filterToOneUserBool })
-			extractObj[0].name = dayjs(currentDate).format("DD-MM-YYYY")
-			convertedCSVResults.push(extractObj)
+			const extractObjDataErrors = convertCsvAction({ action, weekBegin: currentDate, resultList: rows, userList, wpConvertUser, filterToOneUserBool })
+			const extractObjName = dayjs(currentDate).format("DD-MM-YYYY")
+			convertedCSVResults.push({name: extractObjName, ...extractObjDataErrors})
 		} else if (action === actions.condenseTimeSheets) {
 			const currentDate = getCurrentDateFromWeekBegin(weekBegin, rowIndex)
-			// does NOT get pushed to array, add surrounding []
-			const extractObj = convertCsvAction({ action, resultList: rows[rowIndex].data })
-			extractObj[0].name = dayjs(currentDate).format("DD-MM-YYYY")
-			convertedCSVResults.push(extractObj)
+			const extractObjDataErrors = convertCsvAction({ action, resultList: rows[rowIndex].data })
+			const extractObjName = dayjs(currentDate).format("DD-MM-YYYY")
+			convertedCSVResults.push({name: extractObjName, ...extractObjDataErrors})
 		} else if (action === actions.summarizeUtTimeEntries) {
 			convertedCSVResults.push(convertCsvAction({ action, weekBegin, dateEndPeriod, resultList: rows, projectList, userList }))
 		} else if (action === actions.tabulateUtTimeEntries) {
