@@ -1,0 +1,5 @@
+{
+    "EasyMock.corsHeaders": "Authorization, Access-Control-Allow-Origin",
+    "EasyMock.mockFolderName": "bulk-upload/mock",
+    "EasyMock.helloPage": false
+}

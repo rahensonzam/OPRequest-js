@@ -191,7 +191,7 @@ async function doActionAsync(paramsObj) {
 	if (action === actions.convertWeekToDays
 		|| action === actions.convertDaysToWeek
 		|| action === actions.convertNamesToIDs) {
-		if (isValid.errors[0].message !== "") {
+		if (isValid[0].errors[0].message !== "") {
 			return { conversion: isValid }
 		}
 	}
@@ -245,14 +245,14 @@ async function doActionAsync(paramsObj) {
 			convertedCSVResults.push(convertCsvAction({ action, rowIndex, projectList, categoryList, workPackageList, timeEntryList, userList }))
 		} else if (action === actions.extractTimeSheets) {
 			const currentDate = getCurrentDateFromWeekBegin(weekBegin, rowIndex)
-			const extractObj = convertCsvAction({ action, weekBegin: currentDate, resultList: rows, userList, wpConvertUser, filterToOneUserBool })
-			extractObj.name = dayjs(currentDate).format("DD-MM-YYYY")
-			convertedCSVResults.push(extractObj)
+			const extractObjDataErrors = convertCsvAction({ action, weekBegin: currentDate, resultList: rows, userList, wpConvertUser, filterToOneUserBool })
+			const extractObjName = dayjs(currentDate).format("DD-MM-YYYY")
+			convertedCSVResults.push({name: extractObjName, ...extractObjDataErrors})
 		} else if (action === actions.condenseTimeSheets) {
 			const currentDate = getCurrentDateFromWeekBegin(weekBegin, rowIndex)
-			const extractObj = convertCsvAction({ action, resultList: rows[rowIndex].data })
-			extractObj.name = dayjs(currentDate).format("DD-MM-YYYY")
-			convertedCSVResults.push(extractObj)
+			const extractObjDataErrors = convertCsvAction({ action, resultList: rows[rowIndex].data })
+			const extractObjName = dayjs(currentDate).format("DD-MM-YYYY")
+			convertedCSVResults.push({name: extractObjName, ...extractObjDataErrors})
 		} else if (action === actions.summarizeUtTimeEntries) {
 			convertedCSVResults.push(convertCsvAction({ action, weekBegin, dateEndPeriod, resultList: rows, projectList, userList }))
 		} else if (action === actions.tabulateUtTimeEntries) {
@@ -414,7 +414,7 @@ function validateCSV(action, rows, headerRow) {
 	} else {
 		throw new RangeError(`Invalid action: "${action}"`)
 	}
-	return {}
+	return [{}]
 	// convertToWorkPackageIDs: {
 	// 	client: 0,
 	// 	period: 1,
@@ -473,14 +473,14 @@ function innerValidateCSVConversion(expected, headerRow) {
 
 	for (let index = 0; index <= expected.length - 1; index++) {
 		if (!(headerRow.includes(expected[index]))) {
-			return {
+			return [{
 				errors: [{
 					message: `Invalid CSV input\n"${expected[index]}" missing from CSV header\nExpected "${expected}" but got "${headerRow}"`
 				}]
-			}
+			}]
 		}
 	}
-	return { errors: [{ message: "" }] }
+	return [{ errors: [{ message: "" }] }]
 }
 
 // async function getListFileAsync(action, listFilename) {
@@ -540,7 +540,8 @@ function convertResultsToCsv(action, resultArray) {
 			}
 		}
 	}
-	return { data: [{ data: outputCsv }], errors: temp2 }
+	// does NOT get pushed to array, add surrounding []
+	return [{ data: [{ data: outputCsv }], errors: temp2 }]
 }
 
 function convertResultsToCsv2(action, resultArray) {
@@ -579,7 +580,8 @@ function convertResultsToCsv2(action, resultArray) {
 		}
 	}
 	const temp2 = extractErrors(resultArray)
-	return { data: outputData, errors: temp2 }
+	// does NOT get pushed to array, add surrounding []
+	return [{ data: outputData, errors: temp2 }]
 }
 
 function convertResultsToCsv3(action, resultArray) {
@@ -615,14 +617,16 @@ function convertResultsToCsv3(action, resultArray) {
 		}
 	}
 	const temp2 = extractErrors(resultArray)
-	return { data: outputData, errors: temp2 }
+	// does NOT get pushed to array, add surrounding []
+	return [{ data: outputData, errors: temp2 }]
 }
 
 function convertResults(resultArray) {
 	const temp = expandResults(resultArray)
 	const temp3 = extractProp(temp, "data")
 	const temp2 = extractErrors(resultArray)
-	return { data: [{ data: temp3 }], errors: temp2 }
+	// does NOT get pushed to array, add surrounding []
+	return [{ data: [{ data: temp3 }], errors: temp2 }]
 }
 
 // function logConversionErrors(resultArray) {
@@ -964,11 +968,11 @@ function convertCsvAction(paramsObj) {
 
 	// check data for errors
 	const conversionErrorResult = conversionErrorSelect(action, row, rowIndex, wpConvertUser, filterToOneUserBool, projectList, categoryList, workPackageIDs, filteredSortedList)
-	if (conversionErrorResult.errors.message !== "") {
+	if (conversionErrorResult[0].errors.message !== "") {
 		return conversionErrorResult
-		// {data: outputArray, errors: error}
+		// [{ data: outputArray, errors: error }]
 	} else {
-		error = conversionErrorResult.errors
+		error = conversionErrorResult[0].errors
 	}
 
 	let retrievedListLength
@@ -1109,8 +1113,9 @@ function convertCsvAction(paramsObj) {
 		}
 	}
 
-	// console.log("convert", { data: outputArray, errors: error })
+	// console.log("convert", [{ data: outputArray, errors: error }])
 
+	// gets pushed into array, do NOT add surrounding []
 	return { data: outputArray, errors: error }
 }
 
@@ -1168,10 +1173,10 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, filterToOne
 				error.data.subject = period
 				error.data.user = wpConvertUser
 			}
-			return { data: [{ data: {} }], errors: error }
+			return [{ data: [{ data: {} }], errors: error }]
 		}
 		error.message = ""
-		return { errors: error }
+		return [{ errors: error }]
 	} else if (action === actions.convertNamesToIDs) {
 		const projectName = row.client
 		const projectIndex = findArrayIndexFromName(projectList, projectName)
@@ -1196,10 +1201,10 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, filterToOne
 					units: row.units
 				}
 			})
-			return { data: outputArray, errors: error }
+			return [{ data: outputArray, errors: error }]
 		}
 		error.message = ""
-		return { errors: error }
+		return [{ errors: error }]
 	} else if (action === actions.convertMembershipNamesToIDs) {
 		const projectName = row.client
 		const projectIndex = findArrayIndexFromName(projectList, projectName)
@@ -1212,10 +1217,10 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, filterToOne
 					role: row.role
 				}
 			})
-			return { data: outputArray, errors: error }
+			return [{ data: outputArray, errors: error }]
 		}
 		error.message = ""
-		return { errors: error }
+		return [{ errors: error }]
 	} else if (action === actions.extractTimeSheets
 		|| action === actions.summarizeUtTimeEntries
 		|| action === actions.summarizeCatTimeEntries
@@ -1224,15 +1229,15 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, filterToOne
 		if (action === actions.extractTimeSheets) {
 			if (filterToOneUserBool) {
 				error.message = ""
-				return { errors: error }
+				return [{ errors: error }]
 			}
 		}
 		if (filteredSortedList.length === 0) {
 			error.message = "error: No rows found for the selected weeks"
-			return { errors: error }
+			return [{ errors: error }]
 		}
 		error.message = ""
-		return { errors: error }
+		return [{ errors: error }]
 	} else if (action === actions.convertWeekToDays
 		|| action === actions.convertDaysToWeek
 		|| action === actions.exportTimeEntries
@@ -1243,10 +1248,11 @@ function conversionErrorSelect(action, row, rowIndex, wpConvertUser, filterToOne
 		|| action === actions.getAllWorkPackages
 		|| action === actions.getTimeEntries) {
 		error.message = ""
-		return { errors: error }
+		return [{ errors: error }]
 	} else {
 		throw new RangeError(`Invalid action: "${action}"`)
 	}
+	// does NOT get pushed to array, add surrounding []
 }
 
 function setOutputArrayData(action, row, rowIndex, i, currentDate, resultList, workPackageIDs, filteredSortedList, uniqueValuesList, clientTypesList, categoryTypesList, projectList, categoryList, workPackageList, timeEntryList, userList) {
