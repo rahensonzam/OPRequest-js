@@ -28,7 +28,7 @@ Action system for dynamic action sequences
 
 ***6***
 under extractTimesheets
-have a filter for one user
+have a filter for one user - Done
 run for multiple weeks - Done
 
 ***7***
@@ -42,7 +42,7 @@ integrate nested actions with double nested actions
 ***9***
 fix checkIfPropertyExists property
 
-***10***
+***10*** - Done
 integrate getCurrentListPartAAsync into doCurrentActionAsync,
 in other words integrate 'GET only' action
 
