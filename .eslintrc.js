@@ -11,7 +11,7 @@ module.exports = {
     "Papa": "writable"
   },
   parserOptions: {
-      "ecmaVersion": 2020,
+      "ecmaVersion": 2021,
       "sourceType": "module"
   },
   extends: [
